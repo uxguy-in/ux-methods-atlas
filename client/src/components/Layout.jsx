@@ -35,11 +35,17 @@ export default function Layout({ children }) {
   return (
     <>
       <a className="skip" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>Skip to content</a>
+      <div className="announce">
+        <div className="wrap">
+          <span>A companion to UX Brighton 2026: Emerging Methods, Friday 6 November, Brighton Dome.</span>
+          <a href="https://uxbri.org/" target="_blank" rel="noreferrer">Visit uxbri.org</a>
+        </div>
+      </div>
       <header className="site-header">
         <div className="wrap">
           <Link to="/" className="logo" aria-label="UX Methods Atlas home">
-            <span className="logo-mark" aria-hidden="true" />
-            UX Methods Atlas
+            <span className="logo-block" aria-hidden="true">UX</span>
+            <span className="logo-text">Methods Atlas<small>A UX Brighton sister site</small></span>
           </Link>
           <nav className={`nav${open ? ' open' : ''}`} aria-label="Main">
             {LINKS.map(([to, label]) => <NavLink key={to} to={to}>{label}</NavLink>)}
@@ -59,6 +65,7 @@ export default function Layout({ children }) {
           <div>
             <b>UX Methods Atlas</b>
             <p>Research is more than talking to users and reporting it.<br />Curated by Vivek Gopinath from 250+ books, papers and playbooks, with frameworks proposed by the community.</p>
+            <p className="sister">A sister site to <a href="https://uxbri.org/" target="_blank" rel="noreferrer">UX Brighton</a>.</p>
           </div>
           <nav aria-label="Footer">
             {LINKS.map(([to, label]) => <Link key={to} to={to}>{label}</Link>)}
