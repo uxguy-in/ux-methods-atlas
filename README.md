@@ -75,3 +75,7 @@ following Sauro & Lewis, *Quantifying the User Experience*. Everything runs in t
 `npm run build:pages` builds a static copy of the site into `site/`, with the data beside it and hash-based URLs, so it runs on any static host.
 `.github/workflows/pages.yml` runs that build and publishes it on every push to `main`. In the repository's
 Settings → Pages, set **Source** to **GitHub Actions** once.
+
+## Licence
+
+Code: MIT (see `LICENSE`). Method write-ups and data in `server/data/`: CC BY 4.0 (see `LICENSE-CONTENT.md`).

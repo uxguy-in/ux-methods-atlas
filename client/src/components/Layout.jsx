@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { REPO_URL } from '../vocab.js';
 
 const THEME_KEY = 'atlas-theme';
 
@@ -66,6 +67,7 @@ export default function Layout({ children }) {
             <b>UX Methods Atlas</b>
             <p>Research is more than talking to users and reporting it.<br />Curated by Vivek Gopinath from 250+ books, papers and playbooks, with frameworks proposed by the community.</p>
             <p className="sister">A sister site to <a href="https://uxbri.org/" target="_blank" rel="noreferrer">UX Brighton</a>.</p>
+            <p className="sister">Code under <a href={`${REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer">MIT</a>, method write-ups under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>.</p>
           </div>
           <nav aria-label="Footer">
             {LINKS.map(([to, label]) => <Link key={to} to={to}>{label}</Link>)}

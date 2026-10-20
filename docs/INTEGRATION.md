@@ -78,5 +78,6 @@ Rebuild after any change (`npm run build:pages` or `npm run build`).
 
 ## Licence
 
-This repository does not yet include a licence. Until one is added, ask the owner before reusing the code or data
-outside UX Brighton.
+- **Code:** MIT licence (`LICENSE`). Use, change and redistribute it freely; keep the copyright notice.
+- **Method write-ups and data** in `server/data/`: CC BY 4.0 (`LICENSE-CONTENT.md`). Reuse and adapt them, with
+  credit: "UX Methods Atlas by Vivek Gopinath, CC BY 4.0", linking back to this repository.
