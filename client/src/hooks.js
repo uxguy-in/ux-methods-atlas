@@ -4,6 +4,7 @@ import { get } from './api.js';
 export function useApi(url) {
   const [state, setState] = useState({ data: null, error: null, loading: true });
   useEffect(() => {
+    if (!url) return undefined;
     let live = true;
     setState((s) => ({ ...s, loading: true }));
     get(url)

@@ -292,11 +292,23 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .prose p { color: var(--ink-2); }
 .prose h2 { margin: 40px 0 12px; font-size: 28px; }
 
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 56px; align-items: end; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 56px; align-items: center; }
 @media (max-width: 1000px) { .hero-grid { grid-template-columns: 1fr; } }
 .unearthed { border: 2px solid var(--ink); border-radius: var(--radius); padding: 24px; background: var(--bg); }
 .unearthed-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); text-decoration: none; font-weight: 700; letter-spacing: -0.01em; }
 .unearthed-row:hover span:first-child { color: var(--accent); }
+.unearthed-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.spotlight { border-top: 1px solid var(--line); padding: 18px 0 22px; display: grid; gap: 10px; justify-items: start; }
+.spotlight-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); }
+.spotlight h2 { font-size: clamp(24px, 2.6vw, 30px); line-height: 1.12; }
+.spotlight h2 a { text-decoration: none; }
+.spotlight h2 a:hover { color: var(--accent); }
+.spotlight > p { margin: 0; color: var(--ink-2); font-size: 15.5px; line-height: 1.5; }
+.spotlight dl { margin: 4px 0 6px; display: grid; gap: 4px; font-size: 14.5px; line-height: 1.45; }
+.spotlight dt { font-size: 11.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-top: 6px; }
+.spotlight dd { margin: 0; color: var(--ink-2); }
+.unearthed-sub { margin: 0; padding: 14px 0 4px; border-top: 1px solid var(--line); font-size: 11.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.unearthed-sub + .unearthed-row { border-top: 0; }
 .view-switch { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
 .results-line .btn { margin-left: auto; }
 .method-index { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }

@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useMeta, useMethods } from '../hooks.js';
+import { useApi, useMeta, useMethods } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { STATUS, STATUS_ORDER, slug } from '../vocab.js';
+
+const clip = (t, n = 200) => (t.length > n ? `${t.slice(0, t.lastIndexOf(' ', n))}…` : t);
 
 export default function Home() {
   const { data: meta } = useMeta();
@@ -23,6 +25,18 @@ export default function Home() {
     const picked = ids.map((id) => methods?.find((m) => m.id === id)).filter(Boolean);
     return picked.length ? picked : (methods || []).filter((m) => m.status === 'unmigrated' || m.status === 'extinct').slice(0, 6);
   }, [meta, methods]);
+
+  // A different lost method on every visit, so returning visitors learn something new each time.
+  const [seed, setSeed] = useState(0);
+  const unearthed = useMemo(() => {
+    const pool = (methods || []).filter((m) => !['active', 'community'].includes(m.status) && m.summary);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    return pool.slice(0, 4);
+  }, [methods, seed]);
+  const [pick, ...more] = unearthed;
+  // The list payload is slim, so fetch the full record for the method shown in depth.
+  const { data: full } = useApi(pick ? `/api/methods/${pick.id}` : null);
+  const spotlight = full && full.id === pick?.id ? full : pick;
 
   const lost = methods ? methods.filter((m) => !['active', 'community'].includes(m.status)).length : null;
 
@@ -49,9 +63,26 @@ export default function Home() {
             <div className="stat"><b>{meta?.counts?.books ?? '—'}</b><span>source books</span></div>
           </div>
           </div>
-          <aside className="unearthed" aria-label="Unearthed methods">
-            <p className="eyebrow">Unearthed</p>
-            {featured.slice(0, 6).map((m) => (
+          <aside className="unearthed" aria-label="Unearthed methods" aria-live="polite">
+            <div className="unearthed-head">
+              <p className="eyebrow" style={{ margin: 0 }}>Unearthed for you</p>
+              <button type="button" className="btn ghost small" onClick={() => setSeed((n) => n + 1)}>Show another</button>
+            </div>
+            {spotlight ? (
+              <div className="spotlight">
+                <div className="spotlight-meta"><Status value={spotlight.status} /><span>{spotlight.family}</span></div>
+                <h2><Link to={`/methods/${spotlight.id}`}>{spotlight.name}</Link></h2>
+                <p>{spotlight.summary}</p>
+                <dl>
+                  {spotlight.whyLost && <><dt>Why it was lost</dt><dd>{clip(spotlight.whyLost)}</dd></>}
+                  {spotlight.useWhen && <><dt>Use it when</dt><dd>{clip(spotlight.useWhen)}</dd></>}
+                  {spotlight.origin && <><dt>Origin</dt><dd>{spotlight.origin}</dd></>}
+                </dl>
+                <Link to={`/methods/${spotlight.id}`} className="btn red small">Learn this method</Link>
+              </div>
+            ) : <p className="muted">Loading a method…</p>}
+            {more.length > 0 && <p className="unearthed-sub">Also worth a look</p>}
+            {more.map((m) => (
               <Link key={m.id} to={`/methods/${m.id}`} className="unearthed-row">
                 <span>{m.name}</span>
                 <Status value={m.status} />
