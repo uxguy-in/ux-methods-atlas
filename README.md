@@ -28,7 +28,7 @@ For development with hot reload: `npm run dev` (Vite on http://localhost:5173, A
 | Path | What it is |
 | --- | --- |
 | `server/index.js` | Express API and static file server |
-| `server/lib/recommend.js` | Rule-based finder: scores each method against goal, stage, access, time, evidence and expertise |
+| `server/lib/recommend.js` | Rule-based finder: scores each method against goal, material, access, time and evidence, then deals newcomer, mid-level, specialist and lost-method shelves with seeded variety |
 | `server/lib/brief.js` | AI brief: sends the brief plus the best-matching slice of the atlas to Claude (`claude-opus-5-5`) and returns a structured plan that only uses methods in the atlas |
 | `server/data/methods.json` | The methods, one record each (see schema below) |
 | `server/data/books.json` | The 253-book library, linked to the methods each book sources |
@@ -45,7 +45,7 @@ Without an API key the site still works; the finder falls back to rule-based mat
 
 `id, name, aka[], family, donor, origin, status, summary, description, steps[], outputs, useWhen, avoidWhen,
 whyLost, whereToUse, example, sources[], reference, facets{goals[], stage[], data, participants, effort, expertise,
-setting[]}, relatedIds[], bookIds[], keywords[]`
+setting[], material[]}, relatedIds[], bookIds[], keywords[]`
 
 `status` follows the taxonomy of loss from *Lost Methods in UX*: active, vestigial, siloed, renamed, latent,
 extinct, unmigrated, plus `community` for community-proposed frameworks. Community frameworks also carry

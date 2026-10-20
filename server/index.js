@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { methods, books, meta, byId, listFields } from './lib/data.js';
-import { recommend, shelve } from './lib/recommend.js';
+import { shelvesPayload } from './lib/recommend.js';
 import { generateBrief, aiAvailable } from './lib/brief.js';
 
 const app = express();
@@ -31,11 +31,8 @@ app.get('/api/methods/:id', (req, res) => {
 app.get('/api/books', (_req, res) => res.json(books));
 
 app.post('/api/recommend', (req, res) => {
-  const { answers = {}, brief = '' } = req.body || {};
-  const ranked = recommend(methods, answers, brief, 30);
-  const slim = (r) => ({ ...listFields(r.m), score: Math.round(r.score * 10) / 10, why: r.why });
-  const { primary, lost, rest } = shelve(ranked);
-  res.json({ primary: primary.map(slim), lost: lost.map(slim), rest: rest.map(slim) });
+  const { answers = {}, brief = '', seed = 1, exclude = [] } = req.body || {};
+  res.json(shelvesPayload(methods, answers, brief, seed, Array.isArray(exclude) ? exclude.slice(0, 200) : []));
 });
 
 app.post('/api/brief', async (req, res) => {

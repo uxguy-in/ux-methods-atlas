@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { post } from '../api.js';
 import { useMeta } from '../hooks.js';
@@ -16,6 +16,7 @@ const QUESTIONS = [
       { v: 'usability', label: 'Find usability problems', hint: 'Where people struggle, slip or give up', goals: ['evaluate-usability', 'diagnose-errors'] },
       { v: 'attitudes', label: 'Measure attitudes or satisfaction', hint: 'Trust, perceived ease, preference, sentiment', goals: ['measure-attitudes', 'validate-instrument'] },
       { v: 'behaviour', label: 'Measure what people actually do', hint: 'Behaviour, engagement, drift over time', goals: ['measure-behavior', 'monitor-over-time'] },
+      { v: 'compare', label: 'Compare two or more designs', hint: 'Which version works better, and by how much', goals: ['compare-designs', 'evaluate-usability'] },
       { v: 'impact', label: 'Prove a change caused an effect', hint: 'Redesign impact, A/B tests, attribution', goals: ['prove-causation', 'compare-designs'] },
       { v: 'predict', label: 'Predict performance before building', hint: 'Time on task, load, errors, without users', goals: ['predict-performance', 'model-cognition'] },
       { v: 'prioritise', label: 'Decide what to build or fix first', hint: 'Prioritisation, trade-offs, roadmap calls', goals: ['prioritize', 'decision-support'] },
@@ -24,18 +25,19 @@ const QUESTIONS = [
       { v: 'ia', label: 'Structure content and navigation', hint: 'IA, labels, findability', goals: ['information-architecture'] },
       { v: 'synthesis', label: 'Make sense of data I already have', hint: 'Transcripts, tickets, logs, survey text', goals: ['synthesize-data'] },
       { v: 'ideas', label: 'Generate ideas or futures', hint: 'Co-design, speculative and participatory work', goals: ['generate-ideas'] },
+      { v: 'share', label: 'Turn findings into decisions', hint: 'Synthesis people act on, reports, alignment', goals: ['communicate-findings', 'decision-support'] },
     ],
   },
   {
-    id: 'stage',
-    title: 'Where is the product right now?',
+    id: 'material',
+    title: 'What do you have to work with?',
+    help: 'Choose the closest. It rules out methods that need something you do not have yet.',
     options: [
-      { v: 'strategy', label: 'Strategy', hint: 'Deciding where to play' },
-      { v: 'discovery', label: 'Discovery', hint: 'Understanding people and problems' },
-      { v: 'definition', label: 'Definition', hint: 'Framing requirements and concepts' },
-      { v: 'design', label: 'Design', hint: 'Shaping and prototyping solutions' },
-      { v: 'evaluation', label: 'Evaluation', hint: 'Testing what has been designed' },
-      { v: 'post-launch', label: 'Live', hint: 'Shipped and in use' },
+      { v: 'none', label: 'Nothing built yet', hint: 'A problem space, a hunch, people to talk to' },
+      { v: 'concept', label: 'Ideas, sketches or content', hint: 'Concepts, flows, labels, copy' },
+      { v: 'prototype', label: 'A prototype or design', hint: 'Clickable or static, ready to test' },
+      { v: 'live', label: 'A live product', hint: 'Shipped and in real use' },
+      { v: 'data', label: 'Data I already have', hint: 'Analytics, logs, tickets, transcripts, survey answers' },
     ],
   },
   {
@@ -71,12 +73,13 @@ const QUESTIONS = [
     ],
   },
   {
-    id: 'expertise',
-    title: 'How comfortable is the team with rigour?',
+    id: 'level',
+    title: 'Who will run the research?',
+    help: 'You will see picks for every level. This one is shown first.',
     options: [
-      { v: 'beginner', label: 'New to research', hint: 'Keep it approachable' },
-      { v: 'intermediate', label: 'Experienced', hint: 'Comfortable with structured methods' },
-      { v: 'advanced', label: 'Methodologist', hint: 'Statistics, modelling, theory welcome' },
+      { v: 'newcomer', label: 'Someone new to research', hint: 'A designer, PM or junior researcher' },
+      { v: 'mid', label: 'A mid-level researcher', hint: 'Comfortable with structured methods' },
+      { v: 'expert', label: 'A senior or specialist', hint: 'Statistics, modelling and theory welcome' },
     ],
   },
   {
@@ -109,6 +112,26 @@ export default function Finder() {
   const [plan, setPlan] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9));
+  const shown = useRef({ key: '', ids: [] }); // methods already shown for the current answers
+  // Question transitions: the chosen answer stays visible for a beat, the question slides out,
+  // then the next one slides in from the direction of travel.
+  const [leaving, setLeaving] = useState(false);
+  const [dir, setDir] = useState(1);
+  const busyMove = useRef(false);
+  const go = (to) => {
+    if (busyMove.current || to === step) return;
+    busyMove.current = true;
+    setDir(to > step ? 1 : -1);
+    setLeaving(true);
+    setTimeout(() => {
+      setStep(to);
+      setLeaving(false);
+      busyMove.current = false;
+      const top = document.querySelector('.finder');
+      if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 200);
+  };
 
   const done = step >= QUESTIONS.length;
   const q = QUESTIONS[step];
@@ -119,10 +142,17 @@ export default function Finder() {
 
   useEffect(() => {
     if (!done) return;
-    post('/api/recommend', { answers: toAnswers(sel), brief }).then(setRecs).catch((e) => setError(e.message));
+    const key = JSON.stringify(sel);
+    if (shown.current.key !== key) shown.current = { key, ids: [] };
+    post('/api/recommend', { answers: toAnswers(sel), brief, seed, exclude: shown.current.ids }).then(setRecs).catch((e) => setError(e.message));
     // brief is applied when the AI plan is requested, not on every keystroke
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [done, sel]);
+  }, [done, sel, seed]);
+  const shuffle = () => {
+    const ids = Object.values(recs || {}).flat().map((m) => m.id);
+    shown.current.ids = [...new Set([...shown.current.ids, ...ids])];
+    setSeed((n) => n + 1);
+  };
 
   const pick = (v) => {
     if (q.multi) {
@@ -131,7 +161,7 @@ export default function Finder() {
       setSel({ ...sel, [q.id]: next });
     } else {
       setSel({ ...sel, [q.id]: v });
-      setTimeout(() => setStep((s) => s + 1), 160);
+      setTimeout(() => go(step + 1), 260);
     }
   };
 
@@ -139,11 +169,11 @@ export default function Finder() {
     setBusy(true); setError(''); setPlan(null);
     try {
       const answers = toAnswers(sel);
-      const [p, r] = await Promise.all([post('/api/brief', { answers, brief }), post('/api/recommend', { answers, brief })]);
+      const [p, r] = await Promise.all([post('/api/brief', { answers, brief }), post('/api/recommend', { answers, brief, seed })]);
       setPlan(p); setRecs(r);
     } catch (e) {
       setError(e.message);
-      post('/api/recommend', { answers: toAnswers(sel), brief }).then(setRecs).catch(() => {});
+      post('/api/recommend', { answers: toAnswers(sel), brief, seed }).then(setRecs).catch(() => {});
     } finally {
       setBusy(false);
     }
@@ -158,6 +188,7 @@ export default function Finder() {
         <div className="progress" aria-hidden="true">
           {QUESTIONS.map((_, i) => <span key={i} className={i <= step ? 'done' : ''} />)}
         </div>
+        <div key={step} className={`question-stage${leaving ? ' leaving' : ''}`} style={{ '--dir': dir }}>
         <p className="eyebrow">Question {step + 1} of {QUESTIONS.length}</p>
         <div className="question">
           <h2>{q.title}</h2>
@@ -174,11 +205,12 @@ export default function Finder() {
             })}
           </div>
         </div>
+        </div>
         <div className="finder-nav">
-          <button className="btn ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>Back</button>
+          <button className="btn ghost" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0}>Back</button>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn ghost" onClick={() => setStep((s) => s + 1)}>Skip</button>
-            {q.multi && <button className="btn" onClick={() => setStep((s) => s + 1)} disabled={!(val || []).length}>Next</button>}
+            <button className="btn ghost" onClick={() => go(step + 1)}>Skip</button>
+            {q.multi && <button className="btn" onClick={() => go(step + 1)} disabled={!(val || []).length}>Next</button>}
           </div>
         </div>
       </div>
@@ -189,7 +221,7 @@ export default function Finder() {
     const v = sel[qq.id];
     const vals = Array.isArray(v) ? v : v ? [v] : [];
     return vals.map((x) => (
-      <button key={qq.id + x} className="chip" onClick={() => setStep(i)} title="Change this answer">
+      <button key={qq.id + x} className="chip" onClick={() => { setDir(-1); setStep(i); }} title="Change this answer">
         {qq.options.find((o) => o.v === x)?.label}
       </button>
     ));
@@ -219,7 +251,7 @@ export default function Finder() {
           {meta?.static ? 'The AI research direction runs in the downloadable version with an API key. Matches here still update with your brief.' : meta && !meta.ai ? 'The AI brief is off on this server (no API key). Rule-based matches still update with your brief.' : 'Uses Claude to read your brief against the atlas.'}
         </span>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button className="btn ghost" onClick={() => post('/api/recommend', { answers: toAnswers(sel), brief }).then(setRecs)} disabled={!brief.trim()}>
+          <button className="btn ghost" onClick={() => post('/api/recommend', { answers: toAnswers(sel), brief, seed }).then(setRecs)} disabled={!brief.trim()}>
             Refine matches
           </button>
           {!meta?.static && (
@@ -233,27 +265,40 @@ export default function Finder() {
       {error && <div className="notice error" style={{ marginTop: 24 }}>{error}</div>}
       {plan && <Plan plan={plan} />}
 
-      {recs && (
-        <>
-          <section className="shelf">
-            <h2>Best fit for your answers</h2>
-            <p>The methods that match your goal, access, time and evidence needs.</p>
-            <div className="grid">{recs.primary.map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
-          </section>
-          {recs.lost.length > 0 && (
-            <section className="shelf">
-              <h2>Lost and borrowed methods to add rigour</h2>
-              <p>Forgotten, siloed or unmigrated methods that fit the same situation.</p>
-              <div className="grid">{recs.lost.map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
-            </section>
-          )}
-          {recs.rest.length > 0 && (
-            <section className="shelf">
-              <h2>Also worth a look</h2>
-              <div className="grid">{recs.rest.map((m) => <MethodCard key={m.id} m={m} />)}</div>
-            </section>
-          )}
-        </>
+      {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}
+    </div>
+  );
+}
+
+const SHELVES = [
+  { key: 'newcomer', level: 'newcomer', title: 'If you are new to research', blurb: 'Established methods with plenty of guidance, that a designer, PM or junior researcher can run well.' },
+  { key: 'mid', level: 'mid', title: 'For a mid-level researcher', blurb: 'Structured methods that take some practice and give you more depth or confidence.' },
+  { key: 'expert', level: 'expert', title: 'For a senior or specialist', blurb: 'Statistics, modelling and specialist methods for when the decision needs real rigour.' },
+];
+
+function Shelves({ recs, level, onShuffle }) {
+  const ordered = [...SHELVES].sort((a, b) => (b.level === level) - (a.level === level));
+  const empty = SHELVES.every((sh) => !recs[sh.key]?.length) && !recs.tryNext?.length;
+  return (
+    <div className="shelves">
+      <div className="shelves-head">
+        <h2 className="h2">Methods for your situation</h2>
+        <button type="button" className="btn ghost small" onClick={onShuffle}>Show different picks</button>
+      </div>
+      {empty && <p className="notice">Nothing matched all of your answers. Try skipping a question or changing the time or access you have.</p>}
+      {ordered.map((sh) => recs[sh.key]?.length > 0 && (
+        <section key={sh.key} className="shelf">
+          <h2>{sh.title}{sh.level === level && <span className="your-level">Your level</span>}</h2>
+          <p>{sh.blurb}</p>
+          <div className="grid">{recs[sh.key].map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
+        </section>
+      ))}
+      {recs.tryNext?.length > 0 && (
+        <section className="shelf">
+          <h2>What else to try</h2>
+          <p>Lost, borrowed and forgotten methods that fit the same situation and add something the usual toolkit misses.</p>
+          <div className="grid">{recs.tryNext.map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
+        </section>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 // Static stand-in for the Node API, used by the GitHub Pages build.
 // It answers the same routes from the JSON files shipped beside the page.
-import { recommend, shelve } from '../../server/lib/recommend.js';
+import { shelvesPayload } from '../../server/lib/recommend.js';
 import { listFields } from '../../server/lib/fields.js';
 
 const base = import.meta.env.BASE_URL;
@@ -35,10 +35,7 @@ export async function staticGet(url) {
 export async function staticPost(url, data = {}) {
   const { methods } = await all();
   if (url === '/api/recommend') {
-    const ranked = recommend(methods, data.answers || {}, data.brief || '', 30);
-    const slim = (r) => ({ ...listFields(r.m), score: Math.round(r.score * 10) / 10, why: r.why });
-    const { primary, lost, rest } = shelve(ranked);
-    return { primary: primary.map(slim), lost: lost.map(slim), rest: rest.map(slim) };
+    return shelvesPayload(methods, data.answers || {}, data.brief || '', data.seed || 1, data.exclude || []);
   }
   if (url === '/api/brief') {
     throw new Error('The AI research direction needs the Node version of the site with an Anthropic API key. Download it from GitHub to use it. The matches below still work here.');

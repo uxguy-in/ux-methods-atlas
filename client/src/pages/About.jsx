@@ -27,8 +27,11 @@ export default function About() {
         </p>
         <h2>How the recommendations work</h2>
         <p>
-          The finder scores every method against your goal, product stage, access to participants, time, evidence needs
-          and expertise. When you write a brief, Claude reads it alongside the best-matching slice of the atlas and
+          The finder scores every method against your goal, what you have to work with (nothing yet, sketches, a
+          prototype, a live product or existing data), access to participants, time and evidence needs. Each method is
+          tagged with its main purpose and the experience it takes, so results come in shelves for someone new to
+          research, a mid-level researcher and a specialist, plus lost methods worth trying. Close matches are shuffled
+          and spread across disciplines, so you see a different mix each time. When you write a brief, Claude reads it alongside the best-matching slice of the atlas and
           proposes a sequenced plan using only methods that exist here, so every suggestion links to a full write-up.
         </p>
         <h2>The loss taxonomy</h2>

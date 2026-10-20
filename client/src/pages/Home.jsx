@@ -102,7 +102,7 @@ export default function Home() {
           </div>
           <div className="grid">
             {[
-              ['01', 'Answer six questions', 'What you need to learn, where you are, who you can reach, how long you have and how rigorous you want to be.'],
+              ['01', 'Answer seven questions', 'What you need to learn, what you have to work with, who you can reach, how long you have and who will run it.'],
               ['02', 'Describe the problem', 'Write a short brief in your own words. The AI reads it against the whole atlas, not just the methods everyone already knows.'],
               ['03', 'Get a direction', 'A reframed problem, sharp research questions, a sequenced plan, and the lost or borrowed methods that add the rigour.'],
             ].map(([n, t, d]) => (
