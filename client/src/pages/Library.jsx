@@ -94,28 +94,20 @@ function BookList({ counts }) {
   const [genre, setGenre] = useState('');
   const [withMethods, setWithMethods] = useState(false);
   const [type, setType] = useState('');
-  const [status, setStatus] = useState('');
   const [core, setCore] = useState(false);
 
   const genres = useMemo(() => [...new Set((books || []).map((b) => b.genre).filter(Boolean))].sort(), [books]);
   const types = useMemo(() => [...new Set((books || []).map((b) => b.readingType).filter(Boolean))].sort(), [books]);
-  const statuses = useMemo(() => [...new Set((books || []).map((b) => b.readingStatus).filter(Boolean))].sort(), [books]);
-  const progress = useMemo(() => {
-    const c = { 'Reading completed': 0, 'Currently Reading': 0 };
-    for (const b of books || []) if (b.readingStatus in c) c[b.readingStatus] += 1;
-    return c;
-  }, [books]);
   const list = useMemo(() => {
     const w = q.toLowerCase();
     return (books || []).filter((b) =>
       (!genre || b.genre === genre) &&
       (!withMethods || b.methods?.length) &&
       (!type || b.readingType === type) &&
-      (!status || b.readingStatus === status) &&
       (!core || b.core) &&
       (!w || [b.title, b.fullTitle, b.author, ...(b.methods || []).map((m) => m.name)].join(' ').toLowerCase().includes(w))
     );
-  }, [books, q, genre, withMethods, type, status, core]);
+  }, [books, q, genre, withMethods, type, core]);
 
   if (!books) return <Loading error={error} />;
   return (
@@ -128,8 +120,6 @@ function BookList({ counts }) {
           <div className="stats">
             <div className="stat"><b>{books.filter((b) => b.methods?.length).length}</b><span>books with methods</span></div>
             <div className="stat"><b>{books.filter((b) => b.core).length}</b><span>80/20 core books</span></div>
-            <div className="stat"><b>{progress['Currently Reading']}</b><span>reading now</span></div>
-            <div className="stat"><b>{progress['Reading completed']}</b><span>finished</span></div>
           </div>
           <ViewSwitch view="books" counts={counts} />
         </div>
@@ -149,10 +139,6 @@ function BookList({ counts }) {
               <option value="">Any reading list</option>
               {types.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
-            <select className="select" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Reading status">
-              <option value="">Any status</option>
-              {statuses.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
             <button className={`chip${core ? ' on' : ''}`} onClick={() => setCore((v) => !v)} aria-pressed={core}>80/20 core</button>
             <button className={`chip${withMethods ? ' on' : ''}`} onClick={() => setWithMethods((v) => !v)} aria-pressed={withMethods}>Only books with methods</button>
           </div>
@@ -168,7 +154,6 @@ function BookList({ counts }) {
               <div className="by">{b.author}{b.genre ? ` · ${b.genre}` : ''}</div>
               <div className="book-meta">
                 {b.core && <span className="badge core">80/20</span>}
-                {b.readingStatus && <span className={`badge ${b.readingStatus === 'Reading completed' ? 'done' : b.readingStatus === 'Currently Reading' ? 'now' : ''}`}>{b.readingStatus}</span>}
                 {b.readingType && <span className="badge">{b.readingType}</span>}
               </div>
             </div>

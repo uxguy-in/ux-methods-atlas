@@ -58,7 +58,7 @@ export default function Layout({ children }) {
         <div className="wrap">
           <div>
             <b>UX Methods Atlas</b>
-            <p>Research is more than talking to users and reporting it.<br />Curated by Vivek Gopinath from 260+ books, papers and playbooks, with frameworks proposed by the community.</p>
+            <p>Research is more than talking to users and reporting it.<br />Curated by Vivek Gopinath from 250+ books, papers and playbooks, with frameworks proposed by the community.</p>
           </div>
           <nav aria-label="Footer">
             {LINKS.map(([to, label]) => <Link key={to} to={to}>{label}</Link>)}

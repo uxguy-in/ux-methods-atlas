@@ -5,7 +5,7 @@ import { listFields } from '../../server/lib/fields.js';
 
 const base = import.meta.env.BASE_URL;
 const files = {};
-const load = (name) => (files[name] ||= fetch(`${base}data/${name}.json`).then((r) => {
+const load = (name) => (files[name] ||= fetch(`${base}data/${name}.json?v=${__DATA_VERSION__}`).then((r) => {
   if (!r.ok) throw new Error(`Could not load ${name} (${r.status})`);
   return r.json();
 }));
