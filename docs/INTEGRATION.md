@@ -1,7 +1,7 @@
 # Integrating the UX Methods Atlas
 
 This guide is for teams, such as UX Brighton, who want to run the atlas on their own site. Everything is in this
-repository: the code, the data (1014 methods, 262 books) and the calculators.
+repository: the code, the data (1029 methods, 263 books) and the calculators.
 
 ## 1. Get the code
 
