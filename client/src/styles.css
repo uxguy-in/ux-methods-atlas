@@ -386,3 +386,4 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .sum-bars .bar { height: 10px; background: var(--bg-sunk); border-radius: 5px; overflow: hidden; }
 .sum-bars .bar i { display: block; height: 100%; background: var(--accent); }
 @media (max-width: 860px) { .exp-wrap { grid-template-columns: 1fr; } .sum-bars > div { grid-template-columns: 1fr 1fr 44px; } }
+.section[id] { scroll-margin-top: 72px; }

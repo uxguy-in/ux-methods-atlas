@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { STATUS } from './vocab.js';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Finder from './pages/Finder.jsx';
@@ -26,8 +27,15 @@ export default function App() {
         <Route path="/calculators/:calc" element={<Calculators />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/about" element={<About />} />
-        <Route path="*" element={<div className="section"><div className="wrap"><h1 className="h1">Not found</h1><p className="lede">That page does not exist.</p></div></div>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   );
+}
+
+// Old in-page links such as #vestigial land here under hash routing; send them to that status in the atlas.
+function NotFound() {
+  const key = useLocation().pathname.replace(/^\/+|\/+$/g, '');
+  if (STATUS[key]) return <Navigate to={`/methods?status=${key}`} replace />;
+  return <div className="section"><div className="wrap"><h1 className="h1">Not found</h1><p className="lede">That page does not exist.</p></div></div>;
 }

@@ -36,7 +36,7 @@ export default function Lost() {
           <div className="section-head"><div><p className="eyebrow">The taxonomy of loss</p><h2 className="h2">Six ways a method disappears.</h2></div></div>
           <div className="tax">
             {LOST.map((s) => (
-              <a key={s} href={`#${s}`} className="tax-card" style={{ '--sc': `var(--s-${s})` }}>
+              <a key={s} href={`#${s}`} onClick={(e) => { e.preventDefault(); document.getElementById(s)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className="tax-card" style={{ '--sc': `var(--s-${s})` }}>
                 <b>{byStatus[s]?.length ?? 0}</b>
                 <h3>{STATUS[s].label}</h3>
                 <p>{defs[s]?.definition || STATUS[s].short}</p>
