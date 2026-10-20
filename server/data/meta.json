@@ -1,0 +1,594 @@
+{
+ "families": [
+  {
+   "name": "Usability & Evaluation",
+   "blurb": "Testing designs with and without users: the core evaluative toolkit."
+  },
+  {
+   "name": "Field & Ethnographic",
+   "blurb": "Observation in context, from contextual inquiry to thick ethnography."
+  },
+  {
+   "name": "Interviewing & Elicitation",
+   "blurb": "Structured ways of drawing out knowledge, values and mental models."
+  },
+  {
+   "name": "Qualitative Analysis & Synthesis",
+   "blurb": "Coding, theming, matrices and theory-building done properly."
+  },
+  {
+   "name": "Research Design & Rigor",
+   "blurb": "Paradigms, sampling, validity and trustworthiness: the foundations."
+  },
+  {
+   "name": "Survey & Psychometrics",
+   "blurb": "Questionnaires and scales that measure what they claim to."
+  },
+  {
+   "name": "Experimentation & Causal Inference",
+   "blurb": "From A/B tests to econometrics: proving a change caused an effect."
+  },
+  {
+   "name": "Statistics & Modelling",
+   "blurb": "Models for behaviour, attitudes and time, beyond means and p-values."
+  },
+  {
+   "name": "Behavioral Science & Economics",
+   "blurb": "Biases, choice architecture and the economics of decisions."
+  },
+  {
+   "name": "Cognitive Psychology & Perception",
+   "blurb": "Attention, memory, perception and the limits of the mind."
+  },
+  {
+   "name": "Human Factors & Error",
+   "blurb": "Aviation, nuclear and medical methods for error and safety."
+  },
+  {
+   "name": "Task Analysis & Cognitive Modelling",
+   "blurb": "GOMS, HTA and models that predict performance before testing."
+  },
+  {
+   "name": "Information Theory, Physics & Mathematics",
+   "blurb": "Entropy, signal and noise, graphs and laws of motion applied to interfaces."
+  },
+  {
+   "name": "Game Theory & Decision Science",
+   "blurb": "Equilibria, mechanism design and structured decisions."
+  },
+  {
+   "name": "Systems & Complexity",
+   "blurb": "Feedback loops, emergence and system-level failure."
+  },
+  {
+   "name": "Epidemiology & Population Health",
+   "blurb": "Population thinking for design harm: incidence, causation, surveillance."
+  },
+  {
+   "name": "Linguistics, Semiotics & Discourse",
+   "blurb": "Meaning, metaphor, conversation and signs."
+  },
+  {
+   "name": "Computational & Machine Learning",
+   "blurb": "Topic models, clustering and sequence models for behaviour at scale."
+  },
+  {
+   "name": "Neuro, Biometrics & Affect",
+   "blurb": "Physiological and affective measurement."
+  },
+  {
+   "name": "Information Architecture & Content",
+   "blurb": "Structure, findability, language and content."
+  },
+  {
+   "name": "Participatory, Design & Futures",
+   "blurb": "Co-design, speculative design and futures methods."
+  },
+  {
+   "name": "Product Analytics & Strategy",
+   "blurb": "Funnels, cohorts, frameworks and product decisions."
+  },
+  {
+   "name": "Original Frameworks (Vivek Gopinath)",
+   "blurb": "Frameworks developed by Vivek Gopinath for rigorous, forward-looking research."
+  }
+ ],
+ "lossTaxonomy": [
+  {
+   "status": "extinct",
+   "label": "Type 1 — Extinct",
+   "definition": "No current practitioners; knowledge exists only in historical literature. The original methodological community has dissolved.",
+   "examples": [
+    "GOMS / KLM",
+    "CPM-GOMS",
+    "Link Analysis",
+    "UFMEA",
+    "Claims Analysis",
+    "Five-Model Work Modelling",
+    "Repertory Grid Technique",
+    "Lag Sequential Analysis",
+    "Mayhew Usability Engineering Lifecycle"
+   ]
+  },
+  {
+   "status": "vestigial",
+   "label": "Type 2 — Vestigial",
+   "definition": "Practiced in reduced or distorted form; the original intent and theoretical grounding have been lost, leaving only a surface procedure.",
+   "examples": [
+    "Cognitive Walkthrough",
+    "Contextual Inquiry",
+    "Diary Studies",
+    "Think-aloud testing (vs Verbal Protocol Analysis)",
+    "Card Sorting",
+    "Affinity Diagramming",
+    "Braun & Clarke Thematic Analysis",
+    "Discount Usability Testing",
+    "Paper Prototyping",
+    "Participatory Design"
+   ]
+  },
+  {
+   "status": "siloed",
+   "label": "Type 3 — Siloed",
+   "definition": "Active in academic or specialist contexts; absent from industry practice. The knowledge exists but does not circulate.",
+   "examples": [
+    "Ethnographic thick description",
+    "Activity Theory",
+    "Environmental Psychology",
+    "Cognitive Work Analysis",
+    "STAMP / STPA",
+    "Signal Detection Theory",
+    "Naturalistic Decision Making",
+    "IRT / Rasch"
+   ]
+  },
+  {
+   "status": "renamed",
+   "label": "Type 4 — Renamed",
+   "definition": "Rebranded under new terminology; origins unacknowledged. The method continues under a different name without credit or theoretical connection to its origins.",
+   "examples": [
+    "Time-and-motion and task analysis surviving as 'task flows' and journey maps",
+    "Critical incident analysis absorbed into thematic coding",
+    "Scientific management decomposition in 'friction' audits"
+   ]
+  },
+  {
+   "status": "latent",
+   "label": "Type 5 — Latent",
+   "definition": "Known but rarely used; infrastructure for revival exists. The method is in memory but not in practice.",
+   "examples": [
+    "Wizard of Oz Prototyping",
+    "Bayesian inference",
+    "LDA topic modelling",
+    "Concept mapping"
+   ]
+  },
+  {
+   "status": "unmigrated",
+   "label": "Unmigrated (extended edition)",
+   "definition": "Not lost in the strict sense: rigorous tools that exist in neighbouring fields and that UX practice could use today but never adopted in the first place.",
+   "examples": [
+    "Bradford Hill criteria",
+    "Rubin Causal Model",
+    "DAGs",
+    "Difference-in-Differences",
+    "Regression Discontinuity",
+    "Instrumental Variables",
+    "Q Methodology",
+    "Phenomenography",
+    "Micro-phenomenology",
+    "NMF",
+    "HMM",
+    "Multilevel modelling",
+    "Proxemics",
+    "Causal loop diagrams",
+    "Social network analysis"
+   ]
+  }
+ ],
+ "causesOfDeath": [
+  {
+   "name": "Complexity Exceeds Organisational Patience",
+   "explanation": "Powerful methods need training, time, coordination and sustained effort; when pressure intensifies they are the first to be simplified or abandoned. Contextual inquiry was not abandoned because it failed but because it demanded too much."
+  },
+  {
+   "name": "Technological Displacement",
+   "explanation": "New interaction paradigms make some methods obsolete or require adaptation (desktop to mobile, software to embedded). A legitimate cause of evolution that often produces death where adaptation would be more appropriate."
+  },
+  {
+   "name": "Paradigm Shift in the Field",
+   "explanation": "New theoretical frameworks render methods invisible: the 1990s shift from cognitive to social perspectives deprioritised cognitive-model methods; agile marginalised sequential research methods. Valid methods vanish because their framework is no longer fashionable."
+  },
+  {
+   "name": "Loss of Training Infrastructure",
+   "explanation": "Methods survive only while practitioners and institutions teach them. When curricula move on, specialist consultancies close or key textbooks go out of print, the method loses its reproductive capacity (GOMS is in every HCI history but almost no programme teaches its application)."
+  },
+  {
+   "name": "Competitive Displacement by Faster Methods",
+   "explanation": "Simpler, faster methods win in the market for research; the value of richer output is hard to demonstrate while the cost difference is obvious. The selection pressure is systematic and favours speed over validity."
+  },
+  {
+   "name": "Failed Replication and Validity Concerns",
+   "explanation": "Some methods decline because replication fails or assumptions are challenged, a legitimate cause. The problem is distinguishing genuine validity failure from implementation failure: hard-to-implement methods give inconsistent results when done badly, which is misread as invalidity."
+  },
+  {
+   "name": "Fashion and Novelty Preference",
+   "explanation": "New methods gain cultural cachet independent of value while established ones become unfashionable through familiarity, systematically disadvantaging older methods regardless of utility."
+  }
+ ],
+ "epidemiologyGlossary": [
+  {
+   "term": "UX Epidemiology",
+   "definition": "The systematic application of epidemiological thinking (concepts, methods and models) to the study of user experience at the population level."
+  },
+  {
+   "term": "UX Pathogen",
+   "definition": "A design feature, pattern or system property that causes measurable harm to user experience; analogue: biological pathogen (virus, bacterium)."
+  },
+  {
+   "term": "UX Host",
+   "definition": "A user or population of users susceptible to the effects of a UX pathogen. Susceptibility varies by individual characteristics (literacy, age, familiarity with conventions) and contextual factors; analogue: human host."
+  },
+  {
+   "term": "UX Vector",
+   "definition": "The mechanism or channel through which a UX pathogen spreads: design plagiarism, shared component libraries, industry conventions, regulatory structures and market/platform pressure; analogue: transmission vector (mosquito, air, water)."
+  },
+  {
+   "term": "UX Morbidity",
+   "definition": "Harm experienced by users as a result of exposure to a UX pathogen, measured as task failure, decision error, wasted time, financial loss, emotional distress or other user-meaningful outcomes; analogue: disease morbidity."
+  },
+  {
+   "term": "UX Mortality",
+   "definition": "In severe cases, the complete destruction of a user's ability to accomplish a goal, or in high-stakes domains (medical, legal, financial) a contribution to physical harm or death; analogue: death."
+  },
+  {
+   "term": "UX Incidence",
+   "definition": "The rate of new UX harm events in a population over a defined time period; analogue: disease incidence."
+  },
+  {
+   "term": "UX Prevalence",
+   "definition": "The proportion of a population currently experiencing UX harm, as a point-in-time or period measure; analogue: disease prevalence."
+  },
+  {
+   "term": "UX Herd Immunity",
+   "definition": "A state of the design ecosystem in which structural factors (standards, regulation, professional norms, user literacy) make it difficult for harmful design patterns to spread and persist; pursued via individual, product-level and ecosystem-level protection."
+  },
+  {
+   "term": "Iatrogenic UX Harm",
+   "definition": "Design harm caused by an intervention (regulatory, organisational or technical) intended to protect users; the cookie consent epidemic is the canonical example."
+  },
+  {
+   "term": "UXDAI",
+   "definition": "UX Disability-Adjusted Interaction: a composite measure combining time cost and quality-of-experience cost of UX failures into a single population-level unit, weighted by interaction importance and failure severity; analogue: DALY."
+  },
+  {
+   "term": "UX Burden of Design",
+   "definition": "Framework for quantifying harm from poor UX across populations in time lost, financial harm and quality-of-experience impairment; analogue: Global Burden of Disease (WHO/IHME)."
+  },
+  {
+   "term": "Basic Reproduction Number (R0)",
+   "definition": "The average number of additional products that adopt a design pattern for each product that first deploys it; a measure of pattern transmissibility. High-R0 harmful patterns (roach motel, confirmshaming, hidden costs) are regulatory priorities."
+  },
+  {
+   "term": "SIR Model (UX)",
+   "definition": "Susceptible-Infected-Recovered model adapted to UX: products that have not adopted a pattern (susceptible), have adopted it (infected), or adopted then abandoned it under regulatory or reputational pressure (recovered/resistant)."
+  },
+  {
+   "term": "Super-spreader (UX)",
+   "definition": "Highly connected nodes (large platforms, design system providers, influential design publications) with disproportionate influence on pattern spread; priority intervention targets."
+  },
+  {
+   "term": "Type I Cognitive Pathogen",
+   "definition": "Patterns exploiting or overwhelming attention, working memory, decision-making under uncertainty or framing susceptibility; most dark patterns."
+  },
+  {
+   "term": "Type II Information Architecture Pathogen",
+   "definition": "Organisational structures that systematically prevent users finding what they need (inconsistent navigation, buried information, misleading categorisation); spread via templates, platforms and CMSs."
+  },
+  {
+   "term": "Type III Interaction Pattern Pathogen",
+   "definition": "Interaction conventions creating systematic errors (misleading affordances, uninformative feedback, invisible status); can mutate when copied into unsafe contexts."
+  },
+  {
+   "term": "Type IV Systemic Pathogen",
+   "definition": "Structural features of platforms, organisations or industries that produce poor UX across many products; not localised in any interface element."
+  },
+  {
+   "term": "Host Factors / Differential Susceptibility",
+   "definition": "Factors determining susceptibility to UX pathogens: digital literacy; cognitive load; emotional state and stress; time pressure and resources; prior experience; age and generational familiarity; language and culture; disability and accessibility needs; socioeconomic factors affecting device and connectivity."
+  },
+  {
+   "term": "Design Plagiarism (vector)",
+   "definition": "Copying patterns from successful products without understanding the contextual conditions under which they function safely."
+  },
+  {
+   "term": "Component Libraries (vector)",
+   "definition": "Shared UI libraries and design systems (e.g. Bootstrap, Material Design) that transmit good and bad patterns at scale and velocity."
+  },
+  {
+   "term": "Industry Conventions (vector)",
+   "definition": "Normalisation of patterns within an industry; harmful conventions acquire 'epidemiological immunity' as users, regulators and competitors accept them."
+  },
+  {
+   "term": "Platform Pressure (vector)",
+   "definition": "Technical constraints, monetisation models and requirements of host platforms (app stores, ad specs, payment rules) pushing products toward harmful patterns."
+  },
+  {
+   "term": "Passive Surveillance (UX)",
+   "definition": "Behavioural analytics instrumented to detect specific UX failure events as a by-product of normal use; analogue: hospital discharge data, lab reporting."
+  },
+  {
+   "term": "Active Surveillance (UX)",
+   "definition": "Periodic structured assessment of representative user populations using standard task batteries, exposure measures and harm reports."
+  },
+  {
+   "term": "Sentinel Surveillance (UX)",
+   "definition": "Intensive, standardised monitoring of a few high-harm domains (financial services, healthcare, government, employment platforms)."
+  },
+  {
+   "term": "Outbreak Investigation (UX)",
+   "definition": "Establish a case definition, describe by person/place/time, develop and test hypotheses about source, implement and evaluate control measures."
+  },
+  {
+   "term": "UX Vaccination / Design Literacy",
+   "definition": "Digital design literacy as a vaccine: inoculation materials that let users recognise and resist manipulative patterns without first being harmed, grounded in inoculation theory."
+  },
+  {
+   "term": "Positive Contagion",
+   "definition": "The spread of good design through awards, open design systems, business-value case studies and regulatory floors; interventions should raise good design's R0."
+  },
+  {
+   "term": "UX Health Equity Metrics",
+   "definition": "Measures of how UX harm is distributed across demographic groups (age, education, literacy, language, disability)."
+  },
+  {
+   "term": "Lost Method",
+   "definition": "A systematic approach to UX that (a) was once practised with regularity and rigour, (b) has largely disappeared from contemporary practice, and (c) retains significant potential value if recovered."
+  },
+  {
+   "term": "Dark Pattern",
+   "definition": "A user interface design that tricks users into doing things they did not intend; a primary category of UX pathogen."
+  }
+ ],
+ "priorityIndex": [
+  {
+   "method": "GOMS / KLM",
+   "evidence": 5,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Contextual Inquiry (full)",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Verbal Protocol Analysis",
+   "evidence": 5,
+   "feasibility": 4,
+   "impact": 3,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Cognitive Walkthrough (orig.)",
+   "evidence": 4,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Bradford Hill Criteria",
+   "evidence": 5,
+   "feasibility": 5,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Rubin Causal Model",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Directed Acyclic Graphs",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Difference-in-Differences",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Multilevel Modelling",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Signal Detection Theory",
+   "evidence": 5,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Repertory Grid Technique",
+   "evidence": 4,
+   "feasibility": 4,
+   "impact": 3,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Work Modeling (5-model)",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Lag Sequential Analysis",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Participatory Design (orig.)",
+   "evidence": 4,
+   "feasibility": 2,
+   "impact": 4,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Wizard of Oz Prototyping",
+   "evidence": 4,
+   "feasibility": 5,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Claims Analysis",
+   "evidence": 3,
+   "feasibility": 4,
+   "impact": 3,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Grounded Theory in UX",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "UFMEA",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Experience Sampling (ESM)",
+   "evidence": 5,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "NMF / Behavioural ML",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "IRT / Rasch Model",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Micro-Phenomenology",
+   "evidence": 3,
+   "feasibility": 3,
+   "impact": 3,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Environmental Psychology",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "CPM-GOMS",
+   "evidence": 5,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "NDM / Recognition-Primed",
+   "evidence": 4,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Braun & Clarke (full)",
+   "evidence": 5,
+   "feasibility": 5,
+   "impact": 5,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Miles & Huberman",
+   "evidence": 5,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  },
+  {
+   "method": "Q Methodology",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 3,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "CWA",
+   "evidence": 5,
+   "feasibility": 2,
+   "impact": 5,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "STAMP / STPA",
+   "evidence": 5,
+   "feasibility": 2,
+   "impact": 5,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Link Analysis",
+   "evidence": 4,
+   "feasibility": 5,
+   "impact": 3,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Activity Theory methods",
+   "evidence": 4,
+   "feasibility": 3,
+   "impact": 4,
+   "priority": "MEDIUM"
+  },
+  {
+   "method": "Diary Studies (full rigor)",
+   "evidence": 4,
+   "feasibility": 4,
+   "impact": 4,
+   "priority": "HIGH"
+  }
+ ],
+ "featured": [
+  "error-taxonomy-slips-lapses-mistakes",
+  "bradford-hill-criteria",
+  "cpm-goms",
+  "use-failure-modes-and-effects-analysis-ufmea",
+  "rubin-causal-model-potential-outcomes",
+  "repertory-grid-technique"
+ ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "ux-methods-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A deep atlas of UX research methods, lost methods and cross-domain borrowings, with a guided method finder and an AI research brief.",
+  "type": "module",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c auto \"node --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "check:data": "node server/scripts/check-data.js",
+    "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.1.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1",
+    "vite": "^6.4.1"
+  }
+}
