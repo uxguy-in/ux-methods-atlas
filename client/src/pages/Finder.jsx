@@ -8,6 +8,7 @@ import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitor
 const QUESTIONS = [
   {
     id: 'goal',
+    short: 'What you need to find out',
     title: 'What do you need to find out?',
     help: 'Pick up to two. This matters most.',
     multi: 2,
@@ -31,6 +32,7 @@ const QUESTIONS = [
   },
   {
     id: 'material',
+    short: 'What you have',
     title: 'What do you have to work with?',
     help: 'Choose the closest. It rules out methods that need something you do not have yet.',
     options: [
@@ -43,6 +45,7 @@ const QUESTIONS = [
   },
   {
     id: 'participants',
+    short: 'Who you can reach',
     title: 'Who or what can you get access to?',
     options: [
       { v: 'none', label: 'Nobody, just the team', hint: 'Expert and analytical methods' },
@@ -55,6 +58,7 @@ const QUESTIONS = [
   },
   {
     id: 'time',
+    short: 'Time',
     title: 'How long do you have?',
     options: [
       { v: 'hours', label: 'Hours', hint: 'Today' },
@@ -65,6 +69,7 @@ const QUESTIONS = [
   },
   {
     id: 'data',
+    short: 'Evidence that convinces',
     title: 'What kind of evidence will convince people?',
     options: [
       { v: 'qualitative', label: 'Stories and depth', hint: 'Qualitative' },
@@ -75,6 +80,7 @@ const QUESTIONS = [
   },
   {
     id: 'level',
+    short: 'Who runs it',
     title: 'Who will run the research?',
     help: 'You will see picks for every level. This one is shown first.',
     options: [
@@ -85,6 +91,7 @@ const QUESTIONS = [
   },
   {
     id: 'appetite',
+    short: 'How adventurous',
     title: 'How adventurous should the advice be?',
     options: [
       { v: 'proven', label: 'Stick to proven methods', hint: 'What most teams use today' },
@@ -105,9 +112,9 @@ function toAnswers(sel) {
 export default function Finder() {
   const { data: meta } = useMeta();
   const [step, setStep] = useState(0);
-  const [sel, setSel] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(STORE)) || {}; } catch { return {}; }
-  });
+  // Every visit starts blank, so no answer appears chosen before the person chooses it.
+  const [sel, setSel] = useState({});
+  const [editing, setEditing] = useState(false); // changing one answer from the summary
   const [brief, setBrief] = useState('');
   const [recs, setRecs] = useState(null);
   const [plan, setPlan] = useState(null);
@@ -135,11 +142,14 @@ export default function Finder() {
   };
 
   const done = step >= QUESTIONS.length;
+  // After a change made from the summary, go straight back to it instead of through the rest.
+  const advance = () => { if (editing) { setEditing(false); go(QUESTIONS.length); } else go(step + 1); };
+  const change = (i) => { setEditing(true); go(i); };
   const q = QUESTIONS[step];
 
   useEffect(() => {
-    try { sessionStorage.setItem(STORE, JSON.stringify(sel)); } catch { /* storage unavailable */ }
-  }, [sel]);
+    try { sessionStorage.removeItem(STORE); } catch { /* answers were kept here by earlier versions */ }
+  }, []);
 
   useEffect(() => {
     if (!done) return;
@@ -162,7 +172,7 @@ export default function Finder() {
       setSel({ ...sel, [q.id]: next });
     } else {
       setSel({ ...sel, [q.id]: v });
-      setTimeout(() => go(step + 1), 260);
+      setTimeout(() => advance(), 260);
     }
   };
 
@@ -189,10 +199,11 @@ export default function Finder() {
     }
   }
 
-  const reset = () => { setSel({}); setStep(0); setRecs(null); setPlan(null); setBrief(''); };
+  const reset = () => { setSel({}); setEditing(false); setDir(-1); setStep(0); setRecs(null); setPlan(null); setBrief(''); };
 
   if (!done) {
     const val = sel[q.id];
+    const hasAnswer = Array.isArray(val) ? val.length > 0 : Boolean(val);
     return (
       <div className="wrap finder">
         <div className="progress" aria-hidden="true">
@@ -202,7 +213,7 @@ export default function Finder() {
         <p className="eyebrow">Question {step + 1} of {QUESTIONS.length}</p>
         <div className="question">
           <h2>{q.title}</h2>
-          <p className="help">{q.help || 'Choose one. You can skip any question.'}</p>
+          <p className="help">{q.help || 'Choose one, or skip it if it does not matter.'}</p>
           <div className="options" role={q.multi ? 'group' : 'radiogroup'} aria-label={q.title}>
             {q.options.map((o) => {
               const on = q.multi ? (val || []).includes(o.v) : val === o.v;
@@ -216,38 +227,54 @@ export default function Finder() {
           </div>
         </div>
         </div>
-        <div className="finder-nav">
-          <button className="btn ghost" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0}>Back</button>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn ghost" onClick={() => go(step + 1)}>Skip</button>
-            {q.multi && <button className="btn" onClick={() => go(step + 1)} disabled={!(val || []).length}>Next</button>}
+        <div className="finder-nav question-nav">
+          {editing
+            ? <button className="btn ghost" onClick={() => { setEditing(false); go(QUESTIONS.length); }}>Back to your answers</button>
+            : <button className="btn ghost" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0}>Back</button>}
+          <div className="question-nav-end">
+            <button type="button" className="skip-link" onClick={() => { setSel({ ...sel, [q.id]: undefined }); advance(); }}>
+              {editing ? 'Clear this answer' : 'Skip this question'}
+            </button>
+            {(q.multi || hasAnswer) && (
+              <button className="btn accent" onClick={advance} disabled={!hasAnswer}>
+                {editing ? 'Save' : step === QUESTIONS.length - 1 ? 'See methods' : 'Next'}
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  const chips = QUESTIONS.flatMap((qq, i) => {
-    const v = sel[qq.id];
-    const vals = Array.isArray(v) ? v : v ? [v] : [];
-    return vals.map((x) => (
-      <button key={qq.id + x} className="chip" onClick={() => { setDir(-1); setStep(i); }} title="Change this answer">
-        {qq.options.find((o) => o.v === x)?.label}
-      </button>
-    ));
-  });
-
   return (
     <div className="wrap finder">
-      <p className="eyebrow">Your brief</p>
-      <h1 className="h1" style={{ maxWidth: '16ch' }}>Now tell it what's going on.</h1>
-      <p className="lede" style={{ margin: '18px 0 26px' }}>
+      <div className="question-stage finder-done" style={{ '--dir': dir }}>
+      <div className="progress" aria-hidden="true">
+        {QUESTIONS.map((_, i) => <span key={i} className="done" />)}
+      </div>
+      <p className="eyebrow">Your answers</p>
+      <h1 className="h1" style={{ maxWidth: '18ch' }}>Here is what you told us.</h1>
+      <p className="lede" style={{ margin: '14px 0 22px' }}>Change any answer and the methods below update straight away.</p>
+      <dl className="answers-list">
+        {QUESTIONS.map((qq, i) => {
+          const v = sel[qq.id];
+          const vals = (Array.isArray(v) ? v : v ? [v] : []).map((x) => qq.options.find((o) => o.v === x)?.label).filter(Boolean);
+          return (
+            <div key={qq.id} className="answers-row">
+              <dt>{qq.short}</dt>
+              <dd className={vals.length ? '' : 'skipped'}>{vals.length ? vals.join(', ') : 'Skipped'}</dd>
+              <button type="button" className="btn ghost small" onClick={() => change(i)}>Change</button>
+            </div>
+          );
+        })}
+      </dl>
+      <button type="button" className="skip-link" onClick={reset} style={{ marginTop: 12 }}>Start over</button>
+
+      <p className="eyebrow" style={{ marginTop: 48 }}>Your brief</p>
+      <h2 className="h2" style={{ maxWidth: '20ch' }}>Now tell it what's going on.</h2>
+      <p className="lede" style={{ margin: '14px 0 22px' }}>
         Describe the product, the problem and the decision you need to make. Plain words are fine.
       </p>
-      <div className="answers-summary">
-        {chips}
-        <button className="chip" onClick={reset}>Start over</button>
-      </div>
       <label htmlFor="brief" className="eyebrow" style={{ display: 'block', color: 'var(--ink-3)' }}>Problem brief</label>
       <textarea
         id="brief"
@@ -284,6 +311,7 @@ export default function Finder() {
       {plan && <Plan plan={plan} />}
 
       {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}
+      </div>
     </div>
   );
 }
