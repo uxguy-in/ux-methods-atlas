@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useMeta, useMethods } from '../hooks.js';
+import { useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
 import { DATA, EFFORT, GOALS, STAGES, STATUS, STATUS_ORDER, VALIDATION, slug } from '../vocab.js';
@@ -17,7 +17,7 @@ export default function Atlas() {
   const { data: methods, error } = useMethods();
   const { data: meta } = useMeta();
   const [params, setParams] = useSearchParams();
-  const [limit, setLimit] = useState(PAGE);
+  const [limit, setLimit] = useRemembered('limit', PAGE);
 
   const q = params.get('q') || '';
   const f = {

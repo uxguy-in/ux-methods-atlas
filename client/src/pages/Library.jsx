@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useApi, useMethods } from '../hooks.js';
+import { useApi, useMethods, useRemembered } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status } from '../components/MethodCard.jsx';
 
@@ -8,7 +8,7 @@ function csvCell(v) { return `"${String(v ?? '').replace(/"/g, '""')}"`; }
 
 function MethodIndex() {
   const { data: methods, error } = useMethods();
-  const [q, setQ] = useState('');
+  const [q, setQ] = useRemembered('q', '');
   const numbered = useMemo(() => [...(methods || [])]
     .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
     .map((m, i) => ({ ...m, n: i + 1 })), [methods]);
@@ -90,11 +90,11 @@ export default function Library() {
 function BookList({ counts }) {
   const { data: books, error } = useApi('/api/books');
   const [params] = useSearchParams();
-  const [q, setQ] = useState(params.get('q') || '');
-  const [genre, setGenre] = useState('');
-  const [withMethods, setWithMethods] = useState(false);
-  const [type, setType] = useState('');
-  const [core, setCore] = useState(false);
+  const [q, setQ] = useRemembered('q', params.get('q') || '');
+  const [genre, setGenre] = useRemembered('genre', '');
+  const [withMethods, setWithMethods] = useRemembered('withMethods', false);
+  const [type, setType] = useRemembered('type', '');
+  const [core, setCore] = useRemembered('core', false);
 
   const genres = useMemo(() => [...new Set((books || []).map((b) => b.genre).filter(Boolean))].sort(), [books]);
   const types = useMemo(() => [...new Set((books || []).map((b) => b.readingType).filter(Boolean))].sort(), [books]);

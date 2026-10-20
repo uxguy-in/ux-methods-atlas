@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useApi, useMeta, useMethods } from '../hooks.js';
+import { useApi, useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { STATUS, STATUS_ORDER, slug } from '../vocab.js';
 
@@ -27,12 +27,15 @@ export default function Home() {
   }, [meta, methods]);
 
   // A different lost method on every visit, so returning visitors learn something new each time.
-  const [seed, setSeed] = useState(0);
-  const unearthed = useMemo(() => {
-    const pool = (methods || []).filter((m) => !['active', 'community'].includes(m.status) && m.summary);
+  // Coming back to the home page with Back shows the same ones, so nobody loses the method they were reading.
+  const [shownIds, setShownIds] = useRemembered('unearthed', null);
+  const shuffleIds = () => {
+    const pool = (methods || []).filter((m) => !['active', 'community'].includes(m.status) && m.summary).map((m) => m.id);
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
     return pool.slice(0, 4);
-  }, [methods, seed]);
+  };
+  useEffect(() => { if (methods && !shownIds) setShownIds(shuffleIds()); }, [methods, shownIds]); // eslint-disable-line react-hooks/exhaustive-deps
+  const unearthed = useMemo(() => (shownIds || []).map((id) => methods?.find((m) => m.id === id)).filter(Boolean), [methods, shownIds]);
   const [pick, ...more] = unearthed;
   // The list payload is slim, so fetch the full record for the method shown in depth.
   const { data: full } = useApi(pick ? `/api/methods/${pick.id}` : null);
@@ -66,7 +69,7 @@ export default function Home() {
           <aside className="unearthed" aria-label="Unearthed methods" aria-live="polite">
             <div className="unearthed-head">
               <p className="eyebrow" style={{ margin: 0 }}>Unearthed for you</p>
-              <button type="button" className="btn ghost small" onClick={() => setSeed((n) => n + 1)}>Show another</button>
+              <button type="button" className="btn ghost small" onClick={() => setShownIds(shuffleIds())}>Show another</button>
             </div>
             {spotlight ? (
               <div className="spotlight">

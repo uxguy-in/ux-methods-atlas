@@ -1,4 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { cameFrom } from '../nav-trail.js';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status } from '../components/MethodCard.jsx';
@@ -9,6 +10,9 @@ const paras = (t) => (t || '').split(/\n{2,}/).filter(Boolean);
 export default function Method() {
   const { id } = useParams();
   const { data: m, error } = useApi(`/api/methods/${id}`);
+  const { key } = useLocation();
+  const navigate = useNavigate();
+  const from = cameFrom(key);
   if (!m) return <Loading error={error} />;
   const f = m.facets || {};
   const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
@@ -17,6 +21,11 @@ export default function Method() {
     <>
       <section className="method-hero">
         <div className="wrap">
+          {from && (
+            <button type="button" className="back-link" onClick={() => navigate(-1)}>
+              <span aria-hidden="true">←</span> Back to {from.label}
+            </button>
+          )}
           <div className="crumbs">
             <Link to="/methods">Atlas</Link><span>/</span>
             <Link to={`/methods?family=${slug(m.family)}`}>{m.family}</Link>

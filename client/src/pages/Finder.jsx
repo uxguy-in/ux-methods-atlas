@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { post } from '../api.js';
-import { useMeta } from '../hooks.js';
+import { useMeta, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
@@ -111,16 +111,16 @@ function toAnswers(sel) {
 
 export default function Finder() {
   const { data: meta } = useMeta();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useRemembered('step', 0);
   // Every visit starts blank, so no answer appears chosen before the person chooses it.
-  const [sel, setSel] = useState({});
-  const [editing, setEditing] = useState(false); // changing one answer from the summary
-  const [brief, setBrief] = useState('');
+  const [sel, setSel] = useRemembered('answers', {});
+  const [editing, setEditing] = useRemembered('editing', false); // changing one answer from the summary
+  const [brief, setBrief] = useRemembered('brief', '');
   const [recs, setRecs] = useState(null);
-  const [plan, setPlan] = useState(null);
+  const [plan, setPlan] = useRemembered('plan', null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9));
+  const [seed, setSeed] = useRemembered('seed', () => Math.floor(Math.random() * 1e9));
   const shown = useRef({ key: '', ids: [] }); // methods already shown for the current answers
   // Question transitions: the chosen answer stays visible for a beat, the question slides out,
   // then the next one slides in from the direction of travel.

@@ -497,3 +497,11 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
   .answer-chip { white-space: nowrap; }
   .answers-bar .skip-link { white-space: nowrap; flex: none; }
 }
+
+/* Method page: return to the page the visitor came from */
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 6px 0;
+  background: none; border: 0; font: 700 15px var(--font); color: var(--accent); cursor: pointer;
+}
+.back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.back-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

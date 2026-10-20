@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigationType } from 'react-router-dom';
+import { noteLocation } from '../nav-trail.js';
 import { REPO_URL } from '../vocab.js';
 
 const THEME_KEY = 'atlas-theme';
@@ -27,11 +28,49 @@ const LINKS = [
   ['/about', 'About'],
 ];
 
+const scrollKey = (loc) => `atlas-scroll:${loc.key}:${loc.pathname}${loc.search}`;
+
+// New pages open at the top; Back and Forward return to where the visitor was on that page.
+function useScrollMemory(loc, navType) {
+  const lastPath = useRef(null);
+  // A layout effect, so the old page stops recording before the new page's shorter height clamps the scroll.
+  useLayoutEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    let frame = 0;
+    const saveNow = () => { try { sessionStorage.setItem(scrollKey(loc), String(Math.round(scrollY))); } catch { /* storage unavailable */ } };
+    const save = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(saveNow); };
+    // Also save on click, so the position is stored even when a link is followed mid-scroll.
+    addEventListener('scroll', save, { passive: true });
+    addEventListener('click', saveNow, true);
+    return () => { cancelAnimationFrame(frame); removeEventListener('scroll', save); removeEventListener('click', saveNow, true); };
+  }, [loc.key, loc.pathname, loc.search]);
+  useEffect(() => {
+    const pageChanged = lastPath.current !== loc.pathname;
+    lastPath.current = loc.pathname;
+    if (navType !== 'POP') { if (pageChanged) scrollTo(0, 0); return undefined; }
+    let y = 0;
+    try { y = Number(sessionStorage.getItem(scrollKey(loc))) || 0; } catch { /* storage unavailable */ }
+    if (!y) { if (pageChanged) scrollTo(0, 0); return undefined; }
+    // Pages load their data after rendering, so wait until there is enough page to scroll to.
+    const start = performance.now();
+    let frame = requestAnimationFrame(function tryRestore() {
+      const room = document.documentElement.scrollHeight - innerHeight;
+      if (room >= y || performance.now() - start > 2500) { scrollTo(0, Math.min(y, room)); return; }
+      frame = requestAnimationFrame(tryRestore);
+    });
+    return () => cancelAnimationFrame(frame);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loc.key, loc.pathname]);
+}
+
 export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
   const [isDark, toggle] = useTheme();
-  const { pathname } = useLocation();
-  useEffect(() => { setOpen(false); window.scrollTo(0, 0); }, [pathname]);
+  const loc = useLocation();
+  const navType = useNavigationType();
+  noteLocation(loc, navType);
+  useScrollMemory(loc, navType);
+  useEffect(() => { setOpen(false); }, [loc.pathname]);
 
   return (
     <>
