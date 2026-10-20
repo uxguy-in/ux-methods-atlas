@@ -8,7 +8,7 @@ a form for the community to submit methods.
 
 ## Use it online
 
-The public version runs on GitHub Pages at https://uxguy-in.github.io/ux-methods-atlas/. It has every method, the finder and the library. The AI research direction needs a server and an API key, so it only runs in the downloaded version.
+The public version runs on GitHub Pages at https://uxguy-in.github.io/ux-methods-atlas/. It has every method, the finder and the library. The AI research direction works there too: each visitor uses their own Anthropic API key, which stays in their browser and is sent only to Anthropic.
 
 ## Run it
 
@@ -35,11 +35,16 @@ For development with hot reload: `npm run dev` (Vite on http://localhost:5173, A
 | `server/data/meta.json` | Disciplines, loss taxonomy, causes of method death, UX epidemiology glossary |
 | `client/` | React app (Vite). Theme tokens are at the top of `client/src/styles.css` |
 
+## Using it on another site
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md) for hosting it as a static folder, embedding it, or running the
+Node server, and for how API keys and billing work in each case.
+
 ## The AI brief
 
 The `/api/brief` endpoint uses the official Anthropic SDK with adaptive thinking, structured JSON output, and
 server-side refusal fallbacks (`fallbacks: "default"`). Set `CLAUDE_MODEL` in `.env` to use a different model.
-Without an API key the site still works; the finder falls back to rule-based matches.
+Without a server key, visitors can paste their own Anthropic API key in the finder (stored only in their browser). Without any key the site still works; the finder shows its rule-based matches.
 
 ## Method record schema
 

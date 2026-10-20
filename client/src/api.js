@@ -6,7 +6,7 @@ const cache = new Map();
 async function request(url, options) {
   const res = await fetch(url, options);
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
+  if (!res.ok) throw Object.assign(new Error(body.error || `Request failed (${res.status})`), { status: res.status, needsKey: Boolean(body.needsKey) });
   return body;
 }
 
@@ -18,6 +18,6 @@ export function get(url) {
   return cache.get(url);
 }
 
-export const post = (url, data) => (STATIC
+export const post = (url, data, headers = {}) => (STATIC
   ? staticPost(url, data)
-  : request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }));
+  : request(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(data) }));

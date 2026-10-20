@@ -443,3 +443,8 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .shelves-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; border-bottom: 4px solid var(--red); padding-bottom: 14px; }
 .shelves .shelf { animation: q-in .4s cubic-bezier(.2, .7, .2, 1) both; --dir: 0; }
 .your-level { display: inline-block; vertical-align: middle; margin-left: 12px; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; background: var(--green-btn); color: #fff; padding: 4px 8px; }
+.key-panel { margin-top: 24px; border: 2px solid var(--ink); border-top: 6px solid var(--red); padding: 22px 24px; display: grid; gap: 14px; background: var(--bg); }
+.key-panel h3 { font-size: 20px; }
+.key-panel p { margin: 0; color: var(--ink-2); max-width: 75ch; }
+.key-panel input[type=password] { font: inherit; font-family: var(--mono); font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); width: 100%; }
+.linklike { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; text-decoration: underline; cursor: pointer; font-size: inherit; }

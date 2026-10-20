@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { methods, books, meta, byId, listFields } from './lib/data.js';
 import { shelvesPayload } from './lib/recommend.js';
-import { generateBrief, aiAvailable } from './lib/brief.js';
+import { generateBrief, DEFAULT_MODEL } from './lib/brief.js';
+
+const MODEL = process.env.CLAUDE_MODEL || DEFAULT_MODEL;
+const aiAvailable = () => Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 
 const app = express();
 app.use(express.json({ limit: '200kb' }));
@@ -38,15 +41,18 @@ app.post('/api/recommend', (req, res) => {
 app.post('/api/brief', async (req, res) => {
   const { answers = {}, brief = '' } = req.body || {};
   if (!brief || brief.trim().length < 20) return res.status(400).json({ error: 'Write a few sentences about the problem first.' });
-  if (!aiAvailable()) {
-    return res.status(503).json({ error: 'The AI brief needs ANTHROPIC_API_KEY set on the server. The rule-based recommendations still work.' });
+  // A visitor's own key (sent per request, never stored or logged) is used when the server has none.
+  const visitorKey = String(req.get('x-visitor-api-key') || '').trim();
+  if (!aiAvailable() && !visitorKey) {
+    return res.status(503).json({ error: 'Add your own Anthropic API key to use the AI research direction. The rule-based matches still work.', needsKey: true });
   }
   try {
-    res.json(await generateBrief(methods, byId, { answers, brief }));
+    const client = aiAvailable() ? new Anthropic() : new Anthropic({ apiKey: visitorKey });
+    res.json(await generateBrief(client, methods, byId, { answers, brief }, MODEL));
   } catch (err) {
-    console.error(err);
+    console.error(err instanceof Anthropic.APIError ? `Anthropic API error ${err.status}` : err);
     if (err instanceof Anthropic.RateLimitError) return res.status(429).json({ error: 'Rate limited by the API. Try again in a minute.' });
-    if (err instanceof Anthropic.AuthenticationError) return res.status(401).json({ error: 'The API key was rejected.' });
+    if (err instanceof Anthropic.AuthenticationError) return res.status(401).json({ error: 'The API key was rejected.', needsKey: !aiAvailable() });
     if (err instanceof Anthropic.APIError) return res.status(502).json({ error: `API error: ${err.message}` });
     res.status(err.status || 500).json({ error: err.message || 'Something went wrong' });
   }

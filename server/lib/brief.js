@@ -1,7 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk';
+// Builds and runs the AI research direction. Shared by the Node server (with the server's key)
+// and the browser (with a visitor's own key), so it must not touch process.env or Node APIs.
 import { recommend, tokenize, textScore } from './recommend.js';
 
-const MODEL = process.env.CLAUDE_MODEL || 'claude-opus-5-5';
+export const DEFAULT_MODEL = 'claude-opus-5-5';
 
 const SYSTEM = `You are a senior research methodologist advising a UX team. You know the full history of research methods,
 including rigorous methods that UX has lost and methods borrowed from epidemiology, econometrics, human factors,
@@ -78,11 +79,9 @@ const catalogueLine = (m) => ({
   facets: m.facets,
 });
 
-export const aiAvailable = () => Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
-
-export async function generateBrief(methods, byId, { answers = {}, brief = '' }) {
+// client: an Anthropic SDK client, created by the caller with whichever key applies.
+export async function generateBrief(client, methods, byId, { answers = {}, brief = '' }, model = DEFAULT_MODEL) {
   const pool = candidates(methods, answers, brief);
-  const client = new Anthropic();
 
   const user = `Problem brief from the team:
 """
@@ -97,7 +96,7 @@ ${JSON.stringify(pool.map(catalogueLine))}
 Give 3 to 6 plan steps in the order they should run, and 2 to 4 lost or borrowed methods worth adding.`;
 
   const response = await client.beta.messages.create({
-    model: MODEL,
+    model,
     max_tokens: 16000,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',

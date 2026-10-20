@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { post } from '../api.js';
 import { useMeta } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
+import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
 const QUESTIONS = [
   {
@@ -165,14 +166,23 @@ export default function Finder() {
     }
   };
 
+  const [visitorKey, setKeyState] = useState(getVisitorKey);
+  const [showKey, setShowKey] = useState(false);
+  const serverKey = Boolean(meta?.ai);
+  const needKey = meta && !serverKey && !visitorKey;
+
   async function askAI() {
+    if (needKey) { setShowKey(true); return; }
     setBusy(true); setError(''); setPlan(null);
     try {
       const answers = toAnswers(sel);
-      const [p, r] = await Promise.all([post('/api/brief', { answers, brief }), post('/api/recommend', { answers, brief, seed })]);
+      // On a server without its own key, the visitor's key travels with this one request only.
+      const headers = !serverKey && visitorKey ? { 'x-visitor-api-key': visitorKey } : {};
+      const [p, r] = await Promise.all([post('/api/brief', { answers, brief }, headers), post('/api/recommend', { answers, brief, seed })]);
       setPlan(p); setRecs(r);
     } catch (e) {
       setError(e.message);
+      if (e.needsKey) setShowKey(true);
       post('/api/recommend', { answers: toAnswers(sel), brief, seed }).then(setRecs).catch(() => {});
     } finally {
       setBusy(false);
@@ -248,25 +258,77 @@ export default function Finder() {
       />
       <div className="finder-nav">
         <span className="muted" style={{ fontSize: 14, alignSelf: 'center' }}>
-          {meta?.static ? 'The AI research direction runs in the downloadable version with an API key. Matches here still update with your brief.' : meta && !meta.ai ? 'The AI brief is off on this server (no API key). Rule-based matches still update with your brief.' : 'Uses Claude to read your brief against the atlas.'}
+          {serverKey ? 'Uses Claude to read your brief against the atlas.' : visitorKey
+            ? <>Uses Claude with your own API key. <button type="button" className="linklike" onClick={() => setShowKey((v) => !v)}>Change key</button></>
+            : 'The AI research direction uses your own Anthropic API key. Matches below work without one.'}
         </span>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button className="btn ghost" onClick={() => post('/api/recommend', { answers: toAnswers(sel), brief, seed }).then(setRecs)} disabled={!brief.trim()}>
             Refine matches
           </button>
-          {!meta?.static && (
-            <button className="btn accent" onClick={askAI} disabled={busy || brief.trim().length < 20}>
-              {busy ? <><span className="spinner" /> Thinking</> : 'Get a research direction'}
-            </button>
-          )}
+          <button className="btn accent" onClick={askAI} disabled={busy || (!needKey && brief.trim().length < 20)}>
+            {busy ? <><span className="spinner" /> Thinking</> : needKey ? 'Add your API key' : 'Get a research direction'}
+          </button>
         </div>
       </div>
+      {!serverKey && (showKey || (needKey && error)) && (
+        <KeyPanel
+          current={visitorKey}
+          onSave={(k, remember) => { setVisitorKey(k, remember); setKeyState(k); setShowKey(false); setError(''); }}
+          onForget={() => { forgetVisitorKey(); setKeyState(''); }}
+          onClose={() => setShowKey(false)}
+        />
+      )}
 
       {error && <div className="notice error" style={{ marginTop: 24 }}>{error}</div>}
       {plan && <Plan plan={plan} />}
 
       {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}
     </div>
+  );
+}
+
+function KeyPanel({ current, onSave, onForget, onClose }) {
+  const [key, setKey] = useState('');
+  const [remember, setRemember] = useState(isRemembered);
+  const [bad, setBad] = useState(false);
+  const save = (e) => {
+    e.preventDefault();
+    if (!looksLikeKey(key)) { setBad(true); return; }
+    onSave(key, remember);
+  };
+  return (
+    <form className="key-panel" onSubmit={save}>
+      <h3>Use your own Anthropic API key</h3>
+      <p>
+        The AI research direction runs on Claude and is paid for by your own Anthropic account, usually a few cents
+        per brief. Your key stays in this browser and is sent only to Anthropic with each request. It is never sent to
+        this site or stored anywhere else.
+      </p>
+      <label className="field">
+        <span>API key</span>
+        <input
+          type="password" autoComplete="off" spellCheck={false} value={key}
+          className={bad ? 'invalid' : ''}
+          onChange={(e) => { setKey(e.target.value); setBad(false); }}
+          placeholder={current ? 'A key is saved. Paste a new one to replace it.' : 'sk-ant-...'}
+        />
+        {bad && <small className="form-error">That does not look like an Anthropic API key. It starts with sk-ant-.</small>}
+      </label>
+      <label className="radio">
+        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+        Remember it on this device. Leave unticked on a shared computer; the key is then forgotten when you close the tab.
+      </label>
+      <div className="submit-actions">
+        <button type="submit" className="btn accent">Save key</button>
+        {current && <button type="button" className="btn ghost" onClick={onForget}>Forget my key</button>}
+        <button type="button" className="btn ghost" onClick={onClose}>Close</button>
+      </div>
+      <p className="muted small-print">
+        No key yet? Create one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">console.anthropic.com</a> after
+        adding a payment method under Billing. You can set a monthly spend limit there.
+      </p>
+    </form>
   );
 }
 
