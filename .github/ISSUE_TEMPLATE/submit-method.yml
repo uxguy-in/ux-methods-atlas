@@ -1,0 +1,84 @@
+name: Submit a method
+description: Suggest a research method the atlas is missing, or propose a new framework.
+title: "Method submission: "
+labels: ["method-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing. Submissions are public, so leave out email addresses and phone numbers.
+        New frameworks are listed as community-proposed and marked tested or not yet tested.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type
+      options:
+        - New community-proposed framework
+        - Existing method missing from the atlas
+    validations:
+      required: true
+  - type: input
+    id: aka
+    attributes:
+      label: Also known as
+      description: Other names, separated by commas.
+  - type: input
+    id: family
+    attributes:
+      label: Discipline
+      description: For example Usability & Evaluation, Survey & Psychometrics, Statistics & Modelling.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: What it does, in one sentence.
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What it is
+      description: How it works and why it is useful.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to do it
+      description: One step per line.
+  - type: textarea
+    id: use-when
+    attributes:
+      label: Use it when
+  - type: textarea
+    id: avoid-when
+    attributes:
+      label: Avoid it when
+  - type: input
+    id: origin
+    attributes:
+      label: Origin
+      description: Who created it, where and when.
+  - type: input
+    id: reference
+    attributes:
+      label: Key reference or source
+  - type: dropdown
+    id: tested
+    attributes:
+      label: Has it been tested?
+      description: Tested means it has been used beyond the person who proposed it, with results.
+      options:
+        - Not yet tested
+        - Tested
+        - Not applicable (established method)
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence of testing
+      description: Studies, case studies or projects where it was used, and what happened.
+  - type: input
+    id: proposer
+    attributes:
+      label: Proposed by
+      description: Name to credit (optional).

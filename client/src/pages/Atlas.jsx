@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useMeta, useMethods } from '../hooks.js';
 import MethodCard from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
-import { DATA, EFFORT, GOALS, STAGES, STATUS, STATUS_ORDER, slug } from '../vocab.js';
+import { DATA, EFFORT, GOALS, STAGES, STATUS, STATUS_ORDER, VALIDATION, slug } from '../vocab.js';
 
 const PAGE = 60;
 
@@ -27,6 +27,7 @@ export default function Atlas() {
     stage: params.get('stage') || '',
     data: params.get('data') || '',
     effort: params.get('effort') || '',
+    validation: params.get('validation') || '',
   };
   const sort = params.get('sort') || 'name';
 
@@ -47,7 +48,8 @@ export default function Atlas() {
       (!f.goal || m.facets?.goals?.includes(f.goal)) &&
       (!f.stage || m.facets?.stage?.includes(f.stage)) &&
       (!f.data || m.facets?.data === f.data) &&
-      (!f.effort || m.facets?.effort === f.effort)
+      (!f.effort || m.facets?.effort === f.effort) &&
+      (!f.validation || m.validation === f.validation)
     );
     const by = {
       name: (a, b) => a.name.localeCompare(b.name),
@@ -56,7 +58,7 @@ export default function Atlas() {
       donor: (a, b) => (a.donor || '').localeCompare(b.donor || '') || a.name.localeCompare(b.name),
     }[sort];
     return out.sort(by);
-  }, [methods, q, f.family, f.status, f.goal, f.stage, f.data, f.effort, sort]);
+  }, [methods, q, f.family, f.status, f.goal, f.stage, f.data, f.effort, f.validation, sort]);
 
   if (!methods) return <Loading error={error} />;
   const active = Object.values(f).some(Boolean) || q;
@@ -93,6 +95,12 @@ export default function Atlas() {
               <option value="">Any loss type</option>
               {STATUS_ORDER.map((s) => <option key={s} value={s}>{STATUS[s].label}: {STATUS[s].short}</option>)}
             </select>
+            {f.status === 'community' && (
+              <select className="select" value={f.validation} onChange={(e) => set('validation', e.target.value)} aria-label="Tested">
+                <option value="">Tested or not</option>
+                {Object.entries(VALIDATION).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+              </select>
+            )}
             <select className="select" value={f.goal} onChange={(e) => set('goal', e.target.value)} aria-label="Goal">
               <option value="">Any goal</option>
               {Object.entries(GOALS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}

@@ -12,7 +12,7 @@ export default function Families() {
     for (const m of methods || []) {
       c[m.family] ||= { total: 0, lost: 0 };
       c[m.family].total++;
-      if (!['active', 'original'].includes(m.status)) c[m.family].lost++;
+      if (!['active', 'community'].includes(m.status)) c[m.family].lost++;
     }
     return c;
   }, [methods]);

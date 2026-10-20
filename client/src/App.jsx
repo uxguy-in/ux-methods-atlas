@@ -8,6 +8,8 @@ import Lost from './pages/Lost.jsx';
 import Families from './pages/Families.jsx';
 import Library from './pages/Library.jsx';
 import About from './pages/About.jsx';
+import Submit from './pages/Submit.jsx';
+import Calculators from './pages/Calculators.jsx';
 
 export default function App() {
   return (
@@ -20,8 +22,11 @@ export default function App() {
         <Route path="/lost" element={<Lost />} />
         <Route path="/families" element={<Families />} />
         <Route path="/library" element={<Library />} />
+        <Route path="/calculators" element={<Calculators />} />
+        <Route path="/calculators/:calc" element={<Calculators />} />
+        <Route path="/submit" element={<Submit />} />
         <Route path="/about" element={<About />} />
-        <Route path="*" element={<div className="wrap section"><h1 className="h1">Not found</h1><p className="lede">That page does not exist.</p></div>} />
+        <Route path="*" element={<div className="section"><div className="wrap"><h1 className="h1">Not found</h1><p className="lede">That page does not exist.</p></div></div>} />
       </Routes>
     </Layout>
   );

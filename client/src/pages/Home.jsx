@@ -24,7 +24,7 @@ export default function Home() {
     return picked.length ? picked : (methods || []).filter((m) => m.status === 'unmigrated' || m.status === 'extinct').slice(0, 6);
   }, [meta, methods]);
 
-  const lost = methods ? methods.filter((m) => !['active', 'original'].includes(m.status)).length : null;
+  const lost = methods ? methods.filter((m) => !['active', 'community'].includes(m.status)).length : null;
 
   return (
     <>

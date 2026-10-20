@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { STATUS } from '../vocab.js';
+import { STATUS, VALIDATION } from '../vocab.js';
 
 export function Status({ value }) {
   if (!value) return null;
@@ -14,6 +14,7 @@ export default function MethodCard({ m, why }) {
       <p>{m.summary}</p>
       <div className="meta">
         <Status value={m.status} />
+        {m.validation && <span className={`badge ${m.validation === 'tested' ? 'done' : 'untested'}`}>{VALIDATION[m.validation].label}</span>}
         {m.donor && <span>from {m.donor}</span>}
         {why?.filter((w) => !w.startsWith('needs')).slice(0, 1).map((w) => <span key={w} className="why-tag">{w}</span>)}
       </div>

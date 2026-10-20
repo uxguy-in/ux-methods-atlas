@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status } from '../components/MethodCard.jsx';
-import { DATA, EFFORT, EXPERTISE, GOALS, PARTICIPANTS, STAGES, STATUS, slug } from '../vocab.js';
+import { DATA, EFFORT, EXPERTISE, GOALS, PARTICIPANTS, STAGES, STATUS, SUBMIT_URL, VALIDATION, slug } from '../vocab.js';
 
 const paras = (t) => (t || '').split(/\n{2,}/).filter(Boolean);
 
@@ -11,7 +11,7 @@ export default function Method() {
   const { data: m, error } = useApi(`/api/methods/${id}`);
   if (!m) return <Loading error={error} />;
   const f = m.facets || {};
-  const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'original' ? 'Why it exists' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
+  const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
 
   return (
     <>
@@ -23,6 +23,8 @@ export default function Method() {
           </div>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
             <Status value={m.status} />
+            {m.validation && <span className={`badge ${m.validation === 'tested' ? 'done' : 'untested'}`} title={VALIDATION[m.validation].short}>{VALIDATION[m.validation].label}</span>}
+            {m.proposedBy && <span className="muted" style={{ fontSize: 14 }}>Proposed by {m.proposedBy}</span>}
             {m.donor && <span className="muted" style={{ fontSize: 14 }}>Borrowed from {m.donor}</span>}
           </div>
           <h1 className="h1" style={{ maxWidth: '20ch' }}>{m.name}</h1>
@@ -100,6 +102,17 @@ export default function Method() {
                 {(f.goals || []).map((g) => <Link key={g} className="tag" to={`/methods?goal=${g}`}>{GOALS[g] || g}</Link>)}
                 {(f.stage || []).map((s) => <Link key={s} className="tag" to={`/methods?stage=${s}`}>{STAGES[s] || s}</Link>)}
               </div>
+            </div>
+          )}
+          {m.status === 'community' && (
+            <div className="aside-box">
+              <h3>{m.validation === 'tested' ? 'Tested' : 'Not yet tested'}</h3>
+              <p style={{ margin: 0 }}>
+                {m.validation === 'tested'
+                  ? (m.validationNote || 'There is published evidence of this framework being used beyond the person who proposed it.')
+                  : 'This framework has been proposed but has no published evidence yet of use beyond the person who proposed it. Treat it as an idea to try, and share what happens.'}
+              </p>
+              <p style={{ margin: '10px 0 0' }}><a href={SUBMIT_URL} target="_blank" rel="noreferrer">Report a test or submit a method</a></p>
             </div>
           )}
           {m.reference && (

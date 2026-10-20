@@ -5,7 +5,7 @@ import MethodCard from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
 import { STATUS, STATUS_ORDER } from '../vocab.js';
 
-const LOST = STATUS_ORDER.filter((s) => s !== 'active' && s !== 'original');
+const LOST = STATUS_ORDER.filter((s) => s !== 'active' && s !== 'community');
 
 export default function Lost() {
   const { data: meta, error } = useMeta();

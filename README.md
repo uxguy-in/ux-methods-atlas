@@ -3,6 +3,8 @@
 A React + Node.js website holding every UX research method from Vivek Gopinath's library of books, treatises,
 compendia and playbooks, including the rigorous methods the field lost and the ones borrowed from other disciplines.
 It asks a few questions, reads a short problem brief with Claude, and recommends a research direction.
+It also has UX calculators (sample size, confidence intervals, SUS/UMUX-Lite/NPS scoring and significance tests) and
+a form for the community to submit methods.
 
 ## Use it online
 
@@ -46,8 +48,22 @@ whyLost, whereToUse, example, sources[], reference, facets{goals[], stage[], dat
 setting[]}, relatedIds[], bookIds[], keywords[]`
 
 `status` follows the taxonomy of loss from *Lost Methods in UX*: active, vestigial, siloed, renamed, latent,
-extinct, unmigrated, plus original for Vivek's own frameworks. Edit `methods.json` directly to add or correct
-methods, then run `npm run check:data`.
+extinct, unmigrated, plus `community` for community-proposed frameworks. Community frameworks also carry
+`proposedBy` and `validation` (`tested` or `untested`); a framework counts as tested once there is published
+evidence of use beyond the person who proposed it. Edit `methods.json` directly to add or correct methods, then
+run `npm run check:data`.
+
+## Community submissions
+
+The **Submit a method** page builds a pre-filled GitHub issue, and `.github/ISSUE_TEMPLATE/submit-method.yml` offers
+the same form directly on GitHub. Review each issue, add accepted methods to `methods.json` with credit, and mark new
+frameworks `untested` until there is evidence.
+
+## Calculators
+
+`client/src/calc/stats.js` holds the statistics (adjusted-Wald, exact binomial and mid-p, N−1 two-proportion test,
+McNemar, Welch and paired t-tests, log-time and median intervals, problem-discovery adjustment, sample size formulas),
+following Sauro & Lewis, *Quantifying the User Experience*. Everything runs in the browser.
 
 ## GitHub Pages
 

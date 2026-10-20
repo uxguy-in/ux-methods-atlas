@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SUBMIT_URL } from '../vocab.js';
 import { useMeta } from '../hooks.js';
 
 export default function About() {
@@ -33,7 +34,9 @@ export default function About() {
         <h2>The loss taxonomy</h2>
         <p>
           Methods are tagged active, vestigial, siloed, renamed, latent, extinct or unmigrated, following the taxonomy in
-          <em> Lost Methods in UX</em>. Vivek Gopinath's own frameworks are marked as original.
+          <em> Lost Methods in UX</em>. New frameworks put forward by practitioners are marked community-proposed, and each
+          one says whether it has been tested (published evidence of use beyond the person who proposed it) or not yet tested.
+          Anyone can <a href={SUBMIT_URL} target="_blank" rel="noreferrer">submit a method</a>.
         </p>
         <p style={{ marginTop: 32 }}><Link to="/find" className="btn accent">Find a method</Link></p>
       </div>

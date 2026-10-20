@@ -69,7 +69,7 @@ export function scoreMethod(m, a = {}, words = []) {
     const gap = EXPERTISE.indexOf(f.expertise) - EXPERTISE.indexOf(a.expertise);
     s += gap <= 0 ? 1 : -2 * gap;
   }
-  if (a.appetite === 'proven') s += m.status === 'active' ? 3 : m.status === 'original' ? 0 : -2;
+  if (a.appetite === 'proven') s += m.status === 'active' ? 3 : m.status === 'community' ? (m.validation === 'tested' ? 0 : -1) : -2;
   if (a.appetite === 'lost') s += m.status === 'active' ? -2 : 3;
 
   s += textScore(m, words) * 2;
@@ -90,7 +90,7 @@ export function shelve(ranked) {
   const lost = [];
   const rest = [];
   for (const r of ranked) {
-    if (primary.length < 5 && (r.m.status === 'active' || r.m.status === 'original' || primary.length < 2)) primary.push(r);
+    if (primary.length < 5 && (r.m.status === 'active' || (r.m.status === 'community' && r.m.validation === 'tested') || primary.length < 2)) primary.push(r);
     else if (lost.length < 6 && r.m.status !== 'active') lost.push(r);
     else rest.push(r);
   }

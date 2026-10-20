@@ -7,9 +7,14 @@ export const STATUS = {
   latent: { label: 'Latent', short: 'Known, rarely operationalised' },
   extinct: { label: 'Extinct', short: 'Gone from practice' },
   unmigrated: { label: 'Unmigrated', short: 'Never crossed into UX' },
-  original: { label: 'Original', short: "Vivek Gopinath's frameworks" },
+  community: { label: 'Community-proposed', short: 'New frameworks from practitioners' },
 };
-export const STATUS_ORDER = ['active', 'vestigial', 'siloed', 'renamed', 'latent', 'extinct', 'unmigrated', 'original'];
+export const STATUS_ORDER = ['active', 'vestigial', 'siloed', 'renamed', 'latent', 'extinct', 'unmigrated', 'community'];
+
+export const VALIDATION = {
+  tested: { label: 'Tested', short: 'Published evidence of use beyond the proposer' },
+  untested: { label: 'Not yet tested', short: 'Proposed, waiting for independent evidence' },
+};
 
 export const GOALS = {
   'explore-unknowns': 'Explore unknowns',
@@ -41,3 +46,7 @@ export const EFFORT = { hours: 'Hours', days: 'Days', weeks: 'Weeks', months: 'M
 export const EXPERTISE = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
 
 export const slug = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Community submissions go through a GitHub issue form, so the static site needs no backend.
+export const REPO_URL = import.meta.env.VITE_REPO_URL || 'https://github.com/uxguy-in/ux-methods-atlas';
+export const SUBMIT_URL = `${REPO_URL}/issues/new?template=submit-method.yml`;
