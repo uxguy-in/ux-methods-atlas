@@ -138,9 +138,10 @@ export default function Finder() {
       busyMove.current = false;
       const top = document.querySelector('.finder');
       if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 200);
+    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240);
   };
 
+  const [picked, setPicked] = useState(null);
   const done = step >= QUESTIONS.length;
   // After a change made from the summary, go straight back to it instead of through the rest.
   const advance = () => { if (editing) { setEditing(false); go(QUESTIONS.length); } else go(step + 1); };
@@ -171,8 +172,11 @@ export default function Finder() {
       const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v].slice(-q.multi);
       setSel({ ...sel, [q.id]: next });
     } else {
+      if (picked) return;
       setSel({ ...sel, [q.id]: v });
-      setTimeout(() => advance(), 260);
+      setPicked(v);
+      // Hold the confirmed choice long enough to register before the next question slides in.
+      setTimeout(() => { setPicked(null); advance(); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 150 : 520);
     }
   };
 
@@ -218,7 +222,7 @@ export default function Finder() {
             {q.options.map((o) => {
               const on = q.multi ? (val || []).includes(o.v) : val === o.v;
               return (
-                <button key={o.v} className={`option${on ? ' on' : ''}`} onClick={() => pick(o.v)} aria-pressed={on}>
+                <button key={o.v} className={`option${on ? ' on' : ''}${picked === o.v ? ' picked' : ''}`} onClick={() => pick(o.v)} aria-pressed={on}>
                   <b>{o.label}</b>
                   {o.hint && <small>{o.hint}</small>}
                 </button>
@@ -235,7 +239,7 @@ export default function Finder() {
             <button type="button" className="skip-link" onClick={() => { setSel({ ...sel, [q.id]: undefined }); advance(); }}>
               {editing ? 'Clear this answer' : 'Skip this question'}
             </button>
-            {(q.multi || hasAnswer) && (
+            {q.multi && (
               <button className="btn accent" onClick={advance} disabled={!hasAnswer}>
                 {editing ? 'Save' : step === QUESTIONS.length - 1 ? 'See methods' : 'Next'}
               </button>
@@ -252,26 +256,27 @@ export default function Finder() {
       <div className="progress" aria-hidden="true">
         {QUESTIONS.map((_, i) => <span key={i} className="done" />)}
       </div>
-      <p className="eyebrow">Your answers</p>
-      <h1 className="h1" style={{ maxWidth: '18ch' }}>Here is what you told us.</h1>
-      <p className="lede" style={{ margin: '14px 0 22px' }}>Change any answer and the methods below update straight away.</p>
-      <dl className="answers-list">
-        {QUESTIONS.map((qq, i) => {
-          const v = sel[qq.id];
-          const vals = (Array.isArray(v) ? v : v ? [v] : []).map((x) => qq.options.find((o) => o.v === x)?.label).filter(Boolean);
-          return (
-            <div key={qq.id} className="answers-row">
-              <dt>{qq.short}</dt>
-              <dd className={vals.length ? '' : 'skipped'}>{vals.length ? vals.join(', ') : 'Skipped'}</dd>
-              <button type="button" className="btn ghost small" onClick={() => change(i)}>Change</button>
-            </div>
-          );
-        })}
-      </dl>
-      <button type="button" className="skip-link" onClick={reset} style={{ marginTop: 12 }}>Start over</button>
+      <section className="answers-bar" aria-label="Your answers">
+        <span className="answers-bar-label">Your answers</span>
+        <ul className="answers-chips">
+          {QUESTIONS.map((qq, i) => {
+            const v = sel[qq.id];
+            const vals = (Array.isArray(v) ? v : v ? [v] : []).map((x) => qq.options.find((o) => o.v === x)?.label).filter(Boolean);
+            return (
+              <li key={qq.id}>
+                <button type="button" className={`answer-chip${vals.length ? '' : ' skipped'}`} onClick={() => change(i)} title={`Change: ${qq.short}`}>
+                  {vals.length > 0 && <span className="sr-only">{qq.short}: </span>}{vals.length ? vals.join(' + ') : `${qq.short}: any`}
+                  <span className="answer-chip-edit" aria-hidden="true">Change</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <button type="button" className="skip-link" onClick={reset}>Start over</button>
+      </section>
 
-      <p className="eyebrow" style={{ marginTop: 48 }}>Your brief</p>
-      <h2 className="h2" style={{ maxWidth: '20ch' }}>Now tell it what's going on.</h2>
+      <p className="eyebrow" style={{ marginTop: 36 }}>Your brief</p>
+      <h1 className="h1" style={{ maxWidth: '20ch' }}>Now tell it what's going on.</h1>
       <p className="lede" style={{ margin: '14px 0 22px' }}>
         Describe the product, the problem and the decision you need to make. Plain words are fine.
       </p>
