@@ -276,3 +276,47 @@ export function parseNumbers(text) {
 export function parseRows(text) {
   return text.split(/\n+/).map((r) => parseNumbers(r)).filter((r) => r.length);
 }
+
+// ── Added: Fisher exact, correlation, UMUX, SUM ──
+// Two-sided Fisher exact test for a 2×2 table [[a, b], [c, d]] (sum of tables no more likely than the observed one).
+export function fisherExact(a, b, c, d) {
+  const r1 = a + b, r2 = c + d, c1 = a + c, n = r1 + r2;
+  const lp = (x) => logChoose(r1, x) + logChoose(r2, c1 - x) - logChoose(n, c1);
+  const obs = lp(a); let p = 0;
+  for (let x = Math.max(0, c1 - r2); x <= Math.min(r1, c1); x++) { const v = lp(x); if (v <= obs + 1e-7) p += Math.exp(v); }
+  return Math.min(1, p);
+}
+
+// Pearson correlation with a Fisher-z interval and t-test of r = 0.
+export function correlation(xs, ys, conf = 0.95) {
+  const n = xs.length, mx = mean(xs), my = mean(ys);
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; }
+  const r = sxy / Math.sqrt(sxx * syy);
+  const t = r * Math.sqrt((n - 2) / (1 - r * r)), p = 2 * (1 - tCdf(Math.abs(t), n - 2));
+  const z = Math.atanh(r), se = 1 / Math.sqrt(n - 3), zc = zFor(conf);
+  return { r, n, t, p, lo: Math.tanh(z - zc * se), hi: Math.tanh(z + zc * se), r2: r * r, slope: sxy / sxx, intercept: my - (sxy / sxx) * mx };
+}
+// Spearman: Pearson on average ranks.
+export function ranks(xs) {
+  const idx = xs.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]); const r = new Array(xs.length);
+  for (let i = 0; i < idx.length;) { let j = i; while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++; for (let k = i; k <= j; k++) r[idx[k][1]] = (i + j) / 2 + 1; i = j + 1; }
+  return r;
+}
+
+// UMUX (Finstad 2010): items 1 and 3 positive, 2 and 4 negative, 7-point scales.
+export const umux = ([a, b, c, d]) => ((a - 1) + (7 - b) + (c - 1) + (7 - d)) / 24 * 100;
+
+// Single Usability Metric (Sauro & Kindlund 2005): each component becomes a proportion meeting spec, then averaged.
+// time: share predicted under the spec time from the log-normal fit; satisfaction: share predicted above the spec rating.
+export function sumScore({ x, n, times, specTime, sat, specSat, errors, opportunities }) {
+  const parts = {};
+  if (n > 0) parts.completion = x / n;
+  if (times?.length > 1 && specTime > 0) {
+    const l = times.map(Math.log); parts.time = normCdf((Math.log(specTime) - mean(l)) / sd(l));
+  }
+  if (sat?.length > 1 && Number.isFinite(specSat)) parts.satisfaction = 1 - normCdf((specSat - mean(sat)) / sd(sat));
+  if (opportunities > 0 && n > 0 && errors >= 0) parts.errors = Math.max(0, 1 - errors / (opportunities * n));
+  const vals = Object.values(parts).filter(Number.isFinite);
+  return { parts, sum: vals.length ? mean(vals) : NaN };
+}

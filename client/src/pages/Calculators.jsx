@@ -264,29 +264,37 @@ function SUS() {
 
 // ── 5. UMUX-Lite ──
 function UMUXLite() {
-  const [text, setText] = useState('6 6\n7 6\n5 5\n6 7\n4 5\n7 7\n6 5');
-  const rows = S.parseRows(text).filter((r) => r.length === 2 && r.every((v) => v >= 1 && v <= 7));
-  const scores = rows.map(([a, b]) => S.umuxLite(a, b));
+  const [form, setForm] = useState('lite');
+  const [lite, setLite] = useState('6 6\n7 6\n5 5\n6 7\n4 5\n7 7\n6 5');
+  const [full, setFull] = useState('6 2 6 2\n7 1 6 2\n5 3 5 3\n6 2 7 1\n4 4 5 3\n7 1 7 2');
+  const k = form === 'lite' ? 2 : 4;
+  const rows = S.parseRows(form === 'lite' ? lite : full).filter((r) => r.length === k && r.every((v) => v >= 1 && v <= 7));
+  const scores = rows.map((r) => (form === 'lite' ? S.umuxLite(r[0], r[1]) : S.umux(r)));
   const M = scores.length ? S.mean(scores) : NaN;
   const ci = scores.length > 1 ? S.meanCI(M, S.sd(scores), scores.length, 0.95) : null;
-  const sus = S.umuxLiteToSus(M);
+  const sus = form === 'lite' ? S.umuxLiteToSus(M) : M;
+  const name = form === 'lite' ? 'UMUX-Lite' : 'UMUX';
   return (
     <>
       <div className="calc-inputs">
-        <Area label="Responses: one participant per line, two answers from 1 to 7" value={text} onChange={setText} rows={6}
-          hint="Item 1: This system's capabilities meet my requirements. Item 2: This system is easy to use." />
+        <Choice label="Questionnaire" value={form} onChange={setForm} options={[['lite', 'UMUX-Lite (2 items)'], ['full', 'UMUX (4 items)']]} />
+        {form === 'lite'
+          ? <Area label="Responses: one participant per line, two answers from 1 to 7" value={lite} onChange={setLite} rows={6}
+              hint="Item 1: This system's capabilities meet my requirements. Item 2: This system is easy to use." />
+          : <Area label="Responses: one participant per line, four answers from 1 to 7" value={full} onChange={setFull} rows={6}
+              hint="1: capabilities meet my requirements. 2: using it is a frustrating experience. 3: it is easy to use. 4: I spend too much time correcting things. Items 2 and 4 are reversed automatically." />}
       </div>
-      {scores.length === 0 ? <Problem>Add at least one pair of answers between 1 and 7.</Problem> : (
+      {scores.length === 0 ? <Problem>Add at least one complete set of answers between 1 and 7.</Problem> : (
         <>
-          <Result big={num(M)} label={`Mean UMUX-Lite from ${scores.length} participants`}>
+          <Result big={num(M)} label={`Mean ${name} from ${scores.length} participants`}>
             {ci && <IntervalBar lo={ci.lo} hi={ci.hi} point={M} min={0} max={100} bench={68} fmt={(v) => num(v, 0)} benchLabel="SUS average" />}
-            <p>On the SUS scale this is about {num(sus)} (grade {S.susGrade(sus)[1]}), using the regression-adjusted conversion.</p>
+            <p>{form === 'lite' ? `On the SUS scale this is about ${num(sus)} (grade ${S.susGrade(sus)[1]}), using the regression-adjusted conversion.` : `The UMUX tracks SUS closely (r = 0.96 in Finstad's validation), so read it against SUS norms: grade ${S.susGrade(sus)[1]}.`}</p>
           </Result>
-          <Stats rows={[ci && ['95% interval', `${num(ci.lo)} – ${num(ci.hi)}`], ['SUS-equivalent', num(sus)], ['Grade', S.susGrade(sus)[1]]]} />
+          <Stats rows={[ci && ['95% interval', `${num(ci.lo)} – ${num(ci.hi)}`], ['SUS-equivalent', num(sus)], ['Grade', S.susGrade(sus)[1]], ['Individual scores', scores.map((v) => num(v, 0)).join(', ')]]} />
         </>
       )}
-      <About method="umux-lite">
-        <p>UMUX-Lite = ((item 1 − 1) + (item 2 − 1)) / 12 × 100. The SUS-equivalent uses Lewis, Utesch and Maher's (2013) regression: 0.65 × UMUX-Lite + 22.9, which corrects a tendency for raw UMUX-Lite to run higher than SUS.</p>
+      <About method={form === 'lite' ? 'umux-lite' : 'umux-usability-metric-for-user-experience'}>
+        <p>UMUX-Lite = ((item 1 − 1) + (item 2 − 1)) / 12 × 100, and its SUS-equivalent uses Lewis, Utesch and Maher's (2013) regression, 0.65 × UMUX-Lite + 22.9. The four-item UMUX (Finstad 2010) recodes items 1 and 3 as response − 1 and items 2 and 4 as 7 − response, sums them, divides by 24 and multiplies by 100.</p>
       </About>
     </>
   );
@@ -346,6 +354,7 @@ function CompareRates() {
     const X1 = int(x1), N1 = int(n1), X2 = int(x2), N2 = int(n2);
     const bad = !(N1 > 0 && N2 > 0 && X1 >= 0 && X2 >= 0 && X1 <= N1 && X2 <= N2);
     const r = bad ? null : S.twoProportions(X1, N1, X2, N2, conf);
+    const fisher = bad ? NaN : S.fisherExact(X1, N1 - X1, X2, N2 - X2);
     body = (
       <>
         <div className="calc-inputs">
@@ -359,8 +368,8 @@ function CompareRates() {
               <IntervalBar lo={-r.hi} hi={-r.lo} point={-r.diff} min={-1} max={1} bench={0} fmt={(v) => `${v > 0 ? '+' : ''}${Math.round(v * 100)} pts`} benchLabel="No difference" />
               <p>Design B {r.diff < 0 ? 'beats' : r.diff > 0 ? 'trails' : 'matches'} design A by {num(Math.abs(r.diff) * 100, 0)} points ({pct(r.p2, 0)} vs {pct(r.p1, 0)}). {r.p < 1 - conf ? `The difference is statistically significant at the ${conf * 100}% level.` : `The difference is not statistically significant at the ${conf * 100}% level.`} The difference is plausibly between {num(-r.hi * 100, 0)} and {num(-r.lo * 100, 0)} points.</p>
             </Result>
-            {r.minExpected < 1 && <Problem>An expected cell count is below 1. Use Fisher's exact test instead.</Problem>}
-            <Stats rows={[['Design A', pct(r.p1)], ['Design B', pct(r.p2)], ['z (N−1 adjusted)', num(r.z, 3)], ['p (two-sided)', pv(r.p)], [`${conf * 100}% interval, B − A`, `${num(-r.hi * 100)} to ${num(-r.lo * 100)} points`]]} />
+            {r.minExpected < 1 && <Problem>An expected cell count is below 1, so the N−1 test is not reliable here. Use the Fisher exact p-value of {pv(fisher)} instead.</Problem>}
+            <Stats rows={[['Design A', pct(r.p1)], ['Design B', pct(r.p2)], ['z (N−1 adjusted)', num(r.z, 3)], ['p (two-sided)', pv(r.p)], ['Fisher exact p (conservative)', pv(fisher)], [`${conf * 100}% interval, B − A`, `${num(-r.hi * 100)} to ${num(-r.lo * 100)} points`]]} />
           </>
         )}
       </>
@@ -609,17 +618,184 @@ function Discovery() {
   );
 }
 
+
+// ── 12. Top-box ──
+function TopBox() {
+  const [text, setText] = useState('4 4 5 5 5 5 3 5 1 5 5 5');
+  const [points, setPoints] = useState(5); const [cut, setCut] = useState('4'); const [bench, setBench] = useState('75'); const [conf, setConf] = useState(0.8);
+  const xs = S.parseNumbers(text).filter((v) => v >= 1 && v <= points);
+  const C = n_(cut), B = n_(bench) / 100;
+  const bad = xs.length < 2 || !(C >= 1 && C <= points) || !(B > 0 && B < 1);
+  let r = null;
+  if (!bad) {
+    const x = xs.filter((v) => v >= C).length, n = xs.length;
+    const test = S.proportionVsBenchmark(x, n, B), ci = S.adjustedWald(x, n, conf);
+    const M = S.mean(xs), SD = S.sd(xs), t = SD > 0 ? S.oneSampleT(M, SD, n, C) : null;
+    r = { x, n, test, ci, M, SD, t };
+  }
+  const boxes = points - (n_(cut) || points) + 1;
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="Ratings" value={text} onChange={setText} rows={3} hint="One rating per participant, separated by spaces, commas or new lines." />
+        <Choice label="Scale" value={points} onChange={(v) => { setPoints(v); setCut(String(v === 5 ? 4 : v === 7 ? 6 : 9)); }} options={[[5, '5-point'], [7, '7-point'], [10, '10-point']]} />
+        <Num label="Counts as agree from" value={cut} onChange={setCut} min={1} max={points} hint={`Top ${boxes} box${boxes > 1 ? 'es' : ''}`} />
+        <Num label="Target share agreeing" value={bench} onChange={setBench} min={1} max={99} suffix="%" />
+        <Conf value={conf} onChange={setConf} />
+      </div>
+      {bad ? <Problem>Enter at least two ratings within the scale, a cut-off on the scale and a target between 1% and 99%.</Problem> : (
+        <>
+          <Result big={pct(r.x / r.n, 0)} label={`${r.x} of ${r.n} chose ${C} or higher`} tone={r.test.midP < 1 - conf ? 'good' : ''}>
+            <IntervalBar lo={r.ci.lo} hi={r.ci.hi} point={r.x / r.n} bench={B} benchLabel="Target" />
+            <p>There is a {pct(1 - r.test.p, 1)} chance that at least {pct(B, 0)} of all users would agree. {r.test.p < 1 - conf ? 'That clears your confidence level, so the target is met.' : 'That is not enough to claim the target is met.'} Analysed as a mean instead, the average of {num(r.M, 2)} gives a {r.t ? pct(1 - r.t.pOne, 1) : '—'} chance that the true mean is above {C}, because the mean keeps the strength of agreement that top-box throws away.</p>
+          </Result>
+          <Stats rows={[['Top-box share', pct(r.x / r.n)], [`${conf * 100}% interval`, `${pct(r.ci.lo)} – ${pct(r.ci.hi)}`], [`p (${r.test.large ? 'normal' : 'mid-p binomial'})`, pv(r.test.p)], ['Mean rating', `${num(r.M, 2)} (SD ${num(r.SD, 2)})`], r.t && [`p (mean above ${C})`, pv(r.t.pOne)]]} />
+        </>
+      )}
+      <About method="top-box-analysis-of-rating-scales">
+        <p>Ratings at or above the cut-off become 1 and the rest 0. The share is then tested against the target with the one-sided binomial mid-p test (small samples) or the normal approximation, and given an adjusted-Wald interval, exactly as for completion rates. The comparison with a one-sample t-test on the raw ratings follows Sauro and Lewis's worked example, where 10 of 12 agreeing gave a 72.5% chance of meeting 75%, against 81.4% for the mean.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 13. Expectation vs experience ──
+const EXP_SAMPLE = 'Find opening hours, 6.5, 6.1\nChange delivery address, 6.2, 3.4\nCompare two plans, 3.1, 5.6\nCancel subscription, 2.8, 2.5\nDownload invoice, 5.9, 6.3';
+function Expectation() {
+  const [text, setText] = useState(EXP_SAMPLE); const [mid, setMid] = useState('4');
+  const Mid = n_(mid);
+  const tasks = text.split('\n').map((line) => {
+    const parts = line.split(/[,\t;]/).map((s) => s.trim());
+    const nums = parts.slice(1).map(Number);
+    return parts.length >= 3 && nums.slice(0, 2).every((v) => v >= 1 && v <= 7) ? { name: parts[0] || 'Task', e: nums[0], x: nums[1] } : null;
+  }).filter(Boolean);
+  const quad = (t) => (t.e >= Mid ? (t.x >= Mid ? ['Don’t touch it', 'ok'] : ['Fix it fast', 'fix']) : (t.x >= Mid ? ['Promote it', 'promote'] : ['Big opportunity', 'opp']));
+  const W = 420, P = 36, sc = (v) => P + ((v - 1) / 6) * (W - 2 * P);
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One task per line: name, expected ease, experienced ease" value={text} onChange={setText} rows={6} hint="Use mean ratings on a 7-point scale where 7 is very easy. Separate with commas or tabs." />
+        <Num label="Quadrant split" value={mid} onChange={setMid} min={1} max={7} step="0.1" hint="The scale midpoint (4) or your average rating" />
+      </div>
+      {tasks.length === 0 || !(Mid > 1 && Mid < 7) ? <Problem>Enter at least one task with two ratings between 1 and 7, and a split between 1 and 7.</Problem> : (
+        <>
+          <div className="exp-wrap">
+            <svg viewBox={`0 0 ${W} ${W}`} className="exp-plot" role="img" aria-label="Expected versus experienced ease by task">
+              <rect x={P} y={P} width={sc(Mid) - P} height={sc(Mid) - P} className="q promote" />
+              <rect x={sc(Mid)} y={P} width={W - P - sc(Mid)} height={sc(Mid) - P} className="q ok" />
+              <rect x={P} y={sc(Mid)} width={sc(Mid) - P} height={W - P - sc(Mid)} className="q opp" />
+              <rect x={sc(Mid)} y={sc(Mid)} width={W - P - sc(Mid)} height={W - P - sc(Mid)} className="q fix" />
+              <text x={P + 6} y={P + 16} className="ql">Promote it</text>
+              <text x={W - P - 6} y={P + 16} className="ql" textAnchor="end">Don’t touch it</text>
+              <text x={P + 6} y={W - P - 8} className="ql">Big opportunity</text>
+              <text x={W - P - 6} y={W - P - 8} className="ql" textAnchor="end">Fix it fast</text>
+              {tasks.map((t, i) => <g key={i}><circle cx={sc(t.e)} cy={W - sc(t.x)} r="6" className="dot" /><text x={sc(t.e) + 9} y={W - sc(t.x) + 4} className="dl">{i + 1}</text></g>)}
+              <text x={W / 2} y={W - 6} className="ax" textAnchor="middle">Expected ease →</text>
+              <text x={12} y={W / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${W / 2})`}>Experienced ease →</text>
+            </svg>
+            <ol className="exp-list">
+              {tasks.map((t, i) => { const [q, c] = quad(t); return <li key={i}><b>{t.name}</b> <span className={`qtag ${c}`}>{q}</span><br /><span className="muted">expected {num(t.e)}, experienced {num(t.x)} ({t.x - t.e >= 0 ? '+' : ''}{num(t.x - t.e)})</span></li>; })}
+            </ol>
+          </div>
+          <Result label="Where to start">
+            <p>{(() => { const fix = tasks.filter((t) => quad(t)[1] === 'fix').sort((a, b) => (a.x - a.e) - (b.x - b.e)); return fix.length ? `Fix "${fix[0].name}" first: users expected it to be easy (${num(fix[0].e)}) but found it hard (${num(fix[0].x)}). Gaps like this cause the most dissatisfaction.` : 'No task falls in the fix-it-fast quadrant. Look at the big-opportunity tasks next.'; })()}</p>
+          </Result>
+        </>
+      )}
+      <About method="expectation-ratings-expected-vs-experienced-difficulty">
+        <p>Before any tasks, participants rate how easy they expect each one to be; after each task, how easy it was, on the same 7-point scale (Albert and Dixon 2003). Plotting the two means per task gives four quadrants (Tullis and Albert 2008). Expected easy but experienced hard is "fix it fast"; expected hard but experienced easy is "promote it".</p>
+      </About>
+    </>
+  );
+}
+
+// ── 14. Single Usability Metric ──
+function SUM() {
+  const [x, setX] = useState('8'); const [n, setN] = useState('10');
+  const [times, setTimes] = useState('60 70 80 90 100 120 150'); const [spec, setSpec] = useState('100');
+  const [sat, setSat] = useState('5 6 7 4 6 6 5 6'); const [specSat, setSpecSat] = useState('5');
+  const [err, setErr] = useState('4'); const [opp, setOpp] = useState('5');
+  const X = int(x), N = int(n);
+  const bad = !(N > 0 && X >= 0 && X <= N);
+  const r = bad ? null : S.sumScore({ x: X, n: N, times: S.parseNumbers(times).filter((t) => t > 0), specTime: n_(spec), sat: S.parseNumbers(sat), specSat: n_(specSat), errors: n_(err), opportunities: n_(opp) });
+  const label = { completion: 'Completion', time: 'Time (share under target)', satisfaction: 'Satisfaction (share above target)', errors: 'Errors (opportunities error-free)' };
+  return (
+    <>
+      <div className="calc-inputs">
+        <Num label="Successes" value={x} onChange={setX} min={0} /><Num label="Attempts" value={n} onChange={setN} min={1} />
+        <Area label="Task times in seconds (successful attempts)" value={times} onChange={setTimes} rows={2} />
+        <Num label="Target time" value={spec} onChange={setSpec} min={1} suffix="s" />
+        <Area label="Post-task ratings (for example SEQ, 1 to 7)" value={sat} onChange={setSat} rows={2} />
+        <Num label="Target rating" value={specSat} onChange={setSpecSat} step="any" hint="Sauro and Kindlund used 4 on a 5-point scale; 5 or 5.5 suits the 7-point SEQ" />
+        <Num label="Total errors" value={err} onChange={setErr} min={0} /><Num label="Error opportunities per attempt" value={opp} onChange={setOpp} min={0} hint="Leave 0 if you did not log errors" />
+      </div>
+      {bad || !Number.isFinite(r.sum) ? <Problem>Enter at least successes and attempts.</Problem> : (
+        <>
+          <Result big={pct(r.sum, 0)} label={`Single Usability Metric from ${Object.keys(r.parts).length} components`} tone={r.sum >= 0.78 ? 'good' : r.sum < 0.6 ? 'bad' : ''}>
+            <div className="sum-bars">
+              {Object.entries(r.parts).map(([k, v]) => (
+                <div key={k}><span>{label[k]}</span><span className="bar"><i style={{ width: pct(v, 0) }} /></span><b>{pct(v, 0)}</b></div>
+              ))}
+            </div>
+            <p>{(() => { const [k, v] = Object.entries(r.parts).sort((a, b) => a[1] - b[1])[0]; return `The weakest component is ${label[k].split(' (')[0].toLowerCase()} at ${pct(v, 0)}, so that is where this task loses most of its score.`; })()}</p>
+          </Result>
+        </>
+      )}
+      <About method="single-usability-metric-sum">
+        <p>Each metric becomes the share of users meeting a target, then the shares are averaged (Sauro and Kindlund 2005). Completion is the success rate. Time is the share predicted to finish under the target, from a normal fit to log times. Satisfaction is the share predicted to rate above the target, from a normal fit to the ratings. Errors are the share of error opportunities without an error. Components you leave out are skipped.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 15. Correlation ──
+function Correlation() {
+  const [text, setText] = useState('72 0.9\n65 0.8\n80 1\n55 0.6\n90 1\n60 0.7\n77 0.9\n48 0.5\n85 0.9\n70 0.8');
+  const [kind, setKind] = useState('pearson'); const [conf, setConf] = useState(0.95);
+  const rows = S.parseRows(text).filter((r) => r.length === 2);
+  let xs = rows.map((r) => r[0]), ys = rows.map((r) => r[1]);
+  if (kind === 'spearman') { xs = S.ranks(xs); ys = S.ranks(ys); }
+  const bad = rows.length < 4 || S.sd(xs) === 0 || S.sd(ys) === 0;
+  const r = bad ? null : S.correlation(xs, ys, conf);
+  const size = (v) => { const a = Math.abs(v); return a >= 0.5 ? 'strong' : a >= 0.3 ? 'moderate' : a >= 0.1 ? 'weak' : 'negligible'; };
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One pair per line: first measure, second measure" value={text} onChange={setText} rows={7} hint="For example SUS score and completion rate per participant or per task." />
+        <Choice label="Method" value={kind} onChange={setKind} options={[['pearson', 'Pearson'], ['spearman', 'Spearman (ranks)']]} />
+        <Conf value={conf} onChange={setConf} />
+      </div>
+      {bad ? <Problem>Enter at least four pairs, and make sure neither column is constant.</Problem> : (
+        <>
+          <Result big={`r = ${num(r.r, 2)}`} label={`${kind === 'pearson' ? 'Pearson' : 'Spearman'} correlation from ${r.n} pairs`} tone={r.p < 1 - conf ? 'good' : ''}>
+            <IntervalBar lo={r.lo} hi={r.hi} point={r.r} min={-1} max={1} bench={0} fmt={(v) => num(v, 1)} benchLabel="No relationship" />
+            <p>A {size(r.r)} {r.r >= 0 ? 'positive' : 'negative'} relationship. {r.p < 1 - conf ? 'It is statistically significant.' : 'It is not statistically significant.'} The true correlation is plausibly between {num(r.lo, 2)} and {num(r.hi, 2)}{r.hi - r.lo > 0.6 ? ', which is wide, so treat the strength with caution' : ''}. Correlation alone does not show which measure drives the other.</p>
+          </Result>
+          <Stats rows={[['r', num(r.r, 3)], ['r² (shared variance)', pct(r.r2)], ['t', `t(${r.n - 2}) = ${num(r.t, 3)}`], ['p (two-sided)', pv(r.p)], [`${conf * 100}% interval`, `${num(r.lo, 3)} to ${num(r.hi, 3)}`]]} />
+        </>
+      )}
+      <About method="correlation-analysis-with-confidence-intervals">
+        <p>Pearson's r measures linear association; Spearman's version runs the same calculation on ranks, so it suits skewed or ordinal data. Significance uses t = r√((n−2)/(1−r²)) with n − 2 degrees of freedom. The interval uses the Fisher z transformation, atanh(r) ± z/√(n−3), converted back with tanh.</p>
+      </About>
+    </>
+  );
+}
+
 const CALCS = [
   { group: 'Plan', id: 'sample-size', name: 'Sample size planner', blurb: 'How many participants you need to find problems, estimate a metric or compare designs.', C: SampleSize },
   { group: 'Measure', id: 'completion-rate', name: 'Completion rate interval', blurb: 'Confidence interval for a task success rate from a small sample.', C: CompletionRate },
   { group: 'Measure', id: 'task-time', name: 'Task time interval', blurb: 'Typical task time with an interval that respects skew.', C: TaskTime },
   { group: 'Measure', id: 'rating', name: 'Rating scale and benchmark', blurb: 'Interval for SUS, SEQ or any rating scale, tested against a benchmark.', C: Rating },
   { group: 'Measure', id: 'sus', name: 'SUS scorer', blurb: 'Score raw System Usability Scale answers, with grade and percentile.', C: SUS },
-  { group: 'Measure', id: 'umux-lite', name: 'UMUX-Lite scorer', blurb: 'Score the two-item UMUX-Lite and convert it to the SUS scale.', C: UMUXLite },
+  { group: 'Measure', id: 'umux-lite', name: 'UMUX and UMUX-Lite scorer', blurb: 'Score the four-item UMUX or two-item UMUX-Lite on the SUS scale.', C: UMUXLite },
+  { group: 'Measure', id: 'sum', name: 'Single Usability Metric (SUM)', blurb: 'Combine completion, time, satisfaction and errors into one task score.', C: SUM },
+  { group: 'Measure', id: 'top-box', name: 'Top-box and agreement target', blurb: 'Did enough people agree? Top-box share against a target, with the mean for comparison.', C: TopBox },
   { group: 'Measure', id: 'nps', name: 'Net Promoter Score', blurb: 'NPS with a proper confidence interval.', C: NPS },
   { group: 'Compare', id: 'compare-rates', name: 'Compare two completion rates', blurb: 'N−1 two-proportion test or McNemar for the same people.', C: CompareRates },
   { group: 'Compare', id: 'compare-means', name: 'Compare two means', blurb: 'Welch or paired t-test for ratings and task times.', C: CompareMeans },
   { group: 'Compare', id: 'rate-benchmark', name: 'Completion rate vs benchmark', blurb: 'Did more than the target share of users succeed?', C: RateBenchmark },
+  { group: 'Compare', id: 'correlation', name: 'Correlation', blurb: 'How strongly two measures move together, with an interval.', C: Correlation },
+  { group: 'Discover', id: 'expectation', name: 'Expectation vs experience', blurb: 'Map tasks by expected and experienced ease to see what to fix first.', C: Expectation },
   { group: 'Discover', id: 'discovery', name: 'Problems left to find', blurb: 'Estimate how many usability problems your test missed.', C: Discovery },
 ];
 

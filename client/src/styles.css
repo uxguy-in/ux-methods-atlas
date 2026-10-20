@@ -365,3 +365,24 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
   .calc-pick .select { width: 100%; }
   .calc-field input { width: 110px; }
 }
+.exp-wrap { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.exp-plot { width: 100%; height: auto; }
+.exp-plot .q { stroke: var(--line); }
+.exp-plot .q.fix { fill: color-mix(in srgb, #c0392b 12%, transparent); }
+.exp-plot .q.promote { fill: color-mix(in srgb, #1f8a4c 12%, transparent); }
+.exp-plot .q.opp { fill: color-mix(in srgb, #b7791f 12%, transparent); }
+.exp-plot .q.ok { fill: var(--bg-soft); }
+.exp-plot .ql { font-size: 12px; font-weight: 700; fill: var(--ink-2); }
+.exp-plot .ax { font-size: 12px; fill: var(--ink-3); }
+.exp-plot .dot { fill: var(--accent); }
+.exp-plot .dl { font-size: 12px; font-weight: 700; fill: var(--ink); }
+.exp-list { margin: 0; padding-left: 22px; display: grid; gap: 10px; font-size: 15px; }
+.qtag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--bg-sunk); }
+.qtag.fix { background: color-mix(in srgb, #c0392b 16%, transparent); color: #a5281c; }
+.qtag.promote { background: color-mix(in srgb, #1f8a4c 16%, transparent); color: #1f8a4c; }
+.qtag.opp { background: color-mix(in srgb, #b7791f 16%, transparent); color: #9a6212; }
+.sum-bars { display: grid; gap: 8px; margin-top: 16px; }
+.sum-bars > div { display: grid; grid-template-columns: minmax(0, 240px) 1fr 48px; gap: 12px; align-items: center; font-size: 14px; }
+.sum-bars .bar { height: 10px; background: var(--bg-sunk); border-radius: 5px; overflow: hidden; }
+.sum-bars .bar i { display: block; height: 100%; background: var(--accent); }
+@media (max-width: 860px) { .exp-wrap { grid-template-columns: 1fr; } .sum-bars > div { grid-template-columns: 1fr 1fr 44px; } }
