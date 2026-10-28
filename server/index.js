@@ -4,7 +4,7 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
-import { books, meta, byId, kinds, listFields } from './lib/data.js';
+import { books, meta, byId, kinds, listFields, watchData } from './lib/data.js';
 import { booksPayload, metaPayload, methodPayload } from './lib/kinds.js';
 import { shelvesPayload } from './lib/recommend.js';
 import { generateBrief, DEFAULT_MODEL } from './lib/brief.js';
@@ -36,8 +36,7 @@ app.get('/api/methods/:id', (req, res) => {
   res.json(methodPayload(m, byId, books));
 });
 
-const bookList = booksPayload(books, byId);
-app.get('/api/books', (_req, res) => res.json(bookList));
+app.get('/api/books', (_req, res) => res.json(booksPayload(books, byId)));
 
 app.post('/api/recommend', (req, res) => {
   const { answers = {}, brief = '', seed = 1, exclude = [] } = req.body || {};
@@ -71,5 +70,6 @@ if (existsSync(dist)) {
   app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(path.join(dist, 'index.html')));
 }
 
+watchData();
 const port = Number(process.env.PORT) || 8787;
 app.listen(port, () => console.log(`UX Methods Atlas on http://localhost:${port} (AI brief ${aiAvailable() ? 'on' : 'off'})`));
