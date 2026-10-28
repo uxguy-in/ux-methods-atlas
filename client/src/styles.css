@@ -92,6 +92,12 @@ button { font: inherit; color: inherit; }
   .menu-btn { display: grid; }
   .header-cta .btn { display: none; }
 }
+/* Eight links fill the 1200px header, so on desktop the links tighten and "Start here" gives way to the nav's own "Find a method". */
+@media (min-width: 1201px) {
+  .site-header .wrap { gap: 14px; }
+  .nav a { padding: 0 8px; letter-spacing: .04em; }
+  .header-cta .btn { display: none; }
+}
 @media (max-width: 420px) { .logo-text small { display: none; } .logo-block { width: 44px; height: 44px; font-size: 19px; } }
 
 /* ── Buttons & pills ── */
@@ -210,6 +216,8 @@ a.card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow
 .tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .tag { font-size: 12.5px; background: var(--bg-soft); border-radius: var(--radius-sm); padding: 3px 10px; color: var(--ink-2); font-weight: 600; text-decoration: none; }
 a.tag:hover { background: var(--ink); color: var(--bg); }
+.tag-kind { color: var(--focus); }
+a.tag:hover .tag-kind { color: inherit; }
 .related-list { display: flex; flex-direction: column; gap: 8px; }
 .related-list a { text-decoration: none; font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .related-list a:hover { color: var(--accent); }
@@ -277,6 +285,8 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .badge.core { background: var(--ink); color: var(--bg); }
 .badge.now { background: var(--accent-soft); color: var(--accent); }
 .badge.done { background: color-mix(in srgb, #1f8a4c 16%, transparent); color: #1f8a4c; }
+.design-card { margin-top: 20px; }
+.badge.kind-design { background: color-mix(in srgb, var(--focus) 14%, transparent); color: var(--focus); text-decoration: none; white-space: nowrap; }
 .badge.untested { background: color-mix(in srgb, #b7791f 16%, transparent); color: #9a6212; }
 
 /* ── Footer ── */

@@ -7,6 +7,7 @@ import Atlas from './pages/Atlas.jsx';
 import Method from './pages/Method.jsx';
 import Lost from './pages/Lost.jsx';
 import Families from './pages/Families.jsx';
+import Design from './pages/Design.jsx';
 import Library from './pages/Library.jsx';
 import About from './pages/About.jsx';
 import Submit from './pages/Submit.jsx';
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/methods/:id" element={<Method />} />
         <Route path="/lost" element={<Lost />} />
         <Route path="/families" element={<Families />} />
+        <Route path="/design" element={<Design />} />
         <Route path="/library" element={<Library />} />
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/calculators/:calc" element={<Calculators />} />

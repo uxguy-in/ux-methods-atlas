@@ -5,6 +5,7 @@ export const listFields = (m) => ({
   name: m.name,
   aka: m.aka,
   family: m.family,
+  kind: m.kind,
   donor: m.donor,
   status: m.status,
   validation: m.validation,

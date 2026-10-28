@@ -91,6 +91,10 @@
   {
    "name": "Community-Proposed Frameworks",
    "blurb": "New frameworks put forward by practitioners in the community, each marked as tested or not yet tested."
+  },
+  {
+   "name": "Design & Product Practice",
+   "blurb": "Making, ideation and product practices that sit beside research: prototyping, critique, canvases and workshops. Listed separately from the research methods."
   }
  ],
  "lossTaxonomy": [

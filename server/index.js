@@ -4,7 +4,8 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
-import { methods, books, meta, byId, listFields } from './lib/data.js';
+import { books, meta, byId, kinds, listFields } from './lib/data.js';
+import { booksPayload, metaPayload, methodPayload } from './lib/kinds.js';
 import { shelvesPayload } from './lib/recommend.js';
 import { generateBrief, DEFAULT_MODEL } from './lib/brief.js';
 
@@ -15,27 +16,32 @@ const app = express();
 app.use(express.json({ limit: '200kb' }));
 
 app.get('/api/meta', (_req, res) => {
-  res.json({ ...meta, counts: { methods: methods.length, books: books.length }, ai: aiAvailable() });
+  res.json({ ...metaPayload(meta, kinds, books), ai: aiAvailable() });
 });
 
+// The atlas lists research methods only; design & product practices have their own list.
 app.get('/api/methods', (_req, res) => {
   res.set('Cache-Control', 'public, max-age=300');
-  res.json(methods.map(listFields));
+  res.json(kinds.research.map(listFields));
+});
+
+app.get('/api/design', (_req, res) => {
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json(kinds.design.map(listFields));
 });
 
 app.get('/api/methods/:id', (req, res) => {
   const m = byId.get(req.params.id);
   if (!m) return res.status(404).json({ error: 'Method not found' });
-  const related = (m.relatedIds || []).map((id) => byId.get(id)).filter(Boolean).map(listFields);
-  const sourceBooks = (m.bookIds || []).map((id) => books.find((b) => b.id === id)).filter(Boolean);
-  res.json({ ...m, related, sourceBooks });
+  res.json(methodPayload(m, byId, books));
 });
 
-app.get('/api/books', (_req, res) => res.json(books));
+const bookList = booksPayload(books, byId);
+app.get('/api/books', (_req, res) => res.json(bookList));
 
 app.post('/api/recommend', (req, res) => {
   const { answers = {}, brief = '', seed = 1, exclude = [] } = req.body || {};
-  res.json(shelvesPayload(methods, answers, brief, seed, Array.isArray(exclude) ? exclude.slice(0, 200) : []));
+  res.json(shelvesPayload(kinds.research, answers, brief, seed, Array.isArray(exclude) ? exclude.slice(0, 200) : []));
 });
 
 app.post('/api/brief', async (req, res) => {
@@ -48,7 +54,7 @@ app.post('/api/brief', async (req, res) => {
   }
   try {
     const client = aiAvailable() ? new Anthropic() : new Anthropic({ apiKey: visitorKey });
-    res.json(await generateBrief(client, methods, byId, { answers, brief }, MODEL));
+    res.json(await generateBrief(client, kinds.research, kinds.researchById, { answers, brief }, MODEL));
   } catch (err) {
     console.error(err instanceof Anthropic.APIError ? `Anthropic API error ${err.status}` : err);
     if (err instanceof Anthropic.RateLimitError) return res.status(429).json({ error: 'Rate limited by the API. Try again in a minute.' });

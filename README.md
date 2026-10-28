@@ -55,7 +55,10 @@ setting[], material[]}, relatedIds[], bookIds[], keywords[]`
 `status` follows the taxonomy of loss from *Lost Methods in UX*: active, vestigial, siloed, renamed, latent,
 extinct, unmigrated, plus `community` for community-proposed frameworks. Community frameworks also carry
 `proposedBy` and `validation` (`tested` or `untested`); a framework counts as tested once there is published
-evidence of use beyond the person who proposed it. Edit `methods.json` directly to add or correct methods, then
+evidence of use beyond the person who proposed it. Design and product practices (prototyping, critique, canvases,
+story mapping, workshops) carry `"kind": "design"` and `"family": "Design & Product Practice"`; they are listed only on
+the Design & product page (`/api/design`) and are left out of the atlas, the finder, the disciplines and the counts
+(see `server/lib/kinds.js`). Records without `kind` are research methods. Edit `methods.json` directly to add or correct methods, then
 run `npm run check:data`.
 
 ## Community submissions

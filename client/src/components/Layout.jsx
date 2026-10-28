@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigationType } from 'react-router-dom';
 import { noteLocation } from '../nav-trail.js';
+import { useApi } from '../hooks.js';
 import { REPO_URL } from '../vocab.js';
 
 const THEME_KEY = 'atlas-theme';
@@ -23,6 +24,7 @@ const LINKS = [
   ['/methods', 'Atlas'],
   ['/lost', 'Lost methods'],
   ['/families', 'Disciplines'],
+  ['/design', 'Design & product'],
   ['/library', 'Library'],
   ['/calculators', 'Calculators'],
   ['/about', 'About'],
@@ -71,6 +73,11 @@ export default function Layout({ children }) {
   noteLocation(loc, navType);
   useScrollMemory(loc, navType);
   useEffect(() => { setOpen(false); }, [loc.pathname]);
+  // A design & product practice opens on its /methods/ page, but belongs under "Design & product" in the nav.
+  const methodId = loc.pathname.match(/^\/methods\/([^/]+)$/)?.[1];
+  const { data: design } = useApi(methodId ? '/api/design' : null);
+  const onDesign = Boolean(methodId && design?.some((m) => m.id === decodeURIComponent(methodId)));
+  const navClass = (to) => ({ isActive }) => ((to === '/design' ? isActive || onDesign : isActive && !(to === '/methods' && onDesign)) ? 'active' : undefined);
 
   return (
     <>
@@ -88,7 +95,7 @@ export default function Layout({ children }) {
             <span className="logo-text">Methods Atlas<small>A UX Brighton sister site</small></span>
           </Link>
           <nav className={`nav${open ? ' open' : ''}`} aria-label="Main">
-            {LINKS.map(([to, label]) => <NavLink key={to} to={to}>{label}</NavLink>)}
+            {LINKS.map(([to, label]) => <NavLink key={to} to={to} className={navClass(to)}>{label}</NavLink>)}
           </nav>
           <div className="header-cta">
             <button className="icon-btn" onClick={toggle} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>

@@ -18,6 +18,7 @@ export function useApi(url) {
 
 export const useMeta = () => useApi('/api/meta');
 export const useMethods = () => useApi('/api/methods');
+export const useDesignMethods = () => useApi('/api/design');
 
 // State that belongs to one visit of a page: kept when the visitor comes back to it with Back,
 // and fresh when they arrive by clicking a link. Stored per history entry for the browser session.

@@ -5,6 +5,7 @@ const PAGES = [
   [/^\/methods$/, () => 'Atlas'],
   [/^\/lost$/, () => 'Lost methods'],
   [/^\/families/, () => 'Disciplines'],
+  [/^\/design$/, () => 'Design & product'],
   [/^\/find$/, () => 'your results'],
   [/^\/methods\/.+/, () => 'previous method'],
   [/^\/$/, () => 'Home'],

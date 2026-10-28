@@ -60,6 +60,7 @@ function ViewSwitch({ view, counts }) {
     <div className="view-switch" role="tablist">
       <Link role="tab" aria-selected={view === 'books'} className={`chip${view === 'books' ? ' on' : ''}`} to="/library">Books{counts.books ? ` (${counts.books})` : ''}</Link>
       <Link role="tab" aria-selected={view === 'methods'} className={`chip${view === 'methods' ? ' on' : ''}`} to="/library?view=methods">All methods{counts.methods ? ` (${counts.methods})` : ''}</Link>
+      {counts.design > 0 && <Link className="chip" to="/design">Design & product ({counts.design})</Link>}
     </div>
   );
 }
@@ -158,7 +159,9 @@ function BookList({ counts }) {
               </div>
             </div>
             <div className="tags" style={{ alignContent: 'flex-start' }}>
-              {(b.methods || []).map((m) => <Link key={m.id} className="tag" to={`/methods/${m.id}`}>{m.name}</Link>)}
+              {(b.methods || []).map((m) => (
+                <Link key={m.id} className="tag" to={`/methods/${m.id}`}>{m.name}{m.kind === 'design' && <span className="tag-kind"> · Design & product</span>}</Link>
+              ))}
             </div>
           </div>
         ))}

@@ -15,6 +15,8 @@ export default function Method() {
   const from = cameFrom(key);
   if (!m) return <Loading error={error} />;
   const f = m.facets || {};
+  // Design & product practices sit outside the research atlas, so they skip its filters and the finder.
+  const design = m.kind === 'design';
   const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
 
   return (
@@ -27,10 +29,14 @@ export default function Method() {
             </button>
           )}
           <div className="crumbs">
-            <Link to="/methods">Atlas</Link><span>/</span>
-            <Link to={`/methods?family=${slug(m.family)}`}>{m.family}</Link>
+            {design ? (
+              <Link to="/design">Design & product</Link>
+            ) : (
+              <><Link to="/methods">Atlas</Link><span>/</span><Link to={`/methods?family=${slug(m.family)}`}>{m.family}</Link></>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+            {design && <Link to="/design" className="badge kind-design">Design & product practice</Link>}
             <Status value={m.status} />
             {m.validation && <span className={`badge ${m.validation === 'tested' ? 'done' : 'untested'}`} title={VALIDATION[m.validation].short}>{VALIDATION[m.validation].label}</span>}
             {m.proposedBy && <span className="muted" style={{ fontSize: 14 }}>Proposed by {m.proposedBy}</span>}
@@ -108,8 +114,17 @@ export default function Method() {
             <div className="aside-box">
               <h3>Good for</h3>
               <div className="tags">
-                {(f.goals || []).map((g) => <Link key={g} className="tag" to={`/methods?goal=${g}`}>{GOALS[g] || g}</Link>)}
-                {(f.stage || []).map((s) => <Link key={s} className="tag" to={`/methods?stage=${s}`}>{STAGES[s] || s}</Link>)}
+                {design ? (
+                  <>
+                    {(f.goals || []).map((g) => <span key={g} className="tag">{GOALS[g] || g}</span>)}
+                    {(f.stage || []).map((s) => <span key={s} className="tag">{STAGES[s] || s}</span>)}
+                  </>
+                ) : (
+                  <>
+                    {(f.goals || []).map((g) => <Link key={g} className="tag" to={`/methods?goal=${g}`}>{GOALS[g] || g}</Link>)}
+                    {(f.stage || []).map((s) => <Link key={s} className="tag" to={`/methods?stage=${s}`}>{STAGES[s] || s}</Link>)}
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -147,12 +162,14 @@ export default function Method() {
               <h3>Related methods</h3>
               <div className="related-list">
                 {m.related.map((r) => (
-                  <Link key={r.id} to={`/methods/${r.id}`}><span>{r.name}</span><Status value={r.status} /></Link>
+                  <Link key={r.id} to={`/methods/${r.id}`}><span>{r.name}</span>{r.kind === 'design' ? <span className="badge kind-design">Design</span> : <Status value={r.status} />}</Link>
                 ))}
               </div>
             </div>
           )}
-          <Link to="/find" className="btn accent" style={{ width: '100%' }}>Is this right for my problem?</Link>
+          {design
+            ? <Link to="/design" className="btn ghost" style={{ width: '100%' }}>More design & product methods</Link>
+            : <Link to="/find" className="btn accent" style={{ width: '100%' }}>Is this right for my problem?</Link>}
         </aside>
       </div>
     </>

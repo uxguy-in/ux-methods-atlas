@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
@@ -71,6 +71,7 @@ export default function Atlas() {
           <h1 className="h1">{methods.length} methods.</h1>
           <p className="lede" style={{ marginBottom: 0 }}>
             Search by name, discipline, idea or problem. Filter by what you need to learn and how much time you have.
+            {meta?.counts?.design > 0 && <> Design and product practices are <Link to="/design">listed separately</Link>.</>}
           </p>
         </div>
       </section>

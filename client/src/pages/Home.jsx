@@ -116,6 +116,14 @@ export default function Home() {
               </div>
             ))}
           </div>
+          {meta?.counts?.design > 0 && (
+            <Link to="/design" className="card design-card">
+              <span className="fam">Listed separately</span>
+              <h3>{meta.counts.design} design & product methods</h3>
+              <p>Prototyping, ideation, critique, canvases, story mapping and workshops: the making and product practices that sit beside research.</p>
+              <div className="meta"><span className="badge kind-design">Browse design & product</span></div>
+            </Link>
+          )}
         </div>
       </section>
 
