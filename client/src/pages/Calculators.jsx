@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import * as S from '../calc/stats.js';
+import { CATALOG } from '../calc/catalog.js';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -614,8 +615,9 @@ function Discovery() {
           <Stats rows={[['Raw p (average problem frequency)', pct(r.pEst)], ['Problems seen only once', pct(r.once, 0)], ['Adjusted p (Lewis 2001)', pct(r.pAdj)], ['Estimated total problems', num(r.total, 1)]]} />
         </>
       )}
-      <About method="problem-discovery-sample-size-model-1-1-p-n">
+      <About method="problem-discovery-sample-size-model-1-1-p-n" links={[['capture-recapture-estimation-of-usability-problems', 'Capture-recapture estimation of usability problems']]}>
         <p>The raw estimate of p from a small test is inflated, because problems nobody hit are missing from the matrix. Lewis (2001) averages two corrections: normalisation, (p − 1/n)(1 − 1/n), and Good-Turing, p / (1 + share of problems seen once). The share found is then 1 − (1 − p<sub>adj</sub>)<sup>n</sup>, and the total is the number found divided by that share.</p>
+        <p>If you know which evaluator or session found each problem, the <Link to="/calculators/capture-recapture">capture-recapture calculator</Link> estimates the total from how much their findings overlap.</p>
       </About>
     </>
   );
@@ -1356,35 +1358,649 @@ function SPRT() {
   );
 }
 
-const CALCS = [
-  { group: 'Plan', id: 'sample-size', name: 'Sample size planner', blurb: 'How many participants you need to find problems, estimate a metric or compare designs.', C: SampleSize },
-  { group: 'Measure', id: 'completion-rate', name: 'Completion rate interval', blurb: 'Confidence interval for a task success rate from a small sample.', C: CompletionRate },
-  { group: 'Measure', id: 'task-time', name: 'Task time interval', blurb: 'Typical task time with an interval that respects skew.', C: TaskTime },
-  { group: 'Measure', id: 'rating', name: 'Rating scale and benchmark', blurb: 'Interval for SUS, SEQ or any rating scale, tested against a benchmark.', C: Rating },
-  { group: 'Measure', id: 'sus', name: 'SUS scorer', blurb: 'Score raw System Usability Scale answers, with grade and percentile.', C: SUS },
-  { group: 'Measure', id: 'umux-lite', name: 'UMUX and UMUX-Lite scorer', blurb: 'Score the four-item UMUX or two-item UMUX-Lite on the SUS scale.', C: UMUXLite },
-  { group: 'Measure', id: 'sum', name: 'Single Usability Metric (SUM)', blurb: 'Combine completion, time, satisfaction and errors into one task score.', C: SUM },
-  { group: 'Measure', id: 'top-box', name: 'Top-box and agreement target', blurb: 'Did enough people agree? Top-box share against a target, with the mean for comparison.', C: TopBox },
-  { group: 'Measure', id: 'nps', name: 'Net Promoter Score', blurb: 'NPS with a proper confidence interval.', C: NPS },
-  { group: 'Questionnaires', id: 'seq', name: 'SEQ scorer', blurb: 'Single Ease Question mean with an interval, against the average of about 5.5.', C: SEQ },
-  { group: 'Questionnaires', id: 'nasa-tlx', name: 'NASA-TLX scorer', blurb: 'Raw and weighted workload scores, with the 15 pairwise comparisons.', C: NasaTLX },
-  { group: 'Questionnaires', id: 'ueq', name: 'UEQ scorer', blurb: 'Six User Experience Questionnaire scales, against the published benchmark.', C: UEQ },
-  { group: 'Questionnaires', id: 'attrakdiff', name: 'AttrakDiff (short) scorer', blurb: 'Pragmatic, hedonic and attractiveness scores on the AttrakDiff portfolio.', C: AttrakDiff },
-  { group: 'Compare', id: 'compare-rates', name: 'Compare two completion rates', blurb: 'N−1 two-proportion test or McNemar for the same people.', C: CompareRates },
-  { group: 'Compare', id: 'compare-means', name: 'Compare two means', blurb: 'Welch or paired t-test for ratings and task times.', C: CompareMeans },
-  { group: 'Compare', id: 'rate-benchmark', name: 'Completion rate vs benchmark', blurb: 'Did more than the target share of users succeed?', C: RateBenchmark },
-  { group: 'Compare', id: 'correlation', name: 'Correlation', blurb: 'How strongly two measures move together, with an interval.', C: Correlation },
-  { group: 'Experiments', id: 'effect-size', name: 'Effect size', blurb: "Cohen's d and Hedges' g with an interval: how big the difference is.", C: EffectSize },
-  { group: 'Experiments', id: 'nonparametric', name: 'Nonparametric comparison', blurb: 'Mann-Whitney U or Wilcoxon signed-rank for ratings and skewed data.', C: Nonparametric },
-  { group: 'Experiments', id: 'bayes-ab', name: 'Bayesian A/B test', blurb: 'Chance that B beats A and the expected loss of each choice.', C: BayesAB },
-  { group: 'Experiments', id: 'sprt', name: 'Sequential test planner', blurb: 'Wald SPRT boundaries: stop or continue as conversions come in.', C: SPRT },
-  { group: 'Survey quality', id: 'reliability', name: 'Scale reliability', blurb: "Cronbach's alpha with an interval, item diagnostics and McDonald's omega.", C: Reliability },
-  { group: 'Survey quality', id: 'margin-of-error', name: 'Survey margin of error', blurb: 'Margin for a proportion, or the sample needed, with population size and design effect.', C: MarginOfError },
-  { group: 'Qualitative rigour', id: 'intercoder', name: 'Inter-coder agreement', blurb: "Percent agreement, Cohen's kappa and Krippendorff's alpha for coded data.", C: InterCoder },
-  { group: 'Qualitative rigour', id: 'saturation', name: 'Saturation and coverage', blurb: 'Code accumulation, Good-Turing coverage and an estimate of codes still to find.', C: Saturation },
-  { group: 'Discover', id: 'expectation', name: 'Expectation vs experience', blurb: 'Map tasks by expected and experienced ease to see what to fix first.', C: Expectation },
-  { group: 'Discover', id: 'discovery', name: 'Problems left to find', blurb: 'Estimate how many usability problems your test missed.', C: Discovery },
-];
+// Line chart on the expectation-plot frame: series share one x axis and a 0–100% y axis, with labelled points.
+function Curves({ xs, series, marks = [], xFmt = (v) => num(v, 0), yLabel = 'Share of respondents', xLabel = 'Price', label }) {
+  const W = 560, H = 340, L = 60, R = 14, T = 16, B = 40;
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const sx = (v) => L + (x1 === x0 ? 0.5 : (v - x0) / (x1 - x0)) * (W - L - R), sy = (v) => T + (1 - v) * (H - T - B);
+  const ticks = [0, 0.25, 0.5, 0.75, 1];
+  const xt = Array.from({ length: 5 }, (_, i) => x0 + (i / 4) * (x1 - x0));
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={label}>
+        <rect x={L} y={T} width={W - L - R} height={H - T - B} className="q ok" />
+        {ticks.map((t) => <g key={t}><line x1={L} x2={W - R} y1={sy(t)} y2={sy(t)} style={{ stroke: 'var(--line)' }} /><text x={L - 6} y={sy(t) + 4} className="ax" textAnchor="end">{Math.round(t * 100)}%</text></g>)}
+        {xt.map((t, i) => <text key={i} x={sx(t)} y={H - B + 16} className="ax" textAnchor={i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}>{xFmt(t)}</text>)}
+        {series.map((s) => <polyline key={s.name} points={xs.map((x, i) => `${sx(x)},${sy(s.ys[i])}`).join(' ')} style={{ fill: 'none', stroke: s.color, strokeWidth: 2.5, strokeDasharray: s.dash || 'none' }} />)}
+        {marks.filter((m) => m && Number.isFinite(m.x)).map((m) => (
+          <g key={m.label}><circle cx={sx(m.x)} cy={sy(m.y)} r="5" className="dot" /><text x={sx(m.x) + 7} y={sy(m.y) - 7} className="dl">{m.label}</text></g>
+        ))}
+        <text x={(L + W - R) / 2} y={H - 6} className="ax" textAnchor="middle">{xLabel} →</text>
+        <text x={12} y={(T + H - B) / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>{yLabel}</text>
+      </svg>
+      <p className="phase-calcs">{series.map((s) => <span key={s.name} className="muted"><svg width="26" height="10" aria-hidden="true"><line x1="0" x2="26" y1="5" y2="5" style={{ stroke: s.color, strokeWidth: 2.5, strokeDasharray: s.dash || 'none' }} /></svg> {s.name}</span>)}</p>
+    </div>
+  );
+}
+
+// ── 28. Capture-recapture ──
+const CR_SAMPLE = '1 1 1 0\n1 0 1 1\n1 0 0 0\n0 1 0 0\n1 1 0 0\n0 0 1 0\n1 1 1 1\n0 0 0 1\n1 0 1 0\n0 1 0 0';
+function CaptureRecapture() {
+  const [mode, setMode] = useState('two'); const [conf, setConf] = useState(0.95);
+  const [a, setA] = useState('10'); const [b, setB] = useState('15'); const [m, setM] = useState('5');
+  const [text, setText] = useState(CR_SAMPLE);
+  let body;
+  if (mode === 'two') {
+    const A = int(a), B = int(b), M = int(m);
+    const bad = !(A > 0 && B > 0 && M >= 0 && M <= Math.min(A, B));
+    const r = bad ? null : S.lincolnPetersen(A, B, M, conf);
+    body = (
+      <>
+        <div className="calc-inputs">
+          <Num label="Problems found by evaluator A" value={a} onChange={setA} min={1} />
+          <Num label="Problems found by evaluator B" value={b} onChange={setB} min={1} />
+          <Num label="Found by both" value={m} onChange={setM} min={0} />
+          <Conf value={conf} onChange={setConf} />
+        </div>
+        {bad ? <Problem>Each evaluator needs at least one problem, and the overlap must be between 0 and the smaller count.</Problem> : (
+          <>
+            {M < 3 && <Problem>With fewer than three problems in common the estimate is very unstable. Treat it as a rough order of magnitude.</Problem>}
+            <Result big={`about ${num(r.chapman, 0)} problems`} label={`Chapman estimate of the total, ${conf * 100}% interval ${num(r.lo, 0)} to ${num(r.hi, 0)}`} tone={r.remaining / r.chapman < 0.15 ? 'good' : r.remaining / r.chapman > 0.4 ? 'bad' : ''}>
+              <IntervalBar lo={r.lo} hi={r.hi} point={r.chapman} min={0} max={Math.max(r.hi, r.seen) * 1.1} bench={r.seen} benchLabel="Found" fmt={(v) => num(v, 0)} />
+              <p>Between them the two evaluators found {r.seen} different problems. Their overlap suggests about {num(r.chapman, 0)} in total, so roughly {num(r.remaining, 0)} ({pct(r.remaining / r.chapman, 0)}) have not been found yet. Each evaluator found about {pct(r.pA, 0)} and {pct(r.pB, 0)} of the estimated total. The less the two lists overlap, the more is still out there.</p>
+            </Result>
+            <Stats rows={[['Found so far', r.seen], ['Lincoln-Petersen estimate', Number.isFinite(r.lp) ? num(r.lp, 1) : 'Not defined (no overlap)'], ['Chapman estimate (less biased)', num(r.chapman, 1)], ['Standard error (Seber)', num(r.se, 2)], [`${conf * 100}% interval for the total`, `${num(r.lo, 1)} – ${num(r.hi, 1)}`], ['Estimated not yet found', num(r.remaining, 1)]]} />
+          </>
+        )}
+      </>
+    );
+  } else {
+    const rows = S.parseRows(text).filter((r) => r.every((v) => v === 0 || v === 1));
+    const T = rows.reduce((x, r) => Math.max(x, r.length), 0);
+    const full = rows.filter((r) => r.length === T);
+    const r = full.length && T >= 2 ? S.captureMatrix(full, conf) : null;
+    const bad = !r || r.S === 0;
+    const maxF = r ? Math.max(1, ...r.freq) : 1;
+    body = (
+      <>
+        <div className="calc-inputs">
+          <Area label="One problem per line, one column per evaluator: 1 if they found it, 0 if not" value={text} onChange={setText} rows={8}
+            hint="Merge duplicate reports into one line first. Lines with a different number of columns from the rest are skipped." />
+          <Conf value={conf} onChange={setConf} />
+        </div>
+        {rows.length > full.length && <Problem>{rows.length - full.length} line{rows.length - full.length > 1 ? 's' : ''} skipped: every line needs {T} columns of 0s and 1s.</Problem>}
+        {bad ? <Problem>Enter at least one problem, with columns for two or more evaluators.</Problem> : (
+          <>
+            {r.Q2 === 0 && <Problem>No problem was found by exactly two evaluators, so Chao's estimator falls back to its bias-corrected form and the estimate is rough.</Problem>}
+            <Result big={`about ${num(r.chao, 0)} problems`} label={`Chao estimate of the total from ${r.T} evaluators, ${conf * 100}% interval ${num(r.lo, 0)} to ${num(r.hi, 0)}`} tone={r.remaining / r.chao < 0.15 ? 'good' : r.remaining / r.chao > 0.4 ? 'bad' : ''}>
+              <IntervalBar lo={r.lo} hi={r.hi} point={r.chao} min={0} max={Math.max(r.hi, r.S) * 1.1} bench={r.S} benchLabel="Found" fmt={(v) => num(v, 0)} />
+              <p>The {r.T} evaluators found {r.S} different problems. {r.Q1} were found by only one evaluator, which is the sign that more remain: the estimate is about {num(r.chao, 0)} in total, or {num(r.remaining, 0)} still to find. On average each evaluator found {pct(r.pMean, 0)} of the estimated total{r.pMean < 0.3 ? ', so adding evaluators will keep turning up new problems' : ''}.</p>
+            </Result>
+            <div className="disc-table" role="table" aria-label="Problems by number of evaluators who found them">
+              {r.freq.map((c, i) => (
+                <div key={i} role="row" className={i === 0 ? 'hl' : ''}>
+                  <span role="cell">Found by {i + 1}</span>
+                  <span role="cell" className="bar"><i style={{ width: pct(c / maxF, 0) }} /></span>
+                  <span role="cell">{c}</span>
+                </div>
+              ))}
+            </div>
+            <Stats rows={[
+              ['Found so far (S)', r.S], ['Found by one evaluator (Q1)', r.Q1], ['Found by two (Q2)', r.Q2],
+              ['Chao estimate', `${num(r.chao, 1)} (${num(r.lo, 1)} – ${num(r.hi, 1)})`],
+              ['First-order jackknife', num(r.jack1, 1)], ['Second-order jackknife', num(r.jack2, 1)],
+              ['Problems per evaluator', r.perEvaluator.join(' · ')],
+              r.pair && ['Chapman (two evaluators)', num(r.pair.chapman, 1)],
+            ]} />
+          </>
+        )}
+      </>
+    );
+  }
+  return (
+    <>
+      <div className="calc-inputs"><Choice label="Evaluators or sessions" value={mode} onChange={setMode} options={[['two', 'Two'], ['many', 'Several (matrix)']]} /></div>
+      {body}
+      <About method="capture-recapture-estimation-of-usability-problems" links={[['problem-discovery-sample-size-model-1-1-p-n', 'Problem discovery sample size model']]}>
+        <p>Capture-recapture borrows the ecologist's trick for counting animals: if two independent searches overlap a lot, there is little left to find. For two evaluators who find n<sub>1</sub> and n<sub>2</sub> problems with m in common, Lincoln-Petersen estimates the total as n<sub>1</sub>n<sub>2</sub>/m; Chapman's version, (n<sub>1</sub> + 1)(n<sub>2</sub> + 1)/(m + 1) − 1, is less biased and works when m is 0. Its variance is Seber's (n<sub>1</sub> + 1)(n<sub>2</sub> + 1)(n<sub>1</sub> − m)(n<sub>2</sub> − m)/((m + 1)²(m + 2)).</p>
+        <p>For several evaluators the calculator uses Chao's estimator for incidence data, S + ((T − 1)/T)·Q<sub>1</sub>²/(2Q<sub>2</sub>), where Q<sub>1</sub> and Q<sub>2</sub> count problems found by exactly one and two of the T evaluators, with Chao's variance. Intervals use Chao's log-normal method on the number not yet found, so the lower end never falls below what you have. The jackknife estimates are shown as a cross-check.</p>
+        <p>The method assumes every evaluator could find every problem and that evaluators work independently. Problems differ in how easy they are to find, which makes all of these estimates too low; read them as "at least this many". Do not pool evaluators who tested different tasks or parts of the product. For the 1 − (1 − p)<sup>n</sup> view of the same question, use the <Link to="/calculators/discovery">problems left to find</Link> calculator.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 29. KLM ──
+const KLM_SAMPLE = 'H          # hand to the mouse\nP BB       # point at the File menu and click\nP BB       # point at Save As and click\nH          # hands back to the keyboard\n"Q3 report" # type the new name\nK          # press Enter\nR(0.5)     # wait for the save';
+function KLM() {
+  const [text, setText] = useState(KLM_SAMPLE); const [k, setK] = useState(0.28); const [auto, setAuto] = useState(true);
+  const parsed = S.parseKlm(text);
+  const ops = auto ? S.placeM(parsed.ops) : parsed.ops;
+  const r = S.klmTime(ops, k);
+  const bad = parsed.ops.length === 0;
+  const NAMES = { K: 'Keystroke (K)', P: 'Point (P)', B: 'Button press or release (B)', H: 'Home hands (H)', M: 'Mental preparation (M)', R: 'System response (R)' };
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="Operators, in order" value={text} onChange={setText} rows={8}
+          hint={'K keystroke, P point, B mouse button press or release (a click is BB), H move hands between mouse and keyboard, M think, R(2) wait 2 seconds for the system. Write 5K for five keystrokes and "text" for one K per character. Anything after # is a comment.'} />
+        <Choice label="Typing speed (K)" value={k} onChange={setK} options={S.KLM_K.map(([v, l]) => [v, `${l.split(' (')[0]} ${v} s`])} />
+        <Choice label="Mental operators" value={auto ? 'auto' : 'manual'} onChange={(v) => setAuto(v === 'auto')} options={[['auto', 'Place M for me'], ['manual', 'Use my Ms']]} />
+      </div>
+      {parsed.bad.length > 0 && <Problem>Ignored: {[...new Set(parsed.bad)].join(' ')}. Use only K, P, B, H, M, R(seconds), counts such as 5K and "quoted text".</Problem>}
+      {bad ? <Problem>Enter at least one operator.</Problem> : (
+        <>
+          <Result big={secs(r.total)} label={`Predicted time for a skilled user, ${ops.length} operators`}>
+            <div className="sum-bars">
+              {Object.keys(NAMES).filter((o) => r.counts[o]).map((o) => <div key={o}><span>{NAMES[o]} × {r.counts[o]}</span><span className="bar"><i style={{ width: pct(r.time[o] / r.total, 0) }} /></span><b>{num(r.time[o], 2)} s</b></div>)}
+            </div>
+            <p>An expert who makes no errors would take about {secs(r.total)}. {r.time.M / r.total > 0.4 ? `Thinking time (M) is ${pct(r.time.M / r.total, 0)} of the total, so fewer decisions or steps would save the most.` : r.time.P / r.total > 0.35 ? `Pointing is ${pct(r.time.P / r.total, 0)} of the total; keyboard shortcuts or larger, closer targets would save the most.` : 'Compare this with an alternative design by writing its sequence the same way.'}</p>
+          </Result>
+          <Stats rows={[
+            ['Sequence used', ops.map((o) => (o.op === 'R' ? `R(${o.t})` : o.op)).join(' ')],
+            auto && ['Mental operators placed', `${r.counts.M} (rules 0, 1 and 2)`],
+            ['Without mental operators', secs(r.total - r.time.M)],
+            ['K used', `${k} s per keystroke`],
+          ]} />
+        </>
+      )}
+      <About method="keystroke-level-model-klm" links={[['goms-klm', 'GOMS / KLM']]}>
+        <p>The Keystroke-Level Model (Card, Moran and Newell 1980) adds up standard times for each physical and mental step: K keystroke (0.12 s for a good typist, 0.20 s average skilled, 0.28 s average non-secretary, 1.2 s unfamiliar with the keyboard), P point with a mouse 1.1 s, B press or release a mouse button 0.1 s (Kieras's refinement), H move hands between keyboard and mouse 0.4 s, M mental preparation 1.35 s, and R for system response time, which you supply.</p>
+        <p>With "Place M for me" the calculator drops your own Ms and applies the first three placement rules: an M before every keystroke and every pointing action (rule 0), none between a point and the click or key it leads to (rule 1), and only one at the start of a run of keystrokes that form one unit, such as a typed word (rule 2). Rules 3 and 4, which remove Ms before redundant terminators and command names, need judgement: switch to "Use my Ms" and place them yourself if they apply.</p>
+        <p>KLM predicts error-free expert time for a method you specify. It does not tell you whether people will find that method, how long novices take, or how often they make mistakes, so pair it with a usability test. It is most useful for comparing two designs of a routine, repeated task.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 30. Fitts' law ──
+const FITTS_DEFAULTS = { pointer: ['0.1', '0.2'], touch: ['0.1', '0.15'] };
+function Fitts() {
+  const [mode, setMode] = useState('pointer'); const [unit, setUnit] = useState('mm');
+  const [d, setD] = useState('256'); const [w, setW] = useState('16');
+  const [ab, setAb] = useState('default'); const [a, setA] = useState('0.1'); const [b, setB] = useState('0.2');
+  const [sd, setSd] = useState(''); const [mt, setMt] = useState(''); const [sigA, setSigA] = useState('1.5');
+  const [fit, setFit] = useState('256 16 0.92\n128 16 0.74\n512 32 0.95\n256 8 1.12\n64 16 0.55\n512 8 1.31');
+  const pick = (m) => { setMode(m); if (m === 'touch') { setD('30'); setW('7'); } else { setD('256'); setW('16'); } };
+  const toMm = mode === 'touch' && unit === 'dp' ? 0.15875 : 1;
+  const D = n_(d) * toMm, Wd = n_(w) * toMm, SD = n_(sd) * toMm, SA = mode === 'touch' ? n_(sigA) : 0;
+  let A = n_(FITTS_DEFAULTS[mode][0]), B = n_(FITTS_DEFAULTS[mode][1]), fitR = null;
+  if (ab === 'own') { A = n_(a); B = n_(b); }
+  if (ab === 'fit') {
+    const rows = S.parseRows(fit).filter((r) => r.length === 3 && r[0] > 0 && r[1] > 0 && r[2] > 0);
+    const ids = rows.map((r) => S.fittsId(r[0], r[1])), mts = rows.map((r) => r[2]);
+    if (rows.length >= 3 && S.sd(ids) > 0) { fitR = { ...S.correlation(ids, mts), n: rows.length }; A = fitR.intercept; B = fitR.slope; }
+  }
+  const bad = !(D > 0 && Wd > 0 && Number.isFinite(A) && B > 0) || (ab === 'fit' && !fitR);
+  const r = bad ? null : S.fitts({ D, W: Wd, a: A, b: B, sd: SD > 0 ? SD : 0, mt: n_(mt), sigmaA: SA > 0 ? SA : 0 });
+  const sigma = SD > 0 ? SD : SA;
+  const u = mode === 'touch' ? 'mm' : 'units';
+  return (
+    <>
+      <div className="calc-inputs">
+        <Choice label="Input" value={mode} onChange={pick} options={[['pointer', 'Mouse or trackpad'], ['touch', 'Finger on a touch screen']]} />
+        {mode === 'touch' && <Choice label="Sizes in" value={unit} onChange={setUnit} options={[['mm', 'mm'], ['dp', 'dp or pt']]} />}
+        <Num label="Distance to the target (D)" value={d} onChange={setD} min={0} step="any" suffix={mode === 'touch' ? unit : 'px'} />
+        <Num label="Target width (W)" value={w} onChange={setW} min={0} step="any" suffix={mode === 'touch' ? unit : 'px'} hint="Measured along the direction of movement" />
+        <Choice label="Constants a and b" value={ab} onChange={setAb} options={[['default', 'Illustrative defaults'], ['own', 'My own'], ['fit', 'Fit from data']]} />
+        {ab === 'own' && (<><Num label="a (intercept)" value={a} onChange={setA} step="any" suffix="s" /><Num label="b (slope)" value={b} onChange={setB} step="any" min={0} suffix="s/bit" /></>)}
+        {ab === 'fit' && <Area label="Calibration trials: one condition per line, distance, width, mean movement time in seconds" value={fit} onChange={setFit} rows={5} hint="Use the same units for distance and width. At least three conditions with different difficulties." />}
+        <Num label="SD of tap or click positions (optional)" value={sd} onChange={setSd} min={0} step="any" suffix={mode === 'touch' ? unit : 'px'} hint="Along the movement axis, from your own trials; gives the effective width" />
+        {Number.isFinite(n_(sd)) && n_(sd) > 0 && <Num label="Observed mean movement time (optional)" value={mt} onChange={setMt} min={0} step="any" suffix="s" hint="Gives throughput in bits per second" />}
+        {mode === 'touch' && <Num label="Finger imprecision σa" value={sigA} onChange={setSigA} min={0} step="any" suffix="mm" hint="About 1.5 mm in Bi, Li and Zhai's FFitts studies" />}
+      </div>
+      {ab === 'default' && <Problem>The default a = {FITTS_DEFAULTS[mode][0]} s and b = {FITTS_DEFAULTS[mode][1]} s/bit are illustrative round numbers, not measurements of any device. Use them only to compare layouts with each other; fit your own for absolute times.</Problem>}
+      {bad ? <Problem>{ab === 'fit' ? 'Enter at least three calibration conditions with different distances or widths.' : 'Distance and width must be above zero, and b above zero.'}</Problem> : (
+        <>
+          <Result big={secs(r.mt)} label={`Predicted movement time, index of difficulty ${num(r.id, 2)} bits`}>
+            <p>Moving {num(n_(d), 1)} {mode === 'touch' ? unit : 'px'} to a target {num(n_(w), 1)} {mode === 'touch' ? unit : 'px'} wide is a {num(r.id, 2)}-bit task. Halving the distance or doubling the width saves about {num(B * (r.id - S.fittsId(D / 2, Wd)), 2)} s{ab === 'default' ? ' with these illustrative constants' : ''}. {r.id > 4 ? 'This is a hard target: make it bigger or bring it closer if people use it often.' : r.id < 2 ? 'This is an easy target.' : ''}</p>
+          </Result>
+          {mode === 'touch' && sigma > 0 && (
+            <div className="disc-table" role="table" aria-label="Chance a tap lands inside a square target, by size">
+              {[4, 5, 6, 7, 8, 9, 10, 12].map((s) => (
+                <div key={s} role="row" className={Math.abs(s - Wd) < 0.5 ? 'hl' : ''}>
+                  <span role="cell">{s} mm</span>
+                  <span role="cell" className="bar"><i style={{ width: pct(S.hitRate(s, sigma, 2), 0) }} /></span>
+                  <span role="cell">{pct(S.hitRate(s, sigma, 2), 0)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <Stats rows={[
+            ['Index of difficulty, log₂(D/W + 1)', `${num(r.id, 3)} bits`],
+            ['Movement time, a + b·ID', secs(r.mt)],
+            ['Constants', `a = ${num(A, 3)} s, b = ${num(B, 3)} s/bit${ab === 'default' ? ' (illustrative)' : ''}`],
+            fitR && ['Fit to your data', `r² = ${num(fitR.r2, 3)} from ${fitR.n} conditions`],
+            Number.isFinite(r.we) && ['Effective width, 4.133 × SD' + (mode === 'touch' ? ' after removing σa' : ''), `${num(r.we / toMm, 2)} ${mode === 'touch' ? unit : 'px'}`],
+            SD > 0 && !Number.isFinite(r.we) && ['Effective width', 'Not defined: the spread is no bigger than the finger imprecision'],
+            Number.isFinite(r.ide) && ['Effective index of difficulty', `${num(r.ide, 3)} bits`],
+            Number.isFinite(r.throughput) && ['Throughput, IDe ÷ observed time', `${num(r.throughput, 2)} bits/s`],
+            mode === 'touch' && sigma > 0 && ['Chance a tap lands in this target', `${pct(S.hitRate(Wd, sigma, 2), 1)} for a ${num(Wd, 1)} mm square (σ = ${num(sigma, 2)} mm)`],
+            mode === 'touch' && sigma > 0 && ['Square size for 95% of taps', `${num(S.widthForHit(0.95, sigma, 2), 1)} mm (about ${num(S.widthForHit(0.95, sigma, 2) / 0.15875, 0)} dp)`],
+          ]} />
+        </>
+      )}
+      <About method={mode === 'touch' ? 'touch-target-fitts-law-calibration-for-mobile' : 'fitts-law-modelling'} links={[['fitts-law-modelling', "Fitts' law modelling"], ['touch-target-fitts-law-calibration-for-mobile', 'Touch target calibration for mobile']]}>
+        <p>Fitts' law predicts the time to point at a target from its distance D and width W. The calculator uses MacKenzie's Shannon form, MT = a + b·log<sub>2</sub>(D/W + 1), where log<sub>2</sub>(D/W + 1) is the index of difficulty in bits. The constants a and b depend on the device, the person and the task, so fit them from your own trials when you need absolute times: "Fit from data" regresses mean time on the index of difficulty.</p>
+        <p>The effective width replaces the nominal width with the spread people actually produced, We = 4.133 × SD of the endpoints (ISO 9241-411), and throughput is the effective index divided by the observed time. For fingers, Bi, Li and Zhai's FFitts law first removes the finger's own imprecision σa (about 1.5 mm): We = 4.133 × √(σ² − σa²). The tap-accuracy table assumes taps scatter normally with SD σ in both directions around the target centre; with no SD entered it uses σa alone, which is a best case for careful tapping.</p>
+        <p>Do not use Fitts' law for targets people must search for, for movements that are not a single aimed reach (dragging along a path, menus that cascade), or to compare devices with constants measured on another device. Platform guidelines (44 pt on iOS, 48 dp on Android, about 9 mm) already include a margin for fingers in motion.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 31. Hick-Hyman law ──
+function Hick() {
+  const [mode, setMode] = useState('equal'); const [n, setN] = useState('8'); const [freq, setFreq] = useState('40 25 15 10 5 3 1 1');
+  const [a, setA] = useState('0.2'); const [b, setB] = useState('0.15');
+  const A = n_(a), B = n_(b), N = int(n), F = S.parseNumbers(freq).filter((v) => v > 0);
+  const bad = !(Number.isFinite(A) && B > 0) || (mode === 'equal' ? !(N >= 1) : F.length < 1);
+  const H = bad ? NaN : mode === 'equal' ? S.hickBits(N) : S.hickBits(0, F);
+  const nn = mode === 'equal' ? N : F.length;
+  const sizes = [2, 4, 8, 16, 32, 64];
+  const maxRt = A + B * Math.log2(65);
+  return (
+    <>
+      <div className="calc-inputs">
+        <Choice label="Choices are" value={mode} onChange={setMode} options={[['equal', 'Equally likely'], ['weighted', 'Used with different frequencies']]} />
+        {mode === 'equal' ? <Num label="Number of choices" value={n} onChange={setN} min={1} /> : <Area label="How often each choice is picked (counts or percentages)" value={freq} onChange={setFreq} rows={2} />}
+        <Num label="a (intercept)" value={a} onChange={setA} step="any" suffix="s" hint="Illustrative 0.2 s; fit your own" />
+        <Num label="b (seconds per bit)" value={b} onChange={setB} step="any" min={0} suffix="s/bit" hint="0.15 s/bit is Card, Moran and Newell's typical value" />
+      </div>
+      {bad ? <Problem>Enter at least one choice and a slope above zero.</Problem> : (
+        <>
+          <Result big={secs(A + B * H)} label={`Predicted decision time for ${nn} choices, ${num(H, 2)} bits`}>
+            <p>Choosing among {nn} {mode === 'equal' ? 'equally likely' : 'unequally used'} options carries {num(H, 2)} bits of uncertainty, so the decision takes about {secs(A + B * H)}. {mode === 'weighted' ? `If all ${nn} were equally likely it would be ${secs(A + B * S.hickBits(nn))}; putting the common choices first is what makes the difference.` : `Doubling to ${nn * 2} choices adds only about ${num(B * (S.hickBits(nn * 2) - H), 2)} s: decision time grows with the logarithm of the number of options, not in proportion.`}</p>
+          </Result>
+          <div className="disc-table" role="table" aria-label="Predicted decision time by number of equally likely choices">
+            {sizes.map((s) => (
+              <div key={s} role="row" className={s === nn ? 'hl' : ''}>
+                <span role="cell">{s} choices</span>
+                <span role="cell" className="bar"><i style={{ width: pct((A + B * S.hickBits(s)) / maxRt, 0) }} /></span>
+                <span role="cell">{num(A + B * S.hickBits(s), 2)} s</span>
+              </div>
+            ))}
+          </div>
+          <Stats rows={[['Information (H)', `${num(H, 3)} bits`], ['Decision time, a + b·H', secs(A + B * H)], mode === 'weighted' && ['Equally likely, same number', `${num(S.hickBits(nn), 3)} bits`]]} />
+        </>
+      )}
+      <About method="hicks-law-analysis">
+        <p>The Hick-Hyman law says decision time grows with the information in the choice: RT = a + b·H. For n equally likely options H = log<sub>2</sub>(n + 1), where the + 1 allows for the option of not responding. When options are used with different frequencies, H = Σ p<sub>i</sub>·log<sub>2</sub>(1/p<sub>i</sub> + 1) (Card, Moran and Newell 1983), which gives the same answer as log<sub>2</sub>(n + 1) when every p is 1/n. The default b of 0.15 s/bit is Card, Moran and Newell's typical value; a is illustrative.</p>
+        <p>The law applies to choices people make by recognising a known option, such as a familiar menu or a set of keys. It does not apply when people must read and search an unfamiliar list (search time grows roughly linearly with the number of items) or when the decision itself is hard, so do not use it to argue for or against long menus without testing them.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 32. Van Westendorp ──
+const VW_SAMPLE = '10, 15, 25, 35\n5, 10, 20, 30\n8, 12, 18, 25\n12, 18, 30, 45\n6, 10, 15, 20\n15, 20, 28, 40\n4, 8, 12, 16\n9, 14, 22, 32\n7, 12, 20, 28\n11, 16, 24, 30';
+function VanWestendorp() {
+  const [text, setText] = useState(VW_SAMPLE);
+  const rows = S.parseRows(text);
+  const r = S.vanWestendorp(rows);
+  const bad = r.n < 2 || r.prices.length < 2;
+  const money = (v) => (Number.isFinite(v) ? v.toFixed(2).replace(/\.?0+$/, '') : '—');
+  const range = r.pmc && r.pme;
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One respondent per line: too cheap, cheap, expensive, too expensive" value={text} onChange={setText} rows={8}
+          hint="The prices at which the product would be so cheap you would doubt its quality, a bargain, getting expensive but still worth considering, and too expensive to consider. Answers that are not in rising order are left out." />
+      </div>
+      {r.dropped > 0 && <Problem>{r.dropped} respondent{r.dropped > 1 ? 's' : ''} left out: each needs four prices in rising order (too cheap ≤ cheap ≤ expensive ≤ too expensive).</Problem>}
+      {bad ? <Problem>Enter at least two respondents with four prices each.</Problem> : (
+        <>
+          <Result big={range ? `${money(r.pmc.x)} – ${money(r.pme.x)}` : 'No clear range'} label={`Acceptable price range from ${r.n} respondents`}>
+            <p>{range ? `Below ${money(r.pmc.x)} more people think the price is suspiciously cheap than think it is no longer cheap; above ${money(r.pme.x)} more think it is too expensive than think it is not expensive.` : 'The curves do not cross in a way that gives a range; collect more responses.'} {r.opp && `The optimal price point, where as many say "too cheap" as "too expensive", is ${money(r.opp.x)}.`} {r.ipp && `The indifference price, where as many call it cheap as expensive, is ${money(r.ipp.x)}.`}</p>
+          </Result>
+          <Curves xs={r.prices} label="Van Westendorp price sensitivity curves" xFmt={money}
+            series={[
+              { name: 'Too cheap', ys: r.tooCheap, color: 'var(--warn)', dash: '6 4' },
+              { name: 'Not cheap', ys: r.notCheap, color: 'var(--ok)' },
+              { name: 'Cheap', ys: r.cheap, color: 'var(--ok)', dash: '6 4' },
+              { name: 'Not expensive', ys: r.notExpensive, color: 'var(--ink-3)', dash: '2 3' },
+              { name: 'Expensive', ys: r.expensive, color: 'var(--accent)' },
+              { name: 'Too expensive', ys: r.tooExpensive, color: 'var(--bad)', dash: '6 4' },
+            ]}
+            marks={[r.pmc && { ...r.pmc, label: 'PMC' }, r.opp && { ...r.opp, label: 'OPP' }, r.ipp && { ...r.ipp, label: 'IPP' }, r.pme && { ...r.pme, label: 'PME' }]} />
+          <Stats rows={[
+            ['Point of marginal cheapness (PMC)', r.pmc ? money(r.pmc.x) : 'Curves do not cross'],
+            ['Optimal price point (OPP)', r.opp ? money(r.opp.x) : 'Curves do not cross'],
+            ['Indifference price point (IPP)', r.ipp ? money(r.ipp.x) : 'Curves do not cross'],
+            ['Point of marginal expensiveness (PME)', r.pme ? money(r.pme.x) : 'Curves do not cross'],
+            ['Respondents used', r.n],
+          ]} />
+        </>
+      )}
+      <About method="van-westendorp-price-sensitivity-meter">
+        <p>For each price, the calculator works out the share of respondents who would call it too cheap (their "too cheap" answer is at or above it), cheap, expensive (their "expensive" answer is at or below it) and too expensive. "Not cheap" and "not expensive" are 1 minus cheap and 1 minus expensive. Intersections are found by straight-line interpolation between the prices people gave: PMC where too cheap meets not cheap, PME where too expensive meets not expensive, OPP where too cheap meets too expensive, and IPP where cheap meets expensive.</p>
+        <p>Some practitioners define PMC as too cheap against expensive, and PME as too expensive against cheap; the range can then shift. Van Westendorp measures what people say is acceptable, not what they will pay, and needs respondents who understand the product and its alternatives. It says nothing about demand at each price; use Gabor-Granger or a choice-based study for that, and check against real purchase data where you can.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 33. Gabor-Granger ──
+const GG_SAMPLE = '5, 72, 80\n7.5, 60, 80\n10, 46, 80\n12.5, 30, 80\n15, 18, 80';
+function GaborGranger() {
+  const [text, setText] = useState(GG_SAMPLE); const [cost, setCost] = useState('');
+  const pts = S.parseRows(text).filter((r) => (r.length === 2 && r[0] > 0 && r[1] >= 0 && r[1] <= 100) || (r.length === 3 && r[0] > 0 && r[2] > 0 && r[1] >= 0 && r[1] <= r[2]))
+    .map((r) => ({ price: r[0], demand: r.length === 3 ? r[1] / r[2] : r[1] / 100, n: r.length === 3 ? r[2] : null }));
+  const C = cost === '' ? 0 : n_(cost);
+  const bad = pts.length < 2 || new Set(pts.map((p) => p.price)).size !== pts.length || !(C >= 0);
+  const r = bad ? null : S.gaborGranger(pts, C);
+  const maxRev = r ? Math.max(...r.points.map((p) => p.revenue)) : 1;
+  const money = (v) => (Number.isFinite(v) ? v.toFixed(2).replace(/\.?0+$/, '') : '—');
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One price per line: price, number who would buy, number asked" value={text} onChange={setText} rows={6} hint="Or price and the percentage who would buy. Prices must all differ." />
+        <Num label="Unit cost (optional)" value={cost} onChange={setCost} min={0} step="any" hint="Adds a profit-maximising price" />
+      </div>
+      {bad ? <Problem>Enter at least two different prices, each with a share who would buy between 0% and 100%.</Problem> : (
+        <>
+          <Result big={money(r.bestRevenue.price)} label="Revenue-maximising price among those tested">
+            <p>At {money(r.bestRevenue.price)}, {pct(r.bestRevenue.demand, 0)} say they would buy, giving the highest revenue per person asked ({money(r.bestRevenue.revenue)}). {C > 0 && `With a unit cost of ${money(C)}, profit per person asked peaks at ${money(r.bestProfit.price)}.`} {r.bestRevenue === r.points[r.points.length - 1] ? 'That is the highest price you tested, so revenue may keep rising above it: test higher prices.' : r.bestRevenue === r.points[0] ? 'That is the lowest price you tested, so test lower prices too.' : ''}</p>
+          </Result>
+          <Curves xs={r.points.map((p) => p.price)} label="Demand and revenue by price" xFmt={money} yLabel="Share (revenue as share of its peak)"
+            series={[{ name: 'Would buy', ys: r.points.map((p) => p.demand), color: 'var(--accent)' }, { name: 'Revenue (share of the peak)', ys: r.points.map((p) => p.revenue / maxRev), color: 'var(--ok)', dash: '6 4' }]}
+            marks={[{ x: r.bestRevenue.price, y: 1, label: 'Peak revenue' }]} />
+          <Stats rows={r.points.map((p) => [`At ${money(p.price)}`, <>{pct(p.demand, 0)} would buy · revenue {money(p.revenue)}{C > 0 ? ` · profit ${money(p.profit)}` : ''}{Number.isFinite(p.elasticity) ? ` · elasticity ${num(p.elasticity, 2)}` : ''} {p === r.bestRevenue && <span className="qtag promote">Peak revenue</span>}</>])} />
+        </>
+      )}
+      <About method="gabor-granger-pricing">
+        <p>Gabor-Granger asks each respondent whether they would buy at a series of prices. Demand at a price is the share who said yes; revenue per person asked is price × demand, and the revenue-maximising price is the tested price with the highest product. With a unit cost, profit per person is (price − cost) × demand. Arc elasticity between neighbouring prices is the percentage change in demand divided by the percentage change in price, each measured against the midpoint; below −1 demand is elastic and raising the price loses revenue.</p>
+        <p>Stated purchase intent overstates real buying, often by a lot, so read the curve's shape and peak rather than the levels. The answer can only be one of the prices you tested, and asking several prices of the same person anchors their answers; randomise the starting price or show one price per respondent.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 34. Kano ──
+const KANO_SAMPLE = 'Export to PDF: 1 5, 2 5, 1 5, 1 4, 2 5, 1 5, 3 5, 1 5, 1 5, 2 5\nSecure login: 2 5, 3 5, 2 5, 2 5, 1 5, 3 5, 2 5, 2 4, 2 5, 3 5\nDark mode: 1 3, 1 4, 3 3, 1 3, 2 3, 1 4, 3 3, 1 3, 1 2, 3 3\nAnimated onboarding: 3 3, 3 3, 1 3, 3 4, 4 3, 3 3, 5 1, 3 3, 3 3, 2 3';
+const KANO_TAG = { A: 'promote', O: '', M: 'fix', I: 'opp', R: 'fix', Q: 'opp' };
+function Kano() {
+  const [text, setText] = useState(KANO_SAMPLE);
+  const feats = text.split(/\r?\n/).filter((l) => l.trim()).map((line, i) => {
+    const m = line.match(/^([^:\t]*)[:\t](.*)$/);
+    const name = (m ? m[1] : '').trim() || `Feature ${i + 1}`;
+    const ns = S.parseNumbers(m ? m[2] : line).filter((v) => Number.isInteger(v));
+    const pairs = []; for (let j = 0; j + 1 < ns.length; j += 2) pairs.push([ns[j], ns[j + 1]]);
+    return { name, ...S.kano(pairs) };
+  }).filter((f) => f.n > 0);
+  const W = 420, P = 36, s = (v) => P + v * (W - 2 * P);
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One feature per line: name, a colon, then a functional and dysfunctional answer for each respondent" value={text} onChange={setText} rows={6}
+          hint="Answers: 1 I like it, 2 I expect it, 3 I am neutral, 4 I can live with it, 5 I dislike it. Functional = if the product has the feature; dysfunctional = if it does not. Separate respondents with commas." />
+      </div>
+      {feats.length === 0 ? <Problem>Enter at least one feature with pairs of answers from 1 to 5.</Problem> : (
+        <>
+          <div className="exp-wrap">
+            <svg viewBox={`0 0 ${W} ${W}`} className="exp-plot" role="img" aria-label="Kano Better against Worse coefficients by feature">
+              <rect x={P} y={P} width={s(0.5) - P} height={s(0.5) - P} className="q promote" />
+              <rect x={s(0.5)} y={P} width={W - P - s(0.5)} height={s(0.5) - P} className="q ok" />
+              <rect x={P} y={s(0.5)} width={s(0.5) - P} height={W - P - s(0.5)} className="q opp" />
+              <rect x={s(0.5)} y={s(0.5)} width={W - P - s(0.5)} height={W - P - s(0.5)} className="q fix" />
+              <text x={P + 6} y={P + 16} className="ql">Attractive</text>
+              <text x={W - P - 6} y={P + 16} className="ql" textAnchor="end">One-dimensional</text>
+              <text x={P + 6} y={W - P - 8} className="ql">Indifferent</text>
+              <text x={W - P - 6} y={W - P - 8} className="ql" textAnchor="end">Must-be</text>
+              {feats.map((f, i) => Number.isFinite(f.better) && <g key={i}><circle cx={s(-f.worse)} cy={W - s(f.better)} r="6" className="dot" /><text x={s(-f.worse) + 9} y={W - s(f.better) + 4} className="dl">{i + 1}</text></g>)}
+              <text x={W / 2} y={W - 6} className="ax" textAnchor="middle">Dissatisfaction if missing (|Worse|) →</text>
+              <text x={12} y={W / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${W / 2})`}>Satisfaction if present (Better) →</text>
+            </svg>
+            <ol className="exp-list">
+              {feats.map((f, i) => <li key={i}><b>{f.name}</b> <span className={`qtag ${KANO_TAG[f.category]}`}>{S.KANO_NAMES[f.category]}</span><br /><span className="muted">Better {num(f.better, 2)}, Worse {num(f.worse, 2)} · {Object.entries(f.counts).filter(([, c]) => c).map(([k, c]) => `${k} ${c}`).join(', ')}</span></li>)}
+            </ol>
+          </div>
+          <Result label="What to do first">
+            <p>{(() => {
+              const mb = feats.filter((f) => f.category === 'M'), at = feats.filter((f) => f.category === 'A');
+              const q = feats.filter((f) => (f.counts.Q + f.counts.R) / f.n > 0.2);
+              return `${mb.length ? `Make sure ${mb.map((f) => `"${f.name}"`).join(', ')} ${mb.length > 1 ? 'are' : 'is'} in place: people expect ${mb.length > 1 ? 'them' : 'it'} and will be dissatisfied without ${mb.length > 1 ? 'them' : 'it'}, but ${mb.length > 1 ? 'they' : 'it'} will not delight. ` : ''}${at.length ? `${at.map((f) => `"${f.name}"`).join(', ')} could delight without being missed if absent. ` : ''}${q.length ? `Check ${q.map((f) => `"${f.name}"`).join(', ')}: over 20% of answers are reverse or questionable, which often means the question was misunderstood.` : ''}`.trim() || 'No feature is clearly must-be or attractive; look at the Better and Worse scores.';
+            })()}</p>
+          </Result>
+          <Stats rows={feats.map((f, i) => [`${i + 1}. ${f.name} (${f.n} answers)`, `${S.KANO_NAMES[f.category]} · CS+ ${num(f.better, 2)} · CS− ${num(f.worse, 2)}`])} />
+        </>
+      )}
+      <About method="kano-analysis">
+        <p>Each respondent's pair of answers is classified with the standard Kano evaluation table (Berger et al. 1993): like it if present and dislike it if absent is one-dimensional (O); like if present and expect, neutral or tolerate if absent is attractive (A); expect, neutral or tolerate if present and dislike if absent is must-be (M); the same answer to both, like or dislike, is questionable (Q); dislike if present is reverse (R); everything else is indifferent (I). The feature's category is the most frequent one, with ties going to M, then O, A and I (Matzler and Hinterhuber 1998).</p>
+        <p>Better (CS+) = (A + O)/(A + O + M + I) is how much satisfaction rises if the feature is there; Worse (CS−) = −(O + M)/(A + O + M + I) is how much it falls if it is not. The plot splits both at 0.5. Categories drift over time, as attractive features become expected, and differ between segments, so classify segments separately rather than pooling people who want different things.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 35. MaxDiff counts ──
+const MD_SAMPLE = 'Price, Speed, Support, Design | Speed | Design\nPrice, Security, Integrations, Support | Security | Support\nSpeed, Security, Design, Integrations | Security | Design\nPrice, Speed, Security, Design | Price | Design\nSupport, Integrations, Speed, Price | Speed | Integrations\nDesign, Security, Support, Integrations | Security | Integrations\nPrice, Speed, Support, Security | Security | Support\nDesign, Integrations, Price, Speed | Speed | Design';
+function MaxDiff() {
+  const [text, setText] = useState(MD_SAMPLE); const [showShare, setShowShare] = useState(true);
+  const all = text.split(/\r?\n/).filter((l) => l.trim());
+  const canon = new Map(); const nm = (s) => { const k = s.trim().toLowerCase(); if (!canon.has(k)) canon.set(k, s.trim()); return canon.get(k); };
+  const tasks = all.map((line) => {
+    const p = line.split('|'); if (p.length !== 3) return null;
+    const items = [...new Set(p[0].split(/[,;\t]/).map((x) => x.trim()).filter(Boolean).map(nm))];
+    const best = nm(p[1]), worst = nm(p[2]);
+    return items.length >= 2 && items.includes(best) && items.includes(worst) && best !== worst ? { items, best, worst } : null;
+  });
+  const ok = tasks.filter(Boolean);
+  const rows = ok.length ? S.maxdiff(ok) : [];
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One task per line: the items shown, then | best | worst" value={text} onChange={setText} rows={8} hint="Separate the items shown with commas. Stack every respondent's tasks; one line per task answered." />
+        <Choice label="Show" value={showShare ? 'share' : 'counts'} onChange={(v) => setShowShare(v === 'share')} options={[['share', 'Scores and preference shares'], ['counts', 'Counts only']]} />
+      </div>
+      {ok.length < all.length && <Problem>{all.length - ok.length} line{all.length - ok.length > 1 ? 's' : ''} skipped: each needs items | best | worst, with best and worst among the items and different from each other.</Problem>}
+      {rows.length === 0 ? <Problem>Enter at least one complete task.</Problem> : (
+        <>
+          <Result big={rows[0].item} label={`Most preferred of ${rows.length} items, from ${ok.length} tasks`}>
+            <div className="sum-bars">
+              {rows.map((r) => <div key={r.item}><span>{r.item}</span><span className="bar"><i style={{ width: pct((r.norm + 1) / 2, 0) }} /></span><b>{num(r.norm, 2)}</b></div>)}
+            </div>
+            <p>Bars show best minus worst divided by the number of times each item was shown, from −1 (always picked as worst) to +1 (always best). {rows[0].item} leads; {rows[rows.length - 1].item} is least preferred. {showShare && `On the ratio scale, ${rows[0].item} would be chosen about ${num(rows[0].share / rows[rows.length - 1].share, 1)} times as often as ${rows[rows.length - 1].item}.`}</p>
+          </Result>
+          <Stats rows={rows.map((r) => [r.item, `best ${r.best} · worst ${r.worst} · shown ${r.shown} · B − W ${r.bw > 0 ? '+' : ''}${r.bw}${showShare ? ` · share ${num(r.share, 1)}%` : ''}`])} />
+        </>
+      )}
+      <About method="maxdiff-best-worst-scaling">
+        <p>Counting analysis scores each item by how often it was picked as best minus how often as worst. Dividing by the number of times it was shown gives a score from −1 to +1 that is fair when items appeared unequally often. The preference share uses the square root of best over worst counts, √(B/W), which Marley and Louviere (2005) showed approximates a ratio scale; 0.5 is added to both counts so items never or always chosen stay finite, and the shares are scaled to add to 100.</p>
+        <p>Counts are a good first look and agree well with model-based scores when the design is balanced (each item shown equally often and with every other item). For an unbalanced design, for individual-level scores or for segment simulations, fit a multinomial logit or hierarchical Bayes model instead. Shares say how often an item would win a choice among these items, not how much anyone would pay for it.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 36. TURF ──
+const TURF_SAMPLE = 'vanilla, chocolate\nchocolate\nstrawberry, mint\nvanilla, salted caramel\nsalted caramel\nchocolate, strawberry\nmango\nvanilla\nchocolate, salted caramel, mint\nstrawberry, mango\nmint\nvanilla, chocolate, mango\nsalted caramel, strawberry\nchocolate\npistachio, vanilla';
+function TURF() {
+  const [text, setText] = useState(TURF_SAMPLE); const [k, setK] = useState('3');
+  const lists = S.parseCodeLists(text);
+  const names = []; const ix = new Map();
+  const people = lists.map((l) => [...new Set(l.map((x) => { const key = x.toLowerCase(); if (!ix.has(key)) { ix.set(key, names.length); names.push(x); } return ix.get(key); }))]);
+  const K = int(k);
+  const bad = people.length < 2 || names.length < 2 || !(K >= 1);
+  const res = useMemo(() => (bad ? null : S.turf(people, names.length, Math.min(K, names.length, 8))), [text, K, bad]);
+  const single = bad ? [] : names.map((nm, i) => ({ nm, reach: people.filter((p) => p.includes(i)).length / people.length })).sort((a, b) => b.reach - a.reach);
+  const label = (it) => it.items.map((i) => names[i]).join(', ');
+  const last = res && res[res.length - 1], lastBest = last && (last.exhaustive || last.greedy);
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One respondent per line: the items they would choose (or like, or buy)" value={text} onChange={setText} rows={8} hint="Separate items with commas. A respondent who would choose none still counts: leave a line with a dash." />
+        <Num label="Largest set to consider" value={k} onChange={setK} min={1} max={8} hint="Up to 8 items" />
+      </div>
+      {bad ? <Problem>Enter at least two respondents and two different items.</Problem> : (
+        <>
+          <Result big={pct(lastBest.reach, 0)} label={`Best reach with ${last.k} item${last.k > 1 ? 's' : ''}: ${label(lastBest)}`}>
+            <p>{label(lastBest)} together reach {pct(lastBest.reach, 0)} of the {people.length} respondents, meaning each of them would find at least one item they want; those reached like {num(lastBest.freq, 2)} of the items on average. {res.length > 1 && `Going from ${res.length - 1} to ${res.length} items adds ${num((lastBest.reach - (res[res.length - 2].exhaustive || res[res.length - 2].greedy).reach) * 100, 0)} points of reach.`} {res.some((r) => r.exhaustive && r.exhaustive.reach > r.greedy.reach + 1e-12) ? 'The greedy search missed the best set at some sizes, which is why the exhaustive search is shown where it is feasible.' : ''}</p>
+          </Result>
+          <div className="disc-table" role="table" aria-label="Reach of each item on its own">
+            {single.map((s) => (
+              <div key={s.nm} role="row">
+                <span role="cell">{s.nm}</span>
+                <span role="cell" className="bar"><i style={{ width: pct(s.reach, 0) }} /></span>
+                <span role="cell">{pct(s.reach, 0)}</span>
+              </div>
+            ))}
+          </div>
+          <Stats rows={res.flatMap((r) => [
+            [`Best ${r.k}, exhaustive search`, r.exhaustive ? `${label(r.exhaustive)} · reach ${pct(r.exhaustive.reach, 1)} · frequency ${num(r.exhaustive.freq, 2)}` : `Skipped: ${r.combos.toLocaleString()} combinations`],
+            [`Best ${r.k}, greedy search`, `${label(r.greedy)} · reach ${pct(r.greedy.reach, 1)} · frequency ${num(r.greedy.freq, 2)}`],
+          ])} />
+        </>
+      )}
+      <About method="turf-analysis">
+        <p>TURF (total unduplicated reach and frequency) looks for the set of items that the most people would find at least one reason to choose. Reach is the share of respondents who chose at least one item in the set; frequency is the average number of items in the set that each reached respondent chose, used to break ties. The exhaustive search scores every combination of each size when that is quick enough; the greedy search adds, one at a time, the item that adds most reach, which is fast but can miss the best set.</p>
+        <p>TURF assumes that one item a person wants is enough, which suits product lines, menus or feature bundles, not cases where people need several items to be satisfied. It is sensitive to how "would choose" was asked: a top-box rating cut-off or a MaxDiff-based threshold give different reach. Many sets often have nearly the same reach, so look at the alternatives before picking one.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 37. UX ROI ──
+function UXROI() {
+  const [v, setV] = useState({ users: '2000', tasks: '250', seconds: '20', hourly: '45', errors: '300', errorCost: '80', visitors: '500000', baseConv: '2', uplift: '5', convValue: '60', calls: '1200', callCost: '6', oneOff: '120000', running: '15000', years: '3', rate: '8' });
+  const set = (k) => (x) => setV({ ...v, [k]: x });
+  const N = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, x === '' ? 0 : n_(x)]));
+  const bad = Object.values(N).some((x) => !Number.isFinite(x) || x < 0) || !(Number.isInteger(N.years) && N.years >= 1 && N.years <= 20);
+  const r = bad ? null : S.uxRoi({ ...N, baseConv: N.baseConv / 100, uplift: N.uplift / 100, rate: N.rate / 100 });
+  const money = (x) => (Number.isFinite(x) ? `${x < 0 ? '−' : ''}${Math.round(Math.abs(x)).toLocaleString('en-GB')}` : '—');
+  const LABEL = { time: 'Time saved', errors: 'Errors avoided', conversion: 'Extra conversions', support: 'Support contacts avoided' };
+  return (
+    <>
+      <div className="calc-inputs">
+        <Num label="Users" value={v.users} onChange={set('users')} min={0} /><Num label="Tasks per user per year" value={v.tasks} onChange={set('tasks')} min={0} />
+        <Num label="Time saved per task" value={v.seconds} onChange={set('seconds')} min={0} step="any" suffix="s" /><Num label="Cost of an hour of their time" value={v.hourly} onChange={set('hourly')} min={0} step="any" />
+        <Num label="Errors avoided per year" value={v.errors} onChange={set('errors')} min={0} /><Num label="Cost per error" value={v.errorCost} onChange={set('errorCost')} min={0} step="any" />
+        <Num label="Visitors per year" value={v.visitors} onChange={set('visitors')} min={0} /><Num label="Current conversion rate" value={v.baseConv} onChange={set('baseConv')} min={0} step="any" suffix="%" />
+        <Num label="Relative uplift" value={v.uplift} onChange={set('uplift')} min={0} step="any" suffix="%" hint="5% turns a 2% rate into 2.1%" /><Num label="Value per conversion" value={v.convValue} onChange={set('convValue')} min={0} step="any" />
+        <Num label="Support contacts avoided per year" value={v.calls} onChange={set('calls')} min={0} /><Num label="Cost per contact" value={v.callCost} onChange={set('callCost')} min={0} step="any" />
+        <Num label="One-off cost of the work" value={v.oneOff} onChange={set('oneOff')} min={0} step="any" /><Num label="Running cost per year" value={v.running} onChange={set('running')} min={0} step="any" />
+        <Num label="Years to count" value={v.years} onChange={set('years')} min={1} max={20} /><Num label="Discount rate" value={v.rate} onChange={set('rate')} min={0} step="any" suffix="%" />
+      </div>
+      {bad ? <Problem>Use numbers of zero or more, and between 1 and 20 whole years. Leave a benefit at zero if it does not apply.</Problem> : (
+        <>
+          <Result big={pct(r.roi, 0)} label={`Return on investment over ${N.years} year${N.years > 1 ? 's' : ''}, net present value ${money(r.npv)}`} tone={r.npv > 0 ? 'good' : 'bad'}>
+            <div className="sum-bars">
+              {Object.entries(r.parts).filter(([, x]) => x > 0).map(([k, x]) => <div key={k}><span>{LABEL[k]}</span><span className="bar"><i style={{ width: pct(x / r.annual, 0) }} /></span><b>{pct(x / r.annual, 0)}</b></div>)}
+            </div>
+            <p>The change would be worth about {money(r.annual)} a year against {money(N.running)} a year to run and {money(N.oneOff)} up front. {Number.isFinite(r.paybackYears) ? `It pays back in about ${num(r.paybackYears * 12, 0)} months.` : 'At these figures it never pays back.'} Discounted at {num(N.rate, 1)}% a year, it is worth {money(r.npv)} today {r.npv > 0 ? 'more than it costs' : 'less than it costs'}. {(() => { const [k, x] = Object.entries(r.parts).sort((p, q) => q[1] - p[1])[0]; return x > 0 ? `${LABEL[k]} is the biggest benefit (${pct(x / r.annual, 0)}), so that is the assumption to check hardest.` : ''; })()}</p>
+          </Result>
+          <Stats rows={[
+            ['Annual benefit', money(r.annual)], ['Net annual benefit (after running costs)', money(r.net)],
+            [`Total benefit over ${N.years} years`, money(r.totalBenefit)], [`Total cost over ${N.years} years`, money(r.totalCost)],
+            ['ROI (undiscounted)', pct(r.roi, 1)], ['Simple payback', Number.isFinite(r.paybackYears) ? `${num(r.paybackYears * 12, 1)} months` : 'Never'],
+            ...r.flows.map((f) => [`Year ${f.year}: present value · cumulative NPV`, `${money(f.pv)} · ${money(f.cumulative)}`]),
+          ]} />
+        </>
+      )}
+      <About method="ux-roi-and-cost-benefit-calculation">
+        <p>Annual benefit adds four common sources: time saved (users × tasks per user × seconds saved ÷ 3,600 × hourly cost), errors avoided × cost per error, extra conversions (visitors × current rate × relative uplift) × value per conversion, and support contacts avoided × cost per contact. ROI = (total benefit − total cost) ÷ total cost over the years you choose, without discounting. Net present value = − one-off cost + Σ (annual benefit − running cost) ÷ (1 + r)<sup>t</sup> for years t = 1 to n; payback = one-off cost ÷ net annual benefit.</p>
+        <p>The answer is only as good as the inputs, and the uplift and time-saved figures usually come from a small test or a guess. Use measured figures where you have them, show a low and a high case, and do not add benefits that count the same thing twice (fewer errors often means fewer support calls). Time saved is only money if people use it for something else of value.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 38. Lostness ──
+const LOST_SAMPLE = '4 4\n5 7\n6 11\nhome > products > shoes > home > sale > shoes > running > trail\n8 16\n4 5';
+function Lostness() {
+  const [text, setText] = useState(LOST_SAMPLE); const [req, setReq] = useState('4');
+  const R0 = int(req);
+  const people = text.split(/\r?\n/).filter((l) => l.trim()).map((line, i) => {
+    if (/[>→]/.test(line)) { const pages = line.split(/[>→]/).map((p) => p.trim().toLowerCase()).filter(Boolean); return { i, S: pages.length, N: new Set(pages).size, R: R0, path: true }; }
+    const ns = S.parseNumbers(line);
+    return ns.length >= 2 ? { i, N: ns[0], S: ns[1], R: ns.length >= 3 ? ns[2] : R0 } : { i, bad: true };
+  });
+  const ok = people.filter((p) => !p.bad && p.N >= 1 && p.S >= p.N && p.R >= 1 && p.R <= p.N);
+  ok.forEach((p) => { p.L = S.lostness(p.N, p.S, p.R); });
+  const L = ok.map((p) => p.L);
+  const tag = (l) => (l < 0.4 ? ['Not lost', 'promote'] : l > 0.5 ? ['Lost', 'fix'] : ['Borderline', 'opp']);
+  const M = L.length ? S.mean(L) : NaN;
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="One participant per line: distinct pages visited (N), total pages visited (S), optionally the minimum (R)" value={text} onChange={setText} rows={7}
+          hint="Or paste the path itself, with pages separated by >, and the counts are worked out for you. Revisits count towards S but not N." />
+        <Num label="Minimum pages needed (R)" value={req} onChange={setReq} min={1} hint="Including the start page, on the shortest route" />
+      </div>
+      {ok.length < people.length && <Problem>{people.length - ok.length} line{people.length - ok.length > 1 ? 's' : ''} skipped: each needs N ≥ R, S ≥ N, and R at least 1.</Problem>}
+      {ok.length === 0 ? <Problem>Enter at least one participant.</Problem> : (
+        <>
+          <Result big={num(M, 2)} label={`Mean lostness from ${ok.length} participant${ok.length > 1 ? 's' : ''}`} tone={M < 0.4 ? 'good' : M > 0.5 ? 'bad' : ''}>
+            <p>{ok.filter((p) => p.L > 0.5).length} of {ok.length} participants were lost (above 0.5) and {ok.filter((p) => p.L < 0.4).length} were not (below 0.4). {M > 0.5 ? 'On average people wandered: look at where paths diverged from the shortest route.' : M < 0.4 ? 'On average people found their way efficiently.' : 'On average navigation was borderline; look at the individual paths.'} Median {num(S.median(L), 2)}.</p>
+          </Result>
+          <div className="disc-table" role="table" aria-label="Lostness per participant">
+            {ok.map((p) => (
+              <div key={p.i} role="row" className={p.L > 0.5 ? 'hl' : ''}>
+                <span role="cell">P{p.i + 1}</span>
+                <span role="cell" className="bar"><i style={{ width: pct(Math.min(1, p.L), 0) }} /></span>
+                <span role="cell">{num(p.L, 2)}</span>
+              </div>
+            ))}
+          </div>
+          <Stats rows={ok.map((p) => [`Participant ${p.i + 1}${p.path ? ' (path)' : ''}`, <>N {p.N} · S {p.S} · R {p.R} · L = {num(p.L, 3)} <span className={`qtag ${tag(p.L)[1]}`}>{tag(p.L)[0]}</span></>])} />
+        </>
+      )}
+      <About method="lostness-metric">
+        <p>Lostness (Smith 1996) is L = √((N/S − 1)² + (R/N − 1)²), where N is the number of different pages visited, S the total number of pages visited including revisits, and R the minimum number of pages needed to complete the task. A perfect path has N = S = R and scores 0; revisiting pages raises the first term and visiting unneeded pages raises the second. Smith found that people with scores below 0.4 showed no signs of being lost and those above 0.5 did.</p>
+        <p>Lostness only works for tasks with a known shortest route, and only for successful attempts or attempts you treat consistently. Count pages the same way for everyone (decide whether a modal or a filter change is a page), and read it alongside success and time: a participant can be efficient and still end on the wrong page.</p>
+      </About>
+    </>
+  );
+}
+
+// ── 39. Readability ──
+const READ_SAMPLE = 'Your account is almost ready. Check your email for a link to confirm your address.\n\nIf you do not receive the confirmation message within a reasonable period of time, which may vary depending on the configuration of your organisation\'s email filtering infrastructure, you should contact the administrator responsible for your organisation\'s account before attempting to register again.\n\nYou can change your password at any time in Settings.';
+function Readability() {
+  const [text, setText] = useState(READ_SAMPLE); const [longAt, setLongAt] = useState('25');
+  const LA = int(longAt) > 0 ? int(longAt) : 25;
+  const r = S.readability(text, LA);
+  const bad = r.words === 0;
+  const band = bad ? null : S.fleschBand(r.fre);
+  return (
+    <>
+      <div className="calc-inputs">
+        <Area label="Text to check" value={text} onChange={setText} rows={9} hint="Plain text. Headings and list items on their own lines count as sentences." />
+        <Num label="Flag sentences longer than" value={longAt} onChange={setLongAt} min={5} suffix="words" />
+      </div>
+      <Problem>Syllables are counted by a rule of thumb, not a dictionary, so scores are approximate: expect a few points of difference from other tools, especially with names, numbers and abbreviations.</Problem>
+      {bad ? <Problem>Paste some text.</Problem> : (
+        <>
+          <Result big={num(r.fre, 0)} label={`Flesch Reading Ease (0 to 100, higher is easier): ${band[0].toLowerCase()}`} tone={r.fre >= 60 ? 'good' : r.fre < 30 ? 'bad' : ''}>
+            <IntervalBar lo={Math.max(0, Math.min(100, r.fre))} hi={Math.max(0, Math.min(100, r.fre))} point={Math.max(0, Math.min(100, r.fre))} min={0} max={100} bench={60} benchLabel="Plain English" fmt={(v) => num(v, 0)} />
+            <p>The text averages {num(r.wps, 1)} words per sentence and {num(r.spw, 2)} syllables per word, which puts it at about US school grade {num(r.fkgl, 1)} ({band[1]}). {r.long.length ? `${r.long.length} sentence${r.long.length > 1 ? 's are' : ' is'} longer than ${LA} words; splitting ${r.long.length > 1 ? 'them' : 'it'} is usually the quickest gain.` : `No sentence is longer than ${LA} words.`} Plain English for a general audience usually means a score of 60 or more.</p>
+          </Result>
+          {r.long.length > 0 && (
+            <ol className="exp-list">
+              {r.long.map((s, i) => <li key={i}><span className="qtag fix">{s.words} words</span> {s.text}</li>)}
+            </ol>
+          )}
+          <Stats rows={[['Flesch Reading Ease', num(r.fre, 1)], ['Flesch-Kincaid grade', num(r.fkgl, 1)], ['Sentences', r.sentences], ['Words', r.words], ['Syllables (approximate)', r.syllables], ['Words per sentence', num(r.wps, 1)], ['Syllables per word', num(r.spw, 2)], ['Longest sentence', `${Math.max(...r.list.map((s) => s.words))} words`]]} />
+        </>
+      )}
+      <About method="readability-analysis" links={[['readability-testing', 'Readability testing']]}>
+        <p>Flesch Reading Ease = 206.835 − 1.015 × (words ÷ sentences) − 84.6 × (syllables ÷ words). Flesch-Kincaid grade = 0.39 × (words ÷ sentences) + 11.8 × (syllables ÷ words) − 15.59, roughly the US school grade needed to follow the text. Sentences end at a full stop, question mark or exclamation mark, or at a line break between paragraphs and list items. The syllable counter counts vowel groups and corrects for silent e, -es and -ed endings and common vowel pairs; on English prose it agrees with the CMU Pronouncing Dictionary for about 98% of words, but single words can be off by one.</p>
+        <p>Formulas only measure sentence and word length. They cannot tell whether text is clear, accurate, well ordered or suitable for its readers, and short words in a confusing order still score well. Use them to spot dense passages, then test the content with real readers (comprehension or cloze tests). They are designed for English prose, not for interface labels, lists of bullet fragments or other languages.</p>
+      </About>
+    </>
+  );
+}
+
+const COMPONENTS = {
+  'sample-size': SampleSize, 'completion-rate': CompletionRate, 'task-time': TaskTime, rating: Rating, sus: SUS, 'umux-lite': UMUXLite,
+  sum: SUM, 'top-box': TopBox, nps: NPS, seq: SEQ, 'nasa-tlx': NasaTLX, ueq: UEQ, attrakdiff: AttrakDiff,
+  'compare-rates': CompareRates, 'compare-means': CompareMeans, 'rate-benchmark': RateBenchmark, correlation: Correlation,
+  'effect-size': EffectSize, nonparametric: Nonparametric, 'bayes-ab': BayesAB, sprt: SPRT, reliability: Reliability,
+  'margin-of-error': MarginOfError, intercoder: InterCoder, saturation: Saturation, expectation: Expectation, discovery: Discovery,
+  'capture-recapture': CaptureRecapture, klm: KLM, fitts: Fitts, hick: Hick, 'van-westendorp': VanWestendorp, 'gabor-granger': GaborGranger,
+  kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability,
+};
+// Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
+const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
 
 export default function Calculators() {
   const { calc } = useParams();
@@ -1399,7 +2015,7 @@ export default function Calculators() {
           <p className="eyebrow">UX calculators</p>
           <h1 className="h1">{current ? current.name : 'Do the maths properly.'}</h1>
           <p className="lede">
-            {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis. Everything runs in your browser; nothing you enter is sent anywhere.'}
+            {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis, plus predictive models, pricing and business-case tools. Everything runs in your browser; nothing you enter is sent anywhere.'}
           </p>
         </div>
       </section>

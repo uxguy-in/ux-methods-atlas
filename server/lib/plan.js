@@ -3,6 +3,7 @@
 // changes with the answers. Pure functions over the method list, shared by the Node server and
 // the static GitHub Pages build (like recommend.js), so both give the same plan.
 import { rank, scoreMethod } from './recommend.js';
+import { CALC_NAMES } from '../../client/src/calc/catalog.js';
 
 export const PHASES = [
   { key: 'frame', title: 'Frame', blurb: 'Agree the decision the research informs and the question it answers.' },
@@ -44,28 +45,8 @@ export const LIMITS = {
 };
 
 // The calculators that live at /calculators/<id>; check-plan.js confirms each id exists.
-export const CALCULATORS = {
-  'sample-size': 'Sample size planner',
-  discovery: 'Problems left to find',
-  'completion-rate': 'Completion rate interval',
-  'task-time': 'Task time interval',
-  rating: 'Rating scale and benchmark',
-  sus: 'SUS scorer',
-  'top-box': 'Top-box and agreement target',
-  nps: 'Net Promoter Score',
-  'compare-rates': 'Compare two completion rates',
-  'compare-means': 'Compare two means',
-  correlation: 'Correlation',
-  'rate-benchmark': 'Completion rate vs benchmark',
-  'effect-size': 'Effect size',
-  nonparametric: 'Nonparametric comparison',
-  'bayes-ab': 'Bayesian A/B test',
-  sprt: 'Sequential test planner',
-  reliability: 'Scale reliability',
-  'margin-of-error': 'Survey margin of error',
-  intercoder: 'Inter-coder agreement',
-  saturation: 'Saturation and coverage',
-};
+// Calculator ids and names come from the shared catalog, so the planner, the calculators page and the method pages agree.
+export const CALCULATORS = CALC_NAMES;
 
 // Research question frameworks: labelled fields and a sentence assembled from them.
 export const FRAMEWORKS = {

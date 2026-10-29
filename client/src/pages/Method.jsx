@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { cameFrom } from '../nav-trail.js';
+import { calculatorsFor } from '../calc/catalog.js';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
@@ -17,6 +18,8 @@ export default function Method() {
   const f = m.facets || {};
   // Design & product practices sit outside the research atlas, so they skip its filters and the finder.
   const design = m.kind === 'design';
+  // Calculators whose "How this is calculated" section links to this method (reverse map from calc/catalog.js).
+  const calcs = calculatorsFor(m.id || id);
   const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
 
   return (
@@ -110,6 +113,14 @@ export default function Method() {
         </article>
 
         <aside>
+          {calcs.length > 0 && (
+            <div className="aside-box">
+              <h3>Calculate it</h3>
+              <div className="related-list">
+                {calcs.map((c) => <Link key={c.id} to={`/calculators/${c.id}`}><span>{c.name}</span><span className="badge kind">{c.group}</span></Link>)}
+              </div>
+            </div>
+          )}
           {(f.goals?.length > 0 || f.stage?.length > 0) && (
             <div className="aside-box">
               <h3>Good for</h3>

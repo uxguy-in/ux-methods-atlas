@@ -647,3 +647,288 @@ export function sprt(p0, p1, alpha, beta, s = 0, n = 0) {
   const asn0 = ((1 - alpha) * B + alpha * A) / z0, asn1 = (beta * B + (1 - beta) * A) / z1;
   return { A, B, slope, hUp, hLo, llr, decision, upper: (t) => hUp + slope * t, lower: (t) => hLo + slope * t, asn0, asn1 };
 }
+
+// ── Added: capture-recapture estimates of problems not yet found ──
+// Two evaluators or sessions: A finds n1 problems, B finds n2, m are found by both. Lincoln-Petersen N = n1·n2/m;
+// Chapman's bias-corrected N = (n1 + 1)(n2 + 1)/(m + 1) − 1, with Seber's (1982) variance
+// (n1 + 1)(n2 + 1)(n1 − m)(n2 − m)/((m + 1)²(m + 2)). The interval is Chao's (1987) log-normal one on the number not
+// yet seen, so its lower end never falls below the number already found.
+function logNormalInterval(seen, est, v, conf) {
+  const f0 = est - seen;
+  if (!(f0 > 1e-9) || !(v > 0)) return { lo: est, hi: est };
+  const C = Math.exp(zFor(conf) * Math.sqrt(Math.log(1 + v / (f0 * f0))));
+  return { lo: seen + f0 / C, hi: seen + f0 * C };
+}
+export function lincolnPetersen(n1, n2, m, conf = 0.95) {
+  const seen = n1 + n2 - m;
+  const lp = m > 0 ? n1 * n2 / m : Infinity;
+  const chapman = (n1 + 1) * (n2 + 1) / (m + 1) - 1;
+  const v = (n1 + 1) * (n2 + 1) * (n1 - m) * (n2 - m) / ((m + 1) ** 2 * (m + 2));
+  return { seen, lp, chapman, v, se: Math.sqrt(v), ...logNormalInterval(seen, chapman, v, conf), remaining: Math.max(0, chapman - seen), pA: n1 / chapman, pB: n2 / chapman };
+}
+// Several evaluators: rows are problems, columns evaluators, 1 = found. Chao2 (incidence) estimator
+// S + ((T − 1)/T)·Q1²/(2·Q2), or S + ((T − 1)/T)·Q1(Q1 − 1)/2 when Q2 = 0, where Q1 and Q2 count problems found by exactly
+// one and two evaluators. Variance as in Chao (1987) and EstimateS; first- and second-order jackknife shown for comparison.
+export function captureMatrix(rows, conf = 0.95) {
+  const T = Math.max(0, ...rows.map((r) => r.length));
+  const found = rows.filter((r) => r.some((v) => v > 0));
+  const S = found.length, A = T > 1 ? (T - 1) / T : 1;
+  const k = found.map((r) => r.filter((v) => v > 0).length);
+  const Q1 = k.filter((v) => v === 1).length, Q2 = k.filter((v) => v === 2).length;
+  const chao = Q2 > 0 ? S + A * Q1 * Q1 / (2 * Q2) : S + A * Q1 * (Q1 - 1) / 2;
+  let v;
+  if (Q2 > 0) { const r = Q1 / Q2; v = Q2 * (A / 2 * r ** 2 + A * A * r ** 3 + A * A / 4 * r ** 4); }
+  else v = A * Q1 * (Q1 - 1) / 2 + A * A * Q1 * (2 * Q1 - 1) ** 2 / 4 - A * A * Q1 ** 4 / (4 * chao);
+  const jack1 = S + Q1 * A;
+  const jack2 = T > 1 ? S + Q1 * (2 * T - 3) / T - Q2 * (T - 2) ** 2 / (T * (T - 1)) : NaN;
+  const perEvaluator = Array.from({ length: T }, (_, j) => found.filter((r) => r[j] > 0).length);
+  const pair = T === 2 ? lincolnPetersen(perEvaluator[0], perEvaluator[1], found.filter((r) => r[0] > 0 && r[1] > 0).length, conf) : null;
+  return { T, S, Q1, Q2, chao, v: Math.max(0, v), se: Math.sqrt(Math.max(0, v)), ...logNormalInterval(S, chao, Math.max(0, v), conf), jack1, jack2, perEvaluator, pMean: mean(perEvaluator) / chao, remaining: Math.max(0, chao - S), pair, freq: Array.from({ length: T }, (_, i) => k.filter((x) => x === i + 1).length) };
+}
+
+// ── Added: predictive models ──
+// Keystroke-Level Model operator times (Card, Moran and Newell 1980; Kieras 2001). K depends on typing skill.
+export const KLM_TIMES = { P: 1.1, B: 0.1, H: 0.4, M: 1.35 };
+export const KLM_K = [[0.12, 'Good typist (90 wpm)'], [0.2, 'Average skilled typist (55 wpm)'], [0.28, 'Average non-secretary (40 wpm)'], [1.2, 'Unfamiliar with the keyboard']];
+// Tokens: K P B H M, a count before a letter (5K), R(seconds) for system response, and "quoted text" for one K per character.
+// Letters may run together (MPBB); # starts a comment. Returns the operators, each tagged with the token (cognitive unit) it came from.
+export function parseKlm(text) {
+  const ops = [], bad = [];
+  const re = /"([^"]*)"|R\s*\(\s*(\d+(?:\.\d+)?)\s*\)|(\d+)\s*([KPBHM])|([KPBHM]+)|(#[^\n]*)|(\S)/gi;
+  let unit = 0, m;
+  while ((m = re.exec(text))) {
+    unit++;
+    if (m[1] !== undefined) { for (const ch of m[1]) ops.push({ op: 'K', unit, ch }); if (!m[1].length) bad.push('""'); }
+    else if (m[2] !== undefined) ops.push({ op: 'R', unit, t: Number(m[2]) });
+    else if (m[3] !== undefined) { const n = Number(m[3]); for (let i = 0; i < n; i++) ops.push({ op: m[4].toUpperCase(), unit }); }
+    else if (m[5] !== undefined) for (const ch of m[5]) { ops.push({ op: ch.toUpperCase(), unit }); unit++; }
+    else if (m[6] !== undefined) unit--; // comment
+    else if (!/[,;>|]/.test(m[7])) bad.push(m[7]);
+  }
+  return { ops, bad };
+}
+// Heuristic M placement after Card, Moran and Newell's rules: user-written Ms are dropped, then
+// rule 0 puts an M before every K and every P; rule 1 deletes an M between a P and the K or B it anticipates;
+// rule 2 keeps only the first M in a run of Ks from one cognitive unit (a quoted string or a counted run such as 5K).
+// Rules 3 and 4 (redundant terminators, command strings) need judgement and are left to the analyst.
+export function placeM(ops) {
+  const out = [];
+  for (const o of ops.filter((x) => x.op !== 'M')) {
+    const prev = out[out.length - 1];
+    if (o.op === 'P' || o.op === 'K') {
+      const sameUnit = o.op === 'K' && prev && prev.op === 'K' && prev.unit === o.unit;
+      const anticipated = o.op === 'K' && prev && prev.op === 'P';
+      if (!sameUnit && !anticipated) out.push({ op: 'M', unit: o.unit, auto: true });
+    }
+    out.push(o);
+  }
+  return out;
+}
+export function klmTime(ops, k = 0.28) {
+  const counts = { K: 0, P: 0, B: 0, H: 0, M: 0, R: 0 }, time = { K: 0, P: 0, B: 0, H: 0, M: 0, R: 0 };
+  for (const o of ops) { const t = o.op === 'K' ? k : o.op === 'R' ? o.t : KLM_TIMES[o.op]; counts[o.op]++; time[o.op] += t; }
+  return { total: Object.values(time).reduce((a, b) => a + b, 0), counts, time };
+}
+
+// Fitts' law, Shannon form (MacKenzie 1992): ID = log2(D/W + 1) bits, MT = a + b·ID. The effective width
+// We = 4.133 × SD of the endpoints (Crossman; ISO 9241-411). For finger touch, Bi, Li and Zhai's (2013) FFitts law first
+// removes the finger's absolute imprecision σa from the endpoint spread: We = 4.133 × √(σ² − σa²).
+export const fittsId = (D, W) => Math.log2(D / W + 1);
+export function fitts({ D, W, a, b, sd, De, mt, sigmaA = 0 }) {
+  const id = fittsId(D, W), out = { id, mt: a + b * id };
+  if (sd > 0) {
+    const s2 = sd * sd - sigmaA * sigmaA;
+    out.we = s2 > 0 ? 4.133 * Math.sqrt(s2) : NaN;
+    out.ide = fittsId(De > 0 ? De : D, out.we);
+    out.mte = a + b * out.ide;
+    if (mt > 0) out.throughput = out.ide / mt;
+  }
+  return out;
+}
+// Chance that a tap lands inside a target of width w when tap positions scatter normally with SD sigma around its centre:
+// erf(w / (2√2·σ)) along one axis, squared for a square target.
+export const erf = (x) => 2 * normCdf(x * Math.SQRT2) - 1;
+export const hitRate = (w, sigma, dims = 1) => erf(w / (2 * Math.SQRT2 * sigma)) ** dims;
+export const widthForHit = (rate, sigma, dims = 1) => 2 * sigma * normInv((1 + rate ** (1 / dims)) / 2);
+
+// Hick-Hyman law: RT = a + b·H, with H = log2(n + 1) for n equally likely choices, or
+// H = Σ p·log2(1/p + 1) when the choices are used with different frequencies (Card, Moran and Newell 1983).
+export function hickBits(n, freqs) {
+  if (freqs && freqs.length) { const t = freqs.reduce((x, y) => x + y, 0); return freqs.filter((f) => f > 0).reduce((s, f) => s + (f / t) * Math.log2(t / f + 1), 0); }
+  return Math.log2(n + 1);
+}
+
+// ── Added: pricing ──
+// Van Westendorp price sensitivity meter. rows: [too cheap, cheap, expensive, too expensive] per respondent.
+// Curves at each price p: too cheap = share answering ≥ p, cheap = share ≥ p, expensive = share ≤ p, too expensive = share ≤ p.
+// Intersections by linear interpolation between observed prices: PMC = too cheap × not cheap, PME = too expensive × not
+// expensive, OPP = too cheap × too expensive, IPP = cheap × expensive.
+export function crossing(xs, f, g) {
+  for (let i = 0; i < xs.length; i++) {
+    const d = f[i] - g[i];
+    if (d === 0) return { x: xs[i], y: f[i] };
+    if (i + 1 < xs.length) {
+      const d2 = f[i + 1] - g[i + 1];
+      if (d * d2 < 0) { const t = d / (d - d2); return { x: xs[i] + t * (xs[i + 1] - xs[i]), y: f[i] + t * (f[i + 1] - f[i]) }; }
+    }
+  }
+  return null;
+}
+export function vanWestendorp(rows) {
+  const ok = rows.filter((r) => r.length === 4 && r.every((v) => v >= 0) && r[0] <= r[1] && r[1] <= r[2] && r[2] <= r[3]);
+  const n = ok.length;
+  const prices = [...new Set(ok.flat())].sort((a, b) => a - b);
+  const share = (fn) => prices.map((p) => ok.filter((r) => fn(r, p)).length / n);
+  const tooCheap = share((r, p) => r[0] >= p), cheap = share((r, p) => r[1] >= p);
+  const expensive = share((r, p) => r[2] <= p), tooExpensive = share((r, p) => r[3] <= p);
+  const notCheap = cheap.map((v) => 1 - v), notExpensive = expensive.map((v) => 1 - v);
+  return {
+    n, dropped: rows.length - n, prices, tooCheap, cheap, expensive, tooExpensive, notCheap, notExpensive,
+    pmc: crossing(prices, tooCheap, notCheap), pme: crossing(prices, tooExpensive, notExpensive),
+    opp: crossing(prices, tooCheap, tooExpensive), ipp: crossing(prices, cheap, expensive),
+  };
+}
+// Gabor-Granger: demand at each price (share who would buy), revenue index = price × demand, profit index with a unit cost,
+// and arc elasticity between neighbouring prices.
+export function gaborGranger(points, cost = 0) {
+  const pts = [...points].sort((a, b) => a.price - b.price).map((p) => ({ ...p, revenue: p.price * p.demand, profit: (p.price - cost) * p.demand }));
+  pts.forEach((p, i) => {
+    const q = pts[i - 1];
+    p.elasticity = q && p.demand + q.demand > 0 ? ((p.demand - q.demand) / ((p.demand + q.demand) / 2)) / ((p.price - q.price) / ((p.price + q.price) / 2)) : NaN;
+  });
+  const best = (k) => pts.reduce((a, b) => (b[k] > a[k] ? b : a), pts[0]);
+  return { points: pts, bestRevenue: best('revenue'), bestProfit: best('profit') };
+}
+
+// ── Added: Kano ──
+// Answers 1 like, 2 expect it, 3 neutral, 4 can live with it, 5 dislike. Kano evaluation table (Berger et al. 1993):
+// row = functional answer, column = dysfunctional answer.
+export const KANO_TABLE = ['QAAAO', 'RIIIM', 'RIIIM', 'RIIIM', 'RRRRQ'];
+export const KANO_NAMES = { A: 'Attractive', O: 'One-dimensional', M: 'Must-be', I: 'Indifferent', R: 'Reverse', Q: 'Questionable' };
+export const kanoClass = (f, d) => (f >= 1 && f <= 5 && d >= 1 && d <= 5 ? KANO_TABLE[f - 1][d - 1] : null);
+// Category is the most frequent answer; ties go to M > O > A > I > R > Q (Matzler and Hinterhuber 1998).
+// Better (CS+) = (A + O)/(A + O + M + I); Worse (CS−) = −(O + M)/(A + O + M + I) (Berger et al. 1993).
+export function kano(pairs) {
+  const c = { A: 0, O: 0, M: 0, I: 0, R: 0, Q: 0 };
+  for (const [f, d] of pairs) { const k = kanoClass(f, d); if (k) c[k]++; }
+  const n = Object.values(c).reduce((a, b) => a + b, 0), base = c.A + c.O + c.M + c.I;
+  const order = ['M', 'O', 'A', 'I', 'R', 'Q'];
+  const category = n ? order.reduce((best, k) => (c[k] > c[best] ? k : best), 'M') : null;
+  return { counts: c, n, category, better: base ? (c.A + c.O) / base : NaN, worse: base ? -(c.O + c.M) / base : NaN };
+}
+
+// ── Added: MaxDiff counting ──
+// tasks: { items, best, worst }. Per item: times shown, best and worst counts, best − worst, and best − worst divided by
+// times shown (−1 to +1). The ratio scale is √(B/W) with 0.5 added to both counts (Marley and Louviere 2005), rescaled to sum to 100.
+export function maxdiff(tasks) {
+  const s = new Map();
+  const get = (k) => { if (!s.has(k)) s.set(k, { item: k, shown: 0, best: 0, worst: 0 }); return s.get(k); };
+  for (const t of tasks) { for (const it of t.items) get(it).shown++; get(t.best).best++; get(t.worst).worst++; }
+  const rows = [...s.values()].map((r) => ({ ...r, bw: r.best - r.worst, norm: r.shown ? (r.best - r.worst) / r.shown : NaN, ratio: Math.sqrt((r.best + 0.5) / (r.worst + 0.5)) }));
+  const tot = rows.reduce((a, r) => a + r.ratio, 0);
+  rows.forEach((r) => { r.share = 100 * r.ratio / tot; });
+  return rows.sort((a, b) => b.norm - a.norm || b.bw - a.bw);
+}
+
+// ── Added: TURF ──
+// people: one array of liked item indices per respondent. Reach = share of respondents who like at least one item in the set;
+// frequency = average number of liked items in the set per respondent reached. Exhaustive search when the number of
+// combinations is small, and always the greedy search (add the item that adds most reach; ties go to frequency).
+export function choose(n, k) { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
+export function turf(people, nItems, kMax, limit = 2e6) {
+  const sets = people.map((p) => new Set(p)), R = people.length;
+  const score = (combo) => {
+    let reach = 0, hits = 0;
+    for (const s of sets) { let h = 0; for (const i of combo) if (s.has(i)) h++; if (h) reach++; hits += h; }
+    return { reach: reach / R, freq: reach ? hits / reach : 0, hits };
+  };
+  const better = (a, b) => !b || a.reach > b.reach + 1e-12 || (Math.abs(a.reach - b.reach) <= 1e-12 && a.hits > b.hits);
+  const out = [];
+  let greedy = [];
+  for (let k = 1; k <= Math.min(kMax, nItems); k++) {
+    let gBest = null;
+    for (let i = 0; i < nItems; i++) if (!greedy.includes(i)) { const sc = { items: [...greedy, i], ...score([...greedy, i]) }; if (better(sc, gBest)) gBest = sc; }
+    greedy = gBest.items;
+    let exBest = null;
+    const nc = choose(nItems, k);
+    if (nc * R <= limit) {
+      const idx = Array.from({ length: k }, (_, i) => i);
+      for (;;) {
+        const sc = { items: [...idx], ...score(idx) };
+        if (better(sc, exBest)) exBest = sc;
+        let j = k - 1; while (j >= 0 && idx[j] === nItems - k + j) j--;
+        if (j < 0) break;
+        idx[j]++; for (let x = j + 1; x < k; x++) idx[x] = idx[x - 1] + 1;
+      }
+    }
+    out.push({ k, greedy: gBest, exhaustive: exBest, combos: nc });
+  }
+  return out;
+}
+
+// ── Added: business case ──
+// Annual benefits: time saved (users × tasks per user per year × seconds saved / 3600 × hourly cost), errors avoided × cost
+// per error, extra conversions (visitors × baseline rate × relative uplift) × value, support contacts avoided × cost per contact.
+// ROI over the horizon = (benefits − costs)/costs, undiscounted. NPV = −one-off cost + Σ (annual benefit − running cost)/(1 + r)^t.
+// Simple payback = one-off cost ÷ net annual benefit.
+export function uxRoi({ users = 0, tasks = 0, seconds = 0, hourly = 0, errors = 0, errorCost = 0, visitors = 0, baseConv = 0, uplift = 0, convValue = 0, calls = 0, callCost = 0, oneOff = 0, running = 0, years = 3, rate = 0 }) {
+  const parts = {
+    time: users * tasks * seconds / 3600 * hourly,
+    errors: errors * errorCost,
+    conversion: visitors * baseConv * uplift * convValue,
+    support: calls * callCost,
+  };
+  const annual = Object.values(parts).reduce((a, b) => a + b, 0), net = annual - running;
+  const totalBenefit = annual * years, totalCost = oneOff + running * years;
+  let npv = -oneOff; const flows = [];
+  for (let t = 1; t <= years; t++) { const pvt = net / (1 + rate) ** t; npv += pvt; flows.push({ year: t, net, pv: pvt, cumulative: npv }); }
+  return { parts, annual, net, totalBenefit, totalCost, roi: totalCost > 0 ? (totalBenefit - totalCost) / totalCost : NaN, npv, paybackYears: net > 0 ? oneOff / net : Infinity, flows };
+}
+
+// ── Added: lostness ──
+// Smith (1996): L = √((N/S − 1)² + (R/N − 1)²), N distinct pages visited, S total pages visited, R minimum pages required.
+export const lostness = (N, S, R) => Math.sqrt((N / S - 1) ** 2 + (R / N - 1) ** 2);
+
+// ── Added: readability ──
+// Heuristic syllable counter: counts vowel groups, drops a silent final e, -es or -ed, and adjusts for common vowel pairs
+// that split (ia, io, eo, ua) or merge (-tion, -cial, -ious). Agrees with the CMU Pronouncing Dictionary for about 98% of
+// running words in English prose; it is approximate for names, numbers and unusual words.
+export function syllables(word) {
+  let w = String(word).toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return 0;
+  if (w.length <= 3) return 1;
+  let add = 0;
+  if (/[^aeiouy]le$/.test(w)) { add++; w = w.slice(0, -2); } else if (/[^aeiouy]les$/.test(w)) { add++; w = w.slice(0, -3); }
+  if (/(?:[^aeiouy]e|[^aeiouytd]ed|[^aeiouysxzhcg]es)$/.test(w)) w = w.replace(/(?:e|ed|es)$/, '');
+  w = w.replace(/^y/, '');
+  let n = (w.match(/[aeiouy]+/g) || []).length;
+  n += (w.match(/(?:[^aeiouqg]|^)(?:ia|io|iu|eo|ua|uo|ui(?![cntlsdr]))/g) || []).length;
+  n += (w.match(/(?:[^aeiouqgc]|sc)ie(?=n[ct])/g) || []).length;
+  n -= (w.match(/(?:[ct]ia[ln]|[cst]io[nu]|[cgst]ious|[cst]ial|tient|gue|eop)/g) || []).length;
+  n -= (w.match(/[^aeiouy]e(?=(?:ments?|ly|ful|ness|less|ty|work|holders?|line|thing)$)/g) || []).length;
+  n += (w.match(/[aeiou]y[aeiou]/g) || []).length;
+  n += /isms?$/.test(w) ? 1 : 0;
+  n += (w.match(/[^aeiou]y(?=i)/g) || []).length;
+  n += (w.match(/(?:ea|ee)(?=[aeiou])/g) || []).length;
+  return Math.max(1, n + add);
+}
+// Sentences end at . ! ? (or a line break between paragraphs or list items); words are runs of letters, digits and
+// apostrophes. Flesch Reading Ease = 206.835 − 1.015 × words/sentences − 84.6 × syllables/words; Flesch-Kincaid grade =
+// 0.39 × words/sentences + 11.8 × syllables/words − 15.59.
+export function readability(text, longAt = 25) {
+  const chunks = String(text).replace(/\r/g, '').split(/\n\s*\n|\n(?=\s*(?:[-*•]|\d+[.)])\s)/).flatMap((p) => p.replace(/\s+/g, ' ').match(/[^.!?]+(?:[.!?]+["')\]’”]*|$)/g) || []);
+  const sentences = chunks.map((s) => s.trim()).filter((s) => /[A-Za-z0-9]/.test(s)).map((s) => {
+    const words = s.match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)*/g) || [];
+    return { text: s, words: words.length, syllables: words.reduce((a, w) => a + (/^\d+$/.test(w) ? w.length : syllables(w)), 0) };
+  });
+  const S = sentences.length, W = sentences.reduce((a, s) => a + s.words, 0), Y = sentences.reduce((a, s) => a + s.syllables, 0);
+  const wps = S ? W / S : NaN, spw = W ? Y / W : NaN;
+  return {
+    sentences: S, words: W, syllables: Y, wps, spw,
+    fre: 206.835 - 1.015 * wps - 84.6 * spw, fkgl: 0.39 * wps + 11.8 * spw - 15.59,
+    long: sentences.filter((s) => s.words > longAt), list: sentences,
+  };
+}
+export function fleschBand(f) {
+  return f >= 90 ? ['Very easy', '5th grade (age 10–11)'] : f >= 80 ? ['Easy', '6th grade'] : f >= 70 ? ['Fairly easy', '7th grade'] : f >= 60 ? ['Plain English', '8th–9th grade (age 13–15)'] : f >= 50 ? ['Fairly difficult', '10th–12th grade'] : f >= 30 ? ['Difficult', 'College'] : ['Very difficult', 'College graduate'];
+}

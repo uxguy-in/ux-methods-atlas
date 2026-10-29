@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as S from '../../client/src/calc/stats.js';
+import { CATALOG, CALCS_BY_METHOD } from '../../client/src/calc/catalog.js';
 import { kinds } from '../lib/data.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -138,6 +139,123 @@ same('UEQ: most positive answers give +3 on every scale', S.ueqScore([best, best
 same('UEQ: 26 items in six scales', S.UEQ_SCALES.flatMap(([, it]) => it).sort((a, b) => a - b), Array.from({ length: 26 }, (_, i) => i + 1));
 same('UEQ benchmark band', [S.ueqBand('Attractiveness', 1.8), S.ueqBand('Novelty', 0.2), S.ueqBand('Efficiency', 1.0)], ['Excellent', 'Bad', 'Above average']);
 
+
+// ── Capture-recapture: the Lincoln index example in Wikipedia's "Mark and recapture" article (10 marked, 15 caught
+// in the second sample, 5 of them marked): Lincoln-Petersen 30, Chapman 28.3. Seber's (1982) variance and the
+// Chao log-normal interval by hand: var = 11·16·5·10/(6²·7) = 34.921.
+const lp = S.lincolnPetersen(10, 15, 5);
+near('Lincoln-Petersen (published 30)', lp.lp, 30, 1e-12);
+near('Chapman (published 28.3)', lp.chapman, 28 + 1 / 3, 1e-12);
+near('Chapman variance (Seber, by hand)', lp.v, 8800 / 252, 1e-9);
+near('Chapman 95% interval, lower (log-normal, scipy norm.ppf)', lp.lo, 22.38526171603979, 1e-6);
+near('Chapman 95% interval, upper (log-normal, scipy norm.ppf)', lp.hi, 49.11397268377824, 1e-6);
+// Chao2 for a 10-problem × 4-evaluator matrix, by hand: S = 10, Q1 = 5, Q2 = 2, A = 3/4,
+// Chao = 10 + 0.75·25/4 = 14.6875; variance with r = Q1/Q2 = 2.5: 2·(0.375·6.25 + 0.5625·15.625 + 0.140625·39.0625) = 33.2520.
+const cm = S.captureMatrix([[1,1,1,0],[1,0,1,1],[1,0,0,0],[0,1,0,0],[1,1,0,0],[0,0,1,0],[1,1,1,1],[0,0,0,1],[1,0,1,0],[0,1,0,0]]);
+same('Chao2 counts S, Q1, Q2', [cm.S, cm.Q1, cm.Q2], [10, 5, 2]);
+near('Chao2 estimate (by hand 14.6875)', cm.chao, 14.6875, 1e-12);
+near('Chao2 variance (by hand)', cm.v, 33.251953125, 1e-9);
+near('First-order jackknife (by hand 13.75)', cm.jack1, 13.75, 1e-12);
+near('Chao2 matches the saturation calculator on the same incidence data', S.saturation(S.parseCodeLists('a, b\nc\nd, a\ne')).chao, S.captureMatrix([[1,0,1,0],[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]).chao, 1e-12);
+
+// ── KLM: operator times from Card, Moran and Newell (1980) and Kieras (2001). The physical operators of Kieras's
+// drag-a-file-to-the-trash example (point, press, drag, release, point back) are 3P + 2B = 3.5 s.
+near("KLM drag to trash, 3P + 2B (Kieras 3.5 s)", S.klmTime(S.parseKlm('P B P B P').ops).total, 3.5, 1e-9);
+// Heuristic M placement by hand: H P BB H "cat" K → H M P B B H M K K K M K (rule 0 before P and the first K of each unit,
+// rule 2 for the rest of "cat"). With K = 0.2: 2H + 3M + P + 2B + 4K = 0.8 + 4.05 + 1.1 + 0.2 + 0.8 = 6.95 s.
+const km = S.placeM(S.parseKlm('H P BB H "cat" K').ops);
+same('KLM M placement, rules 0 and 2', km.map((o) => o.op).join(''), 'HMPBBHMKKKMK');
+near('KLM time with placed Ms, K = 0.2 (by hand 6.95 s)', S.klmTime(km, 0.2).total, 6.95, 1e-9);
+same('KLM rule 1: no M between a point and its keystroke', S.placeM(S.parseKlm('P K').ops).map((o) => o.op).join(''), 'MPK');
+same('KLM comments are ignored', S.parseKlm('H # hand to mouse, then Point\nP BB').ops.map((o) => o.op).join(''), 'HPBB');
+near('KLM counts and response time, 5K R(2) at K = 0.28', S.klmTime(S.parseKlm('5K R(2)').ops, 0.28).total, 3.4, 1e-9);
+
+// ── Fitts' law by hand: D = 256, W = 16 → ID = log2(17) = 4.0875 bits; a = 0.1, b = 0.2 → MT = 0.9175 s.
+// Effective width with SD 4: We = 16.532, IDe = log2(256/16.532 + 1) = 4.0431; throughput at 0.9 s = 4.4923 bits/s.
+const ft = S.fitts({ D: 256, W: 16, a: 0.1, b: 0.2, sd: 4, mt: 0.9 });
+near("Fitts index of difficulty log2(17)", ft.id, 4.087462841250339, 1e-12);
+near("Fitts movement time", ft.mt, 0.9174925682500679, 1e-12);
+near("Fitts effective width 4.133 × 4", ft.we, 16.532, 1e-12);
+near("Fitts effective ID", ft.ide, 4.043092463404468, 1e-9);
+near("Fitts throughput", ft.throughput, 4.492324959338298, 1e-9);
+near("FFitts effective width, SD 2 mm, σa 1.5 mm: 4.133·√1.75", S.fitts({ D: 30, W: 7, a: 0.1, b: 0.15, sd: 2, sigmaA: 1.5 }).we, 5.467445084314977, 1e-9);
+near('Tap hit rate, 7 mm square, σ 1.5 mm (scipy erf², 0.9611)', S.hitRate(7, 1.5, 2), 0.9611240481897717, 1e-6);
+near('Square for 95% of taps, σ 1.5 mm (scipy norm.ppf)', S.widthForHit(0.95, 1.5, 2), 6.709429933673368, 1e-6);
+// Hick-Hyman by hand: 8 equal choices → log2(9) = 3.1699 bits; frequencies 4:2:1:1 → Σ p·log2(1/p + 1) = 2.1654 bits.
+near('Hick-Hyman bits, 8 equal choices', S.hickBits(8), Math.log2(9), 1e-12);
+near('Hick-Hyman bits, unequal frequencies', S.hickBits(0, [4, 2, 1, 1]), 2.1654445244429965, 1e-12);
+
+// ── Van Westendorp, ten respondents, intersections by hand. PMC: at 11, too cheap 3/10 = not cheap 3/10. OPP: too cheap
+// falls 0.1 → 0 and too expensive rises 0 → 0.1 between 15 and 16, so 15.5. IPP: cheap 0.3 → 0.2 and expensive
+// 0.2 → 0.3 between 16 and 18, so 17. PME: too expensive 0.2 → 0.3 and not expensive 0.3 → 0.2 between 24 and 25, so 24.5.
+const vw = S.vanWestendorp([[10,15,25,35],[5,10,20,30],[8,12,18,25],[12,18,30,45],[6,10,15,20],[15,20,28,40],[4,8,12,16],[9,14,22,32],[7,12,20,28],[11,16,24,30]]);
+near('Van Westendorp PMC (by hand 11)', vw.pmc.x, 11, 1e-9);
+near('Van Westendorp OPP (by hand 15.5)', vw.opp.x, 15.5, 1e-9);
+near('Van Westendorp IPP (by hand 17)', vw.ipp.x, 17, 1e-9);
+near('Van Westendorp PME (by hand 24.5)', vw.pme.x, 24.5, 1e-9);
+same('Van Westendorp drops answers out of order', S.vanWestendorp([[5, 10, 20, 30], [10, 5, 20, 30]]).dropped, 1);
+// Gabor-Granger by hand: revenue 4.5, 5.625, 5.75, 4.6875, 3.375 → peak at 10; with unit cost 8, profit per person asked is
+// −2.7, −0.375, 1.15, 1.6875, 1.575 → peak at 12.5.
+const gg = S.gaborGranger([[5, 72], [7.5, 60], [10, 46], [12.5, 30], [15, 18]].map(([price, y]) => ({ price, demand: y / 80 })), 8);
+same('Gabor-Granger revenue-maximising price', gg.bestRevenue.price, 10);
+near('Gabor-Granger peak revenue per person asked', gg.bestRevenue.revenue, 5.75, 1e-12);
+same('Gabor-Granger profit-maximising price, unit cost 8', gg.bestProfit.price, 12.5);
+
+// ── Kano evaluation table (Berger et al. 1993): row = functional answer, column = dysfunctional answer.
+same('Kano table lookups', [[1, 5], [1, 2], [1, 4], [2, 5], [4, 5], [3, 3], [5, 1], [1, 1], [5, 5]].map(([f, d]) => S.kanoClass(f, d)), ['O', 'A', 'A', 'M', 'M', 'I', 'R', 'Q', 'Q']);
+const kn = S.kano([[1, 5], [1, 5], [1, 3], [2, 5], [3, 3]]);
+same('Kano category (2 O, 1 A, 1 M, 1 I)', kn.category, 'O');
+near('Kano Better (A + O)/(A + O + M + I) = 3/5', kn.better, 0.6, 1e-12);
+near('Kano Worse −(O + M)/(A + O + M + I) = −3/5', kn.worse, -0.6, 1e-12);
+same('Kano tie goes to must-be', S.kano([[1, 3], [2, 5]]).category, 'M');
+
+// ── MaxDiff counts by hand: A best twice in 2 showings (+1), B best once in 3 (+1/3), C worst once in 3, D worst twice in 2.
+// Share of A = √(2.5/0.5) / (√5 + √3 + 1 + √(1/3) + √(1/5)) = 37.31%.
+const md = S.maxdiff([{ items: ['A', 'B', 'C', 'D'], best: 'A', worst: 'D' }, { items: ['A', 'B', 'C', 'E'], best: 'A', worst: 'C' }, { items: ['B', 'C', 'D', 'E'], best: 'B', worst: 'D' }]);
+same('MaxDiff order', md.map((r) => r.item), ['A', 'B', 'E', 'C', 'D']);
+same('MaxDiff best − worst', md.map((r) => r.bw), [2, 1, 0, -1, -2]);
+near('MaxDiff normalised score for B', md[1].norm, 1 / 3, 1e-12);
+near('MaxDiff share for A', md[0].share, 100 * Math.sqrt(5) / (Math.sqrt(5) + Math.sqrt(3) + 1 + Math.sqrt(1 / 3) + Math.sqrt(1 / 5)), 1e-9);
+
+// ── TURF against a brute-force search with itertools.combinations: best pair {0, 1} reaches 6 of 10 (7 hits);
+// best three {0, 1, 2} reach 8 of 10 (10 hits). The greedy search finds the same sets here.
+const tf = S.turf([[0, 1], [1], [2], [0, 3], [3], [1, 2], [4], [0], [1, 3], [2, 4]], 5, 3);
+same('TURF exhaustive best sets', tf.map((r) => [...r.exhaustive.items].sort()), [[1], [0, 1], [0, 1, 2]]);
+same('TURF reach', tf.map((r) => r.exhaustive.reach), [0.4, 0.6, 0.8]);
+near('TURF frequency for the best three', tf[2].exhaustive.freq, 1.25, 1e-12);
+same('TURF greedy best three', [...tf[2].greedy.items].sort(), [0, 1, 2]);
+
+// ── UX ROI by hand: 100 users × 600 tasks × 30 s = 500 hours × 60 = 30,000 a year; one-off 50,000, running 5,000;
+// 3 years at 10%: NPV = −50,000 + 25,000 × (1/1.1 + 1/1.1² + 1/1.1³) = 12,171.30; ROI = (90,000 − 65,000)/65,000; payback 2 years.
+const roi = S.uxRoi({ users: 100, tasks: 600, seconds: 30, hourly: 60, oneOff: 50000, running: 5000, years: 3, rate: 0.1 });
+near('ROI annual benefit', roi.annual, 30000, 1e-9);
+near('NPV (by hand 12,171.30)', roi.npv, 12171.299774605548, 1e-6);
+near('ROI (by hand 38.46%)', roi.roi, 25000 / 65000, 1e-12);
+near('Payback in years (by hand 2)', roi.paybackYears, 2, 1e-12);
+near('Conversion benefit: 500,000 × 2% × 5% × 60', S.uxRoi({ visitors: 500000, baseConv: 0.02, uplift: 0.05, convValue: 60 }).parts.conversion, 30000, 1e-6);
+
+// ── Lostness (Smith 1996): the optimal path N = S = R scores 0; N = 6, S = 12, R = 3 gives √(0.5² + 0.5²) = 0.7071.
+near('Lostness, optimal path', S.lostness(4, 4, 4), 0, 1e-12);
+near('Lostness, N 6, S 12, R 3', S.lostness(6, 12, 3), Math.SQRT1_2, 1e-12);
+near('Lostness, N 5, S 7, R 4', S.lostness(5, 7, 4), Math.sqrt((5 / 7 - 1) ** 2 + (4 / 5 - 1) ** 2), 1e-12);
+
+// ── Readability: Wikipedia's Flesch examples. "The cat sat on the mat." scores 116; the platypus sentence (13 words,
+// 26 syllables) 24.4; "This sentence, taken as a reading passage unto itself, is being used to prove a point." 69. The syllable
+// counter is a heuristic, so the last only has to land within 6 points (it counts "being" as one syllable).
+const cat = S.readability('The cat sat on the mat.');
+near('Flesch Reading Ease, "The cat sat on the mat." (published 116)', cat.fre, 116.145, 1e-9);
+const plat = S.readability('The Australian platypus is seemingly a hybrid of a mammal and reptilian creature.');
+same('Platypus sentence words and syllables', [plat.words, plat.syllables], [13, 26]);
+near('Flesch Reading Ease, platypus (published 24.4)', plat.fre, 24.4, 0.1);
+near('Flesch-Kincaid grade, platypus (by hand 13.08)', plat.fkgl, 0.39 * 13 + 11.8 * 2 - 15.59, 1e-9);
+near('Flesch Reading Ease, "This sentence…" (published 69, heuristic within 6)', S.readability('This sentence, taken as a reading passage unto itself, is being used to prove a point.').fre, 69, 6);
+const sylWords = { usability: 5, research: 2, participant: 4, questionnaire: 3, interface: 3, the: 1, experience: 4, simple: 2, make: 1, evaluation: 5, reptilian: 4, people: 2, table: 2, wanted: 2, jumped: 1, boxes: 2, likely: 2, statement: 2, science: 2, different: 3 };
+const sylOk = Object.entries(sylWords).filter(([w, n]) => S.syllables(w) === n).length;
+near('Syllable heuristic: share of 20 common UX words counted exactly (at least 90%)', sylOk / 20, 1, 0.1);
+same('Sentence splitting with paragraphs and list items', S.readability('One two. Three four!\n\nFive six?\n- seven eight\n- nine').sentences, 5);
+
+// ── The shared catalog matches the calculators page: every calculator has a component, and the methods each one
+// lists in calc/catalog.js are exactly the methods its "How this is calculated" section links to.
 // ── Every atlas method a calculator links to exists.
 const src = readFileSync(path.join(root, 'client', 'src', 'pages', 'Calculators.jsx'), 'utf8');
 const linked = new Set([...src.matchAll(/method="([a-z0-9-]+)"/g)].map((m) => m[1]));
@@ -146,6 +264,21 @@ for (const m of src.matchAll(/method=\{[^}]*\}/g)) for (const x of m[0].matchAll
 for (const m of src.matchAll(/links=\{\[(.*?)\]\}>/g)) for (const x of m[1].matchAll(/\['([a-z0-9-]+)', /g)) linked.add(x[1]);
 const missing = [...linked].filter((id) => !kinds.byId.has(id));
 same(`All ${linked.size} linked method ids exist`, missing, []);
+
+const compBlock = src.slice(src.indexOf('const COMPONENTS = {'), src.indexOf('};', src.indexOf('const COMPONENTS = {')));
+const compOf = Object.fromEntries([...compBlock.matchAll(/'?([a-z0-9-]+)'?: ([A-Za-z]+)/g)].map((m) => [m[1], m[2]]));
+const bodyOf = (name) => { const i = src.indexOf(`\nfunction ${name}(`); const j = src.indexOf('\n// ── ', i + 1); return i < 0 ? '' : src.slice(i, j < 0 ? undefined : j); };
+const idsIn = (body) => {
+  const ids = new Set([...body.matchAll(/method="([a-z0-9-]+)"/g)].map((m) => m[1]));
+  for (const m of body.matchAll(/method=\{[^}]*\}/g)) for (const x of m[0].matchAll(/[?:] '([a-z0-9-]+)'/g)) ids.add(x[1]);
+  for (const m of body.matchAll(/links=\{\[(.*?)\]\}>/g)) for (const x of m[1].matchAll(/\['([a-z0-9-]+)', /g)) ids.add(x[1]);
+  return [...ids].sort();
+};
+const drift = CATALOG.filter((c) => !compOf[c.id] || JSON.stringify(idsIn(bodyOf(compOf[c.id]))) !== JSON.stringify([...c.methods].sort())).map((c) => c.id);
+same(`Catalog matches the page for all ${CATALOG.length} calculators`, drift, []);
+same('Catalog ids are unique', new Set(CATALOG.map((c) => c.id)).size, CATALOG.length);
+same('Every catalog method id exists', Object.keys(CALCS_BY_METHOD).filter((id) => !kinds.byId.has(id)), []);
+same('Reverse map: calculators for lostness-metric', (CALCS_BY_METHOD['lostness-metric'] || []).map((c) => c.id), ['lostness']);
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

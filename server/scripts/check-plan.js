@@ -15,8 +15,10 @@ for (const id of ids) {
   else if (!kinds.researchById.has(id)) problems.push(`method id is a design practice, not a research method: ${id}`);
 }
 
+// Every calculator id the planner knows must have a component on the calculators page.
 const calcSource = readFileSync(path.join(root, 'client', 'src', 'pages', 'Calculators.jsx'), 'utf8');
-for (const id of Object.keys(CALCULATORS)) if (!calcSource.includes(`id: '${id}'`)) problems.push(`calculator not found: ${id}`);
+const components = calcSource.slice(calcSource.indexOf('const COMPONENTS = {'), calcSource.indexOf('};', calcSource.indexOf('const COMPONENTS = {')));
+for (const id of Object.keys(CALCULATORS)) if (!new RegExp(`(^|[\\s{,])'?${id}'?:`).test(components)) problems.push(`calculator not found: ${id}`);
 
 // Build plans across the main answer combinations and check each is complete.
 let plans = 0;
