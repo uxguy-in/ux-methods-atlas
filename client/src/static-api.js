@@ -1,6 +1,7 @@
 // Static stand-in for the Node API, used by the GitHub Pages build.
 // It answers the same routes from the JSON files shipped beside the page.
 import { shelvesPayload } from '../../server/lib/recommend.js';
+import { buildPlan } from '../../server/lib/plan.js';
 import { listFields } from '../../server/lib/fields.js';
 import { booksPayload, metaPayload, methodPayload, splitKinds } from '../../server/lib/kinds.js';
 import { getVisitorKey } from './visitor-key.js';
@@ -41,6 +42,7 @@ export async function staticPost(url, data = {}) {
   if (url === '/api/recommend') {
     return shelvesPayload(kinds.research, data.answers || {}, data.brief || '', data.seed || 1, data.exclude || []);
   }
+  if (url === '/api/plan') return buildPlan(kinds.research, kinds.researchById, data.input || {});
   if (url === '/api/brief') {
     // No server here, so the browser calls Anthropic directly with the visitor's own key.
     const key = getVisitorKey();

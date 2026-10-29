@@ -5,7 +5,8 @@ import { useMeta, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
-const QUESTIONS = [
+// Shared with the study planner, which asks the same goal and material questions.
+export const QUESTIONS = [
   {
     id: 'goal',
     short: 'What you need to find out',
@@ -316,8 +317,32 @@ export default function Finder() {
       {plan && <Plan plan={plan} />}
 
       {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}
+      {recs && <PlanCta sel={sel} />}
       </div>
     </div>
+  );
+}
+
+// Hands the finder answers to the study planner, so the roadmap starts from the same situation.
+function PlanCta({ sel }) {
+  const a = {
+    goal: sel.goal?.length ? sel.goal : undefined,
+    material: sel.material,
+    participants: sel.participants !== 'any' ? sel.participants : undefined,
+    time: sel.time,
+    approach: ['qualitative', 'quantitative', 'mixed'].includes(sel.data) ? sel.data : undefined,
+    expertise: sel.level,
+  };
+  const known = Object.fromEntries(Object.entries(a).filter(([, v]) => v));
+  return (
+    <aside className="plan-cta">
+      <div>
+        <p className="eyebrow">Next step</p>
+        <h2>Turn these methods into a study plan.</h2>
+        <p>Frame the question, add your constraints, and get a phased roadmap from framing to reporting, with similar methods to swap in.</p>
+      </div>
+      <Link to={`/plan?a=${encodeURIComponent(JSON.stringify(known))}`} className="btn accent">Plan my study</Link>
+    </aside>
   );
 }
 

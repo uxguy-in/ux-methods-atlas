@@ -21,6 +21,7 @@ function useTheme() {
 
 const LINKS = [
   ['/find', 'Find a method'],
+  ['/plan', 'Plan my study'],
   ['/methods', 'Atlas'],
   ['/lost', 'Lost methods'],
   ['/families', 'Disciplines'],

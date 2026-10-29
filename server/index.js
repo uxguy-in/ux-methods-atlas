@@ -7,6 +7,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { books, meta, byId, kinds, listFields, watchData } from './lib/data.js';
 import { booksPayload, metaPayload, methodPayload } from './lib/kinds.js';
 import { shelvesPayload } from './lib/recommend.js';
+import { buildPlan } from './lib/plan.js';
 import { generateBrief, DEFAULT_MODEL } from './lib/brief.js';
 
 const MODEL = process.env.CLAUDE_MODEL || DEFAULT_MODEL;
@@ -41,6 +42,11 @@ app.get('/api/books', (_req, res) => res.json(booksPayload(books, byId)));
 app.post('/api/recommend', (req, res) => {
   const { answers = {}, brief = '', seed = 1, exclude = [] } = req.body || {};
   res.json(shelvesPayload(kinds.research, answers, brief, seed, Array.isArray(exclude) ? exclude.slice(0, 200) : []));
+});
+
+// The study planner's roadmap. Only structured answers are sent; the question text stays in the browser.
+app.post('/api/plan', (req, res) => {
+  res.json(buildPlan(kinds.research, kinds.researchById, (req.body || {}).input || {}));
 });
 
 app.post('/api/brief', async (req, res) => {

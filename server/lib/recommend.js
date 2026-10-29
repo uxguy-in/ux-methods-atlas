@@ -106,15 +106,26 @@ export function scoreMethod(m, a = {}, words = []) {
   if (m.status === 'community' && m.validation !== 'tested') s -= 1;
 
   s += textScore(m, words) * 2;
-  return { score: s, why };
+  return { score: s, why, fine: fineScore(m, a) };
 }
 
-export function recommend(methods, answers = {}, brief = '', limit = 24) {
-  const words = tokenize(brief);
-  return methods
-    .map((m) => ({ m, ...scoreMethod(m, answers, words) }))
-    .sort((x, y) => y.score - x.score)
-    .slice(0, limit);
+// Finer-grained signals worth less than one point in total. They separate the many methods that
+// tie on the coarse score above, which otherwise fall back to the data file's alphabetical order.
+export function fineScore(m, a = {}) {
+  const f = m.facets || {};
+  const goals = f.goals || [];
+  let s = 0;
+  if (a.goals?.length) {
+    if (goals[0] === a.goals[0]) s += 0.3; // the method's main purpose is the person's first goal
+    s += 0.15 * (a.goals.filter((g) => goals.includes(g)).length / a.goals.length);
+  }
+  if (a.data && a.data !== 'any' && f.data === a.data) s += 0.1;
+  if (a.participants && f.participants === a.participants) s += 0.1;
+  if (a.time && f.effort === a.time) s += 0.1;
+  // A fuller write-up is more useful to land on: steps to follow, when to use and avoid it, an example.
+  s += 0.1 * Math.min((m.steps || []).length, 6) / 6;
+  s += 0.05 * ['useWhen', 'avoidWhen', 'example', 'outputs'].filter((k) => m[k]?.length).length / 4;
+  return s;
 }
 
 // Small deterministic generator so the same seed deals the same picks (server and static build agree).
@@ -128,6 +139,29 @@ function rng(seed) {
   };
 }
 
+// A stable draw in [0, 1) for one method under one seed. It depends only on the id and the seed,
+// not on where the method sits in the list, so a new entry does not reshuffle everything after it.
+export function seededDraw(id, seed = 1) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 0x01000193);
+  return rng((h ^ Math.imul(seed >>> 0, 0x9e3779b1)) >>> 0)();
+}
+
+// Equal coarse scores are ordered by the fine signals plus a seeded draw, so tied methods are
+// shuffled per seed instead of always listing A to D first.
+export function rank(methods, answers = {}, words = [], seed = 1) {
+  return methods
+    .map((m) => {
+      const r = scoreMethod(m, answers, words);
+      return { m, why: r.why, coarse: r.score, score: r.score + r.fine, tie: r.fine + 0.5 * seededDraw(m.id, seed) };
+    })
+    .sort((x, y) => y.coarse - x.coarse || y.tie - x.tie);
+}
+
+export function recommend(methods, answers = {}, brief = '', limit = 24, seed = 1) {
+  return rank(methods, answers, tokenize(brief), seed).slice(0, limit);
+}
+
 const LEVEL = { beginner: 'newcomer', intermediate: 'mid', advanced: 'expert' };
 const isLost = (m) => !['active', 'community'].includes(m.status);
 
@@ -135,13 +169,10 @@ const isLost = (m) => !['active', 'community'].includes(m.status);
 // borrowed methods to try. Near-ties are shuffled by the seed and each shelf spreads across
 // disciplines, so the same answers do not always produce the same handful of methods.
 export function shelves(methods, answers = {}, brief = '', seed = 1, exclude = []) {
-  const words = tokenize(brief);
-  const rand = rng(seed);
   const seen = new Set(exclude);
-  const ranked = methods
-    .map((m) => ({ m, ...scoreMethod(m, answers, words) }))
+  const ranked = rank(methods, answers, tokenize(brief), seed)
     // Methods already shown in this session sink, so "Show different picks" really shows different ones.
-    .map((r) => ({ ...r, jitter: r.score + rand() * 4 - (seen.has(r.m.id) ? 12 : 0) }))
+    .map((r) => ({ ...r, jitter: r.score + seededDraw(r.m.id, seed) * 4 - (seen.has(r.m.id) ? 12 : 0) }))
     .sort((x, y) => y.jitter - x.jitter);
   const top = ranked[0]?.score ?? 0;
   const floor = Math.min(top - 14, top * 0.4);

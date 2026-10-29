@@ -3,6 +3,7 @@ import { STATUS } from './vocab.js';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Finder from './pages/Finder.jsx';
+import Plan from './pages/Plan.jsx';
 import Atlas from './pages/Atlas.jsx';
 import Method from './pages/Method.jsx';
 import Lost from './pages/Lost.jsx';
@@ -19,6 +20,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/find" element={<Finder />} />
+        <Route path="/plan" element={<Plan />} />
         <Route path="/methods" element={<Atlas />} />
         <Route path="/methods/:id" element={<Method />} />
         <Route path="/lost" element={<Lost />} />

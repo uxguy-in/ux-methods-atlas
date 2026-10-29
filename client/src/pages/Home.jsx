@@ -116,6 +116,12 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <Link to="/plan" className="card design-card plan-home-card">
+            <span className="fam">New</span>
+            <h3>Plan my study</h3>
+            <p>Have a method in mind but not a plan? Frame your research question with PICO, SPICE, SPIDER or ECLIPSE, add your constraints, and get a phased roadmap with analysis, survey-quality and reporting advice.</p>
+            <div className="meta"><span className="badge">Build a roadmap</span></div>
+          </Link>
           {meta?.counts?.design > 0 && (
             <Link to="/design" className="card design-card">
               <span className="fam">Listed separately</span>
