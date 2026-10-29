@@ -13,6 +13,10 @@ import LossAversion from '../calc/tools/LossAversion.jsx';
 import WeberJND from '../calc/tools/WeberJND.jsx';
 import TreeTest from '../calc/tools/TreeTest.jsx';
 import HTA from '../calc/tools/HTA.jsx';
+import SurveystatsFactor from '../calc/tools/SurveystatsFactor.jsx';
+import SurveystatsValidity from '../calc/tools/SurveystatsValidity.jsx';
+import SurveystatsDrivers from '../calc/tools/SurveystatsDrivers.jsx';
+import SurveystatsCrosstab from '../calc/tools/SurveystatsCrosstab.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2671,6 +2675,7 @@ const COMPONENTS = {
   kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability, 'cluster-personas': ClusterPersonas,
   'shannon-information': ShannonInfo, 'information-foraging': InfoForaging, 'signal-detection': SignalDetection, discounting: Discounting,
   'loss-aversion': LossAversion, 'weber-jnd': WeberJND, 'tree-test': TreeTest, hta: HTA,
+  'factor-analysis': SurveystatsFactor, 'scale-validity': SurveystatsValidity, 'key-drivers': SurveystatsDrivers, crosstab: SurveystatsCrosstab,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));

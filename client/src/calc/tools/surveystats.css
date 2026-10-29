@@ -1,0 +1,53 @@
+/* Styles for the survey statistics tools (factor analysis, scale validity, key drivers, crosstabs). Theme tokens only. */
+.svs-root { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
+.svs-root > *, .svs-two > * { min-width: 0; }
+.svs-h { font-size: 20px; margin: 12px 0 -8px; }
+.svs-note { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 75ch; }
+.svs-actions { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; font-size: 15px; }
+.svs-plot { display: block; width: 100%; height: auto; max-width: 760px; }
+.svs-plot text { font-family: var(--font); }
+.svs-plot .ax { font-size: 12px; fill: var(--ink-3); }
+.svs-plot .lb { font-size: 12px; fill: var(--ink); }
+.svs-plot .lbb { font-size: 12px; font-weight: 700; fill: var(--ink); }
+.svs-plot .grid { stroke: var(--line); }
+.svs-plot .axis { stroke: var(--ink-3); }
+.svs-plot .obs { stroke: var(--c1); fill: none; stroke-width: 2.5; }
+.svs-plot .obs-pt { fill: var(--c1); }
+.svs-plot .sim { stroke: var(--c2); fill: none; stroke-width: 2; stroke-dasharray: 6 4; }
+.svs-plot .simm { stroke: var(--ink-3); fill: none; stroke-width: 1.5; stroke-dasharray: 2 3; }
+.svs-plot .ref { stroke: var(--ink-3); stroke-dasharray: 4 4; }
+.svs-plot .kline { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.svs-plot .dot { fill: var(--c1); fill-opacity: 0.45; }
+.svs-plot .q { stroke: var(--line); }
+.svs-plot .q.fix { fill: color-mix(in srgb, var(--bad) 10%, transparent); }
+.svs-plot .q.keep { fill: color-mix(in srgb, var(--ok) 10%, transparent); }
+.svs-plot .q.low { fill: var(--bg-soft); }
+.svs-plot .q.overkill { fill: color-mix(in srgb, var(--warn) 10%, transparent); }
+.svs-plot .ql { font-size: 12px; font-weight: 700; fill: var(--ink-2); }
+.svs-plot .pt { fill: var(--accent); }
+.svs-plot .mos { stroke: var(--bg); stroke-width: 2; }
+.svs-plot .mos.hi { stroke: var(--ink); stroke-width: 2.5; }
+.svs-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin: 6px 0 0; padding: 0; list-style: none; }
+.svs-legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid var(--c1); margin-right: 6px; vertical-align: 3px; }
+.svs-legend i.sim { border-top: 3px dashed var(--c2); }
+.svs-legend i.simm { border-top: 2px dotted var(--ink-3); }
+.svs-legend i.sw { width: 12px; height: 12px; border: 0; vertical-align: -1px; }
+.svs-table td.main { font-weight: 800; }
+.svs-table td.dim { color: var(--ink-3); }
+.svs-table td.hi { font-weight: 800; }
+.svs-table td.bad { background: color-mix(in srgb, var(--bad) 12%, transparent); font-weight: 700; }
+.svs-table td.warn { background: color-mix(in srgb, var(--warn) 12%, transparent); }
+.svs-table td.good { background: color-mix(in srgb, var(--ok) 10%, transparent); }
+.svs-table td.diag { background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 700; }
+.svs-table th.rot { white-space: normal; min-width: 64px; }
+.svs-table td small { display: block; color: var(--ink-3); font-size: 12px; font-weight: 400; }
+.svs-table .qtag { display: inline-block; margin: 0 4px 3px 0; white-space: nowrap; }
+.svs-names { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.svs-names label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; }
+.svs-names input { font: inherit; font-size: 15px; padding: 7px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); width: 190px; max-width: 100%; box-sizing: border-box; }
+.svs-pick td:first-child { min-width: 0; }
+.svs-pick input[type='checkbox'] { width: 18px; height: 18px; accent-color: var(--accent); vertical-align: -3px; }
+.svs-pick select { padding: 6px 30px 6px 10px; font-size: 13px; }
+.svs-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .svs-two { grid-template-columns: 1fr; } }
+.svs-heat td { text-align: center; }
