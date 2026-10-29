@@ -5,6 +5,14 @@ import * as SM from '../calc/summaries.js';
 import StudySummary from '../components/StudySummary.jsx';
 import * as CL from '../calc/cluster.js';
 import { CATALOG } from '../calc/catalog.js';
+import ShannonInfo from '../calc/tools/ShannonInfo.jsx';
+import InfoForaging from '../calc/tools/InfoForaging.jsx';
+import SignalDetection from '../calc/tools/SignalDetection.jsx';
+import Discounting from '../calc/tools/Discounting.jsx';
+import LossAversion from '../calc/tools/LossAversion.jsx';
+import WeberJND from '../calc/tools/WeberJND.jsx';
+import TreeTest from '../calc/tools/TreeTest.jsx';
+import HTA from '../calc/tools/HTA.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2661,6 +2669,8 @@ const COMPONENTS = {
   'margin-of-error': MarginOfError, intercoder: InterCoder, saturation: Saturation, expectation: Expectation, discovery: Discovery,
   'capture-recapture': CaptureRecapture, klm: KLM, fitts: Fitts, hick: Hick, 'van-westendorp': VanWestendorp, 'gabor-granger': GaborGranger,
   kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability, 'cluster-personas': ClusterPersonas,
+  'shannon-information': ShannonInfo, 'information-foraging': InfoForaging, 'signal-detection': SignalDetection, discounting: Discounting,
+  'loss-aversion': LossAversion, 'weber-jnd': WeberJND, 'tree-test': TreeTest, hta: HTA,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));

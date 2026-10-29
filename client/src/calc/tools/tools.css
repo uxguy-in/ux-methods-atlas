@@ -1,0 +1,83 @@
+/* Styles for the behaviour, information, tree-test and HTA tools (client/src/calc/tools). Theme tokens only. */
+.tl-bars { display: grid; gap: 7px; }
+.tl-bars > div { display: grid; grid-template-columns: minmax(0, 220px) minmax(60px, 1fr) 120px; gap: 12px; align-items: center; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tl-bars .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-bars .bar { height: 10px; background: var(--bg-sunk); overflow: hidden; }
+.tl-bars .bar i { display: block; height: 100%; background: var(--c1); }
+.tl-bars .tone-ok .bar i { background: var(--ok); }
+.tl-bars .tone-bad .bar i { background: var(--bad); }
+.tl-bars .tone-warn .bar i { background: var(--warn); }
+@media (max-width: 640px) { .tl-bars > div { grid-template-columns: minmax(0, 1fr) 60px 100px; gap: 8px; font-size: 13px; } }
+.tl-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.tl-check { display: inline-flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 600; cursor: pointer; }
+.tl-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.tl-note { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 75ch; }
+.tl-code { width: 100%; box-sizing: border-box; font: 13px/1.4 var(--mono); padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-soft); color: var(--ink); overflow-wrap: anywhere; word-break: break-all; }
+.tl-defs { margin: 0; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); padding-left: 20px; }
+.tl-defs b { color: var(--ink); }
+.tl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); max-width: 100%; }
+.tl-plot { display: block; }
+.tl-plot text { font-family: var(--font); }
+.tl-plot .ax { font-size: 12px; fill: var(--ink-3); }
+.tl-plot .lb { font-size: 12px; fill: var(--ink); }
+.tl-plot .lbs { font-size: 11px; fill: var(--ink-2); }
+.tl-plot .grid { stroke: var(--line); }
+.tl-cell-ok { background: color-mix(in srgb, var(--ok) 14%, transparent); font-weight: 700; }
+.tl-cell-bad { background: color-mix(in srgb, var(--bad) 10%, transparent); }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin: 6px 0 0; padding: 0; list-style: none; }
+.tl-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+/* Tree test builder */
+.tt-preview { display: grid; gap: 2px; font-size: 14px; max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; background: var(--bg); }
+.tt-preview button { text-align: left; font: inherit; font-size: 14px; border: 1px solid transparent; background: none; color: var(--ink); padding: 4px 8px; border-radius: var(--radius-sm); cursor: pointer; overflow-wrap: anywhere; }
+.tt-preview button:hover { border-color: var(--line); background: var(--bg-soft); }
+.tt-preview button.on { background: color-mix(in srgb, var(--ok) 16%, transparent); border-color: var(--ok); font-weight: 700; }
+.tt-preview button .mk { color: var(--ok); margin-left: 6px; }
+.tt-tasks { display: grid; gap: 12px; }
+.tt-task { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; display: grid; gap: 8px; background: var(--bg); }
+.tt-task.on { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.tt-task textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); resize: vertical; }
+.tt-task .ans { font-size: 13px; color: var(--ink-2); }
+.tt-build { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .tt-build { grid-template-columns: 1fr; } }
+
+/* Tree test participant screen: covers the page so nothing else distracts. */
+.tt-run { position: fixed; inset: 0; z-index: 1000; background: var(--bg); color: var(--ink); overflow-y: auto; }
+.tt-run-in { max-width: 680px; margin: 0 auto; padding: 28px 16px 60px; display: grid; gap: 18px; }
+.tt-run h1 { font-size: clamp(24px, 4vw, 32px); }
+.tt-run .prog { font-size: 13px; font-weight: 700; color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; }
+.tt-run .task { font-size: 19px; line-height: 1.45; padding: 16px 18px; border-left: 5px solid var(--accent); background: var(--bg-soft); }
+.tt-crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 14px; color: var(--ink-3); }
+.tt-crumbs button { font: inherit; font-size: 14px; background: none; border: 0; color: var(--accent); text-decoration: underline; cursor: pointer; padding: 2px; }
+.tt-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tt-list button { width: 100%; text-align: left; font: inherit; font-size: 17px; font-weight: 600; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); cursor: pointer; display: flex; justify-content: space-between; gap: 10px; }
+.tt-list button:hover, .tt-list button:focus-visible { border-color: var(--ink); background: var(--bg-soft); }
+.tt-list button span:last-child { color: var(--ink-3); }
+.tt-here { display: grid; gap: 10px; padding: 14px 16px; border: 2px solid var(--ok); border-radius: var(--radius-sm); }
+.tt-here p { margin: 0; }
+.tt-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.tt-scale { display: flex; flex-wrap: wrap; gap: 6px; }
+.tt-scale button { min-width: 44px; height: 44px; font: inherit; font-weight: 700; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); cursor: pointer; }
+.tt-scale button.on { background: var(--red); border-color: var(--red); color: #fff; }
+.tt-scale-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); max-width: 380px; }
+
+/* HTA */
+.hta-svg .box { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.2; }
+.hta-svg .box.root { stroke: var(--ink); stroke-width: 2; }
+.hta-svg .box.risk-h { fill: color-mix(in srgb, var(--bad) 12%, var(--bg)); stroke: var(--bad); }
+.hta-svg .box.risk-m { fill: color-mix(in srgb, var(--warn) 12%, var(--bg)); }
+.hta-svg .num { font-size: 12px; font-weight: 800; fill: var(--accent); }
+.hta-svg .nm { font-size: 12.5px; fill: var(--ink); }
+.hta-svg .meta { font-size: 11px; fill: var(--ink-3); }
+.hta-svg .plan { font-size: 11.5px; font-style: italic; fill: var(--ink-2); }
+.hta-svg .link { stroke: var(--ink-3); stroke-width: 1.2; fill: none; }
+.hta-svg .stop { stroke: var(--ink); stroke-width: 2.5; }
+.hta-outline { margin: 0; padding-left: 0; list-style: none; font-size: 15px; }
+.hta-outline ul { list-style: none; margin: 0; padding-left: 22px; border-left: 1px dashed var(--line); }
+.hta-outline li { margin: 4px 0; }
+.hta-outline summary { cursor: pointer; }
+.hta-outline .n { font-weight: 800; color: var(--accent); margin-right: 6px; font-variant-numeric: tabular-nums; }
+.hta-outline .pl { display: block; font-size: 13px; font-style: italic; color: var(--ink-2); margin: 2px 0 2px 4px; }
+.hta-outline .leaf { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.hta-outline .qtag { margin-left: 6px; }
+.tl-bars b { text-align: right; overflow-wrap: anywhere; }
