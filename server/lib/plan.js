@@ -57,6 +57,14 @@ export const CALCULATORS = {
   'compare-means': 'Compare two means',
   correlation: 'Correlation',
   'rate-benchmark': 'Completion rate vs benchmark',
+  'effect-size': 'Effect size',
+  nonparametric: 'Nonparametric comparison',
+  'bayes-ab': 'Bayesian A/B test',
+  sprt: 'Sequential test planner',
+  reliability: 'Scale reliability',
+  'margin-of-error': 'Survey margin of error',
+  intercoder: 'Inter-coder agreement',
+  saturation: 'Saturation and coverage',
 };
 
 // Research question frameworks: labelled fields and a sentence assembled from them.
@@ -304,6 +312,7 @@ function samplingItems(s, st) {
       ['theoretical-sampling-and-saturation', gt ? 7.5 : 2.5, 'Grounded theory samples as the analysis develops, until new data adds nothing.'],
       ['saturation-monitoring', 3, 'Track when new sessions stop adding new codes.'],
     );
+    calcs.push('saturation');
   }
   if (usab && !st.quant) {
     cands.push(['problem-discovery-sample-size-model-1-1-p-n', 6.5, 'Usability testing: size the study by the share of problems you need to find.']);
@@ -320,6 +329,7 @@ function samplingItems(s, st) {
     );
     if (st.modes.includes('analytics') && !survey) cands.push(['analytics-data-quality-assessment', 4, 'With logs, the sample is whoever was tracked; check who is missing.']);
     calcs.push('sample-size');
+    if (survey) calcs.push('margin-of-error');
   }
   if (!cands.length) cands.push(['participant-recruiting-and-screener-design', 5, 'Recruit the people the question is about.']);
   const why = n ? `You expect about ${n} participants${s.participants ? ` and have ${(ACCESS[s.participants] || '').toLowerCase()}` : ''}.` : 'Decide who takes part and how many before recruiting.';
@@ -412,7 +422,7 @@ function analyseItems(s, st) {
     const goals = s.goals || [];
     const cands = [];
     const calcs = [];
-    if (m.includes('experiment')) { cands.push(['effect-size-calculation', 7, 'Report how big the difference is, not just whether it is significant.'], ['a-b-result-decision-rules-and-triage', 5, 'Agree in advance what result leads to which decision.']); calcs.push('compare-rates', 'compare-means'); }
+    if (m.includes('experiment')) { cands.push(['effect-size-calculation', 7, 'Report how big the difference is, not just whether it is significant.'], ['a-b-result-decision-rules-and-triage', 5, 'Agree in advance what result leads to which decision.']); calcs.push('compare-rates', 'compare-means', 'effect-size', 'bayes-ab', 'sprt'); }
     if (m.includes('quant-survey')) {
       cands.push(
         ['reliability-analysis-cronbachs-alpha-split-half-omega', goals.includes('measure-attitudes') || goals.includes('validate-instrument') ? 7 : 3, 'Check your scales measure consistently before comparing scores.'],
@@ -420,7 +430,7 @@ function analyseItems(s, st) {
         ['survey-weighting', s.participants === 'large' ? 4 : 1.5, 'Weight the sample back to the population.'],
         ['correlation-analysis-with-confidence-intervals', 3, 'How strongly measures move together, with intervals.'],
       );
-      calcs.push('rating', 'top-box', 'nps', 'correlation');
+      calcs.push('reliability', 'rating', 'top-box', 'nps', 'correlation');
     }
     if (m.includes('usability')) {
       cands.push(['adjusted-wald-confidence-interval-for-completion-rates', 6, 'Small samples: give completion rates with honest intervals.'], ['confidence-intervals-for-task-time-log-transformed-and-median', 4, 'Task times are skewed; use the right interval.']);
@@ -430,7 +440,7 @@ function analyseItems(s, st) {
       cands.push(['exploratory-data-analysis-for-behavioural-ux-data', 6, 'Look at distributions and outliers before modelling.'], ['funnel-analysis', 4, 'Find where people drop out.']);
       calcs.push('compare-rates');
     }
-    if (!cands.length) { cands.push(['effect-size-calculation', 5, 'Report how big differences are, with intervals.']); calcs.push('compare-means'); }
+    if (!cands.length) { cands.push(['effect-size-calculation', 5, 'Report how big differences are, with intervals.']); calcs.push('compare-means', 'effect-size'); }
     items.push({ key: 'analyse:quant', label: st.mixed ? 'Quantitative strand' : '', why: 'Analyse the numbers.', goals: ['synthesize-data', ...goals], cands, calcs });
   }
   return items;
@@ -612,6 +622,8 @@ const QUAL_ANALYSIS = {
 };
 const QUAL_ORDER = ['thematic', 'framework', 'gt', 'gioia', 'miles', 'rapid'];
 
+const calcLinks = (...ids) => ids.map((id) => ({ id, name: CALCULATORS[id] }));
+
 function refs(ids, byId) {
   return ids.map((id) => byId.get(id)).filter(Boolean).map(slim);
 }
@@ -630,7 +642,7 @@ function guidance(s, st, byId) {
     block('qual-analysis', 'Choosing a qualitative analysis', `For your answers we suggest ${QUAL_ANALYSIS[fit].head.toLowerCase()}. The others are here so you can see why, and swap if your situation differs.`, [
       ...[fit, ...QUAL_ORDER.filter((k) => k !== fit)].map((k) => ({ ...QUAL_ANALYSIS[k], recommended: k === fit })),
       { head: 'Combining approaches', text: 'Approaches can be combined when each does a different job: Charmaz-style coding to build categories, then Miles and Huberman matrices to compare them across segments; a Gioia data structure to present theory built from coding; thematic analysis with a framework matrix so a team can share and check the work.', ids: ['focused-coding-charmaz', 'miles-and-huberman-analytic-displays', 'gioia-data-structure-coding-first-order-to-aggregate-dimensions', 'framework-analysis'] },
-      { head: 'Quality', text: 'Whatever you choose, state your quality criteria up front: credibility checks, an audit trail of decisions, negative cases, and member checks where they make sense.', ids: ['quality-criteria-sets-for-qualitative-and-grounded-theory-research', 'lincoln-and-guba-trustworthiness-criteria', 'dependability-audit-trail', 'member-checking', 'negative-case-analysis-and-rival-explanations'] },
+      { head: 'Quality', text: 'Whatever you choose, state your quality criteria up front: credibility checks, an audit trail of decisions, negative cases, and member checks where they make sense. If several people apply a fixed codebook, check their coding agreement; track saturation to decide when to stop recruiting.', ids: ['quality-criteria-sets-for-qualitative-and-grounded-theory-research', 'lincoln-and-guba-trustworthiness-criteria', 'dependability-audit-trail', 'member-checking', 'negative-case-analysis-and-rival-explanations', 'cohens-kappa-and-krippendorffs-alpha-inter-rater-reliability', 'species-accumulation-and-good-turing-coverage-for-saturation'], calcs: calcLinks('intercoder', 'saturation') },
     ]);
   }
 
@@ -640,16 +652,16 @@ function guidance(s, st, byId) {
       { head: 'Define the construct', text: 'Write down what each measure is meant to capture, and what it is not, before writing items.', ids: ['scale-construction-and-validation'] },
       { head: 'Use validated scales where they exist', text: 'Prefer a published, validated scale over home-made items; adapt with care and re-check reliability.', ids: ['validated-scale-construction', 'survey-item-type-selection-decision-tree-and-rating-format-catalogue'] },
       { head: 'Test the questions', text: 'Run cognitive interviews with five to ten people from the audience, code the problems you see, then pilot the full survey and check timings and drop-out.', ids: ['cognitive-interviewing-for-questionnaire-design', 'behaviour-coding-for-questionnaire-pretesting', 'questionnaire-pilot-testing'] },
-      { head: 'Check reliability and validity', text: 'Report internal consistency for multi-item scales and check the items hang together as intended before comparing groups.', ids: ['reliability-analysis-cronbachs-alpha-split-half-omega', 'exploratory-factor-analysis-efa', 'convergent-and-discriminant-validity-cr-ave-fornell-larcker-htmt'] },
+      { head: 'Check reliability and validity', text: 'Report internal consistency for multi-item scales and check the items hang together as intended before comparing groups.', ids: ['reliability-analysis-cronbachs-alpha-split-half-omega', 'exploratory-factor-analysis-efa', 'convergent-and-discriminant-validity-cr-ave-fornell-larcker-htmt'], calcs: calcLinks('reliability') },
       { head: 'Sample and weight', text: 'Say who could have answered and who did. Use probability sampling to generalise; otherwise use quotas and weight to known population figures, and say so.', ids: ['probability-sampling', 'quota-sampling', 'survey-weighting', 'total-survey-error-framework'] },
-      { head: 'Sample size and margin of error', text: moe ? `With about ${n} complete answers, a proportion near 50% has a margin of error of about ±${moe.toFixed(1)} points at 95% confidence. Subgroups have wider margins.` : 'Decide the precision the decision needs, then work back to the sample size. About 400 answers gives roughly ±5 points on a proportion.', ids: ['sample-size-planning-for-summative-ux-studies'], calcs: [{ id: 'sample-size', name: CALCULATORS['sample-size'] }] },
+      { head: 'Sample size and margin of error', text: moe ? `With about ${n} complete answers, a proportion near 50% has a margin of error of about ±${moe.toFixed(1)} points at 95% confidence. Subgroups have wider margins.` : 'Decide the precision the decision needs, then work back to the sample size. About 400 answers gives roughly ±5 points on a proportion.', ids: ['sample-size-planning-for-summative-ux-studies', 'design-effects-and-design-based-analysis-of-complex-samples'], calcs: calcLinks('margin-of-error', 'sample-size') },
     ]);
   }
   if (st.modes.includes('qual-survey')) {
     block('survey-qual', 'Survey quality: qualitative', 'Open-ended surveys trade depth for reach. Design for answers you can analyse.', [
       { head: 'Design the open questions', text: 'Ask about a specific recent occasion, one topic per question, with neutral wording. Keep to a few open questions so people do not tire.', ids: ['survey-question-writing-diagnostic-checks-structures-and-wording-principles'] },
       { head: 'Pilot for depth', text: 'Pilot with a handful of people and read the answers: if they come back as one-liners, rephrase or add a probe asking for an example.', ids: ['questionnaire-pilot-testing', 'web-probing-and-respondent-debriefing', 'cognitive-interviewing-for-questionnaire-design'] },
-      { head: 'Plan the coding', text: 'Decide early whether you will build themes (reflexive thematic analysis), code against a fixed codebook, or count categories (content analysis). If AI helps with coding, check its work and say so.', ids: ['thematic-analysis', 'content-analysis', 'start-list-coding-with-a-structured-codebook-and-check-coding', 'ethics-of-ai-assisted-qualitative-analysis'] },
+      { head: 'Plan the coding', text: 'Decide early whether you will build themes (reflexive thematic analysis), code against a fixed codebook, or count categories (content analysis). If AI helps with coding, check its work and say so. With a fixed codebook, have a second person code a sample and check agreement.', ids: ['thematic-analysis', 'content-analysis', 'start-list-coding-with-a-structured-codebook-and-check-coding', 'ethics-of-ai-assisted-qualitative-analysis', 'cohens-kappa-and-krippendorffs-alpha-inter-rater-reliability'], calcs: calcLinks('intercoder') },
     ]);
   }
 
@@ -739,6 +751,7 @@ export function planMarkdown(s, plan, { methodUrl = (id) => `/methods/${id}`, ca
     g.options.forEach((o) => {
       L.push(`- **${o.head}${o.recommended ? ' (suggested)' : ''}:** ${o.text}`);
       if (o.ids.length) L.push(`  - See: ${o.ids.map((m) => `[${m.name}](${methodUrl(m.id)})`).join(', ')}`);
+      if (o.calcs?.length) L.push(`  - Calculators: ${o.calcs.map((c) => `[${c.name}](${calcUrl(c.id)})`).join(', ')}`);
     });
     L.push('');
   });

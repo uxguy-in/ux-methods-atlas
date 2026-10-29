@@ -14,6 +14,7 @@
     "start": "node server/index.js",
     "check:data": "node server/scripts/check-data.js",
     "check:plan": "node server/scripts/check-plan.js",
+    "check:calc": "node server/scripts/check-calc.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {
