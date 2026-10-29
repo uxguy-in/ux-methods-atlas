@@ -516,6 +516,24 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .back-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* Find a method: the two-way switch between the finder and the study planner */
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--ink); border-radius: var(--radius); margin: 0 0 32px; max-width: 640px; }
+.mode-opt { display: flex; flex-direction: column; gap: 2px; padding: 12px 18px; text-decoration: none; color: var(--ink); background: var(--bg); min-width: 0; transition: background .12s, color .12s; }
+.mode-opt + .mode-opt { border-left: 2px solid var(--ink); }
+.mode-opt b { font-weight: 900; font-size: 14.5px; letter-spacing: .05em; text-transform: uppercase; line-height: 1.25; }
+.mode-opt small { font-size: 13.5px; color: var(--ink-3); line-height: 1.35; }
+a.mode-opt:hover { background: var(--bg-sunk); }
+.mode-opt.on { background: var(--red); color: #fff; }
+.mode-opt.on small { color: #f6dfe3; }
+.carry-note { margin: 0 0 24px; padding: 10px 14px; border-left: 4px solid var(--green); background: var(--bg-soft); color: var(--ink-2); font-size: 15px; max-width: 75ch; }
+.carry-note.carry-after { margin: 28px 0 0; }
+@media (max-width: 640px) {
+  .mode-switch { margin-bottom: 24px; }
+  .mode-opt { padding: 10px 12px; }
+  .mode-opt b { font-size: 13px; letter-spacing: .03em; }
+  .mode-opt small { font-size: 12.5px; }
+}
+
 /* ── Study planner ── */
 .plan-page .question h2 { max-width: 22ch; }
 .plan-group { border: 0; padding: 0; margin: 0 0 30px; min-width: 0; }
@@ -584,6 +602,7 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .plan-cta h2 { font-size: 26px; margin: 0 0 6px; }
 .plan-cta p { margin: 0; color: var(--ink-2); max-width: 62ch; }
 .plan-cta .eyebrow { margin-bottom: 8px; }
+.plan-home-actions { margin-top: 6px; }
 @media (max-width: 640px) {
   .phase { grid-template-columns: 1fr; gap: 10px; }
   .phase .num { width: 36px; height: 36px; font-size: 16px; }

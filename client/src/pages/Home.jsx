@@ -116,12 +116,19 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <Link to="/plan" className="card design-card plan-home-card">
-            <span className="fam">New</span>
-            <h3>Plan my study</h3>
-            <p>Have a method in mind but not a plan? Frame your research question with PICO, SPICE, SPIDER or ECLIPSE, add your constraints, and get a phased roadmap with analysis, survey-quality and reporting advice.</p>
-            <div className="meta"><span className="badge">Build a roadmap</span></div>
-          </Link>
+          <div className="card design-card plan-home-card">
+            <span className="fam">Find a method, two ways</span>
+            <h3>One method, or a whole study</h3>
+            <p>
+              Need one method? Answer the questions and get matches. Need a plan? Frame your research question with PICO, SPICE,
+              SPIDER or ECLIPSE, add your constraints, and get a phased roadmap with analysis, survey-quality and reporting advice.
+              Switch between them at any time; your answers come with you.
+            </p>
+            <div className="hero-actions plan-home-actions">
+              <Link to="/find" className="btn accent small">One method</Link>
+              <Link to="/plan" className="btn ghost small">Plan a whole study</Link>
+            </div>
+          </div>
           {meta?.counts?.design > 0 && (
             <Link to="/design" className="card design-card">
               <span className="fam">Listed separately</span>

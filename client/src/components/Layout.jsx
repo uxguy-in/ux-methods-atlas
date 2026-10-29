@@ -21,7 +21,6 @@ function useTheme() {
 
 const LINKS = [
   ['/find', 'Find a method'],
-  ['/plan', 'Plan my study'],
   ['/methods', 'Atlas'],
   ['/lost', 'Lost methods'],
   ['/families', 'Disciplines'],
@@ -78,7 +77,12 @@ export default function Layout({ children }) {
   const methodId = loc.pathname.match(/^\/methods\/([^/]+)$/)?.[1];
   const { data: design } = useApi(methodId ? '/api/design' : null);
   const onDesign = Boolean(methodId && design?.some((m) => m.id === decodeURIComponent(methodId)));
-  const navClass = (to) => ({ isActive }) => ((to === '/design' ? isActive || onDesign : isActive && !(to === '/methods' && onDesign)) ? 'active' : undefined);
+  // The study planner (/plan) is the "Plan a whole study" mode of Find a method.
+  const onPlan = loc.pathname === '/plan';
+  const navClass = (to) => ({ isActive }) => {
+    if (to === '/find') return isActive || onPlan ? 'active' : undefined;
+    return (to === '/design' ? isActive || onDesign : isActive && !(to === '/methods' && onDesign)) ? 'active' : undefined;
+  };
 
   return (
     <>

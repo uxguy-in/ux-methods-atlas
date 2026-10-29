@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { post } from '../api.js';
 import { useMeta, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
+import ModeSwitch, { planLink } from '../components/ModeSwitch.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
 // Shared with the study planner, which asks the same goal and material questions.
@@ -110,11 +111,22 @@ function toAnswers(sel) {
   return { ...rest, goals };
 }
 
+const answered = (v) => (Array.isArray(v) ? v.length > 0 : Boolean(v));
+// The next question after `from` still to ask: questions answered in the study planner are not asked again.
+const nextOpen = (from, sel, carried) => {
+  let i = from + 1;
+  while (i < QUESTIONS.length && carried.includes(QUESTIONS[i].id) && answered(sel[QUESTIONS[i].id])) i++;
+  return i;
+};
+
 export default function Finder() {
   const { data: meta } = useMeta();
-  const [step, setStep] = useRemembered('step', 0);
+  // Answers handed over from "Plan a whole study" when the visitor switches mode.
+  const carry = useLocation().state?.carry;
+  const [carried] = useRemembered('carried', () => Object.keys(carry || {}).filter((k) => answered(carry[k])));
+  const [step, setStep] = useRemembered('step', () => nextOpen(-1, carry || {}, carried));
   // Every visit starts blank, so no answer appears chosen before the person chooses it.
-  const [sel, setSel] = useRemembered('answers', {});
+  const [sel, setSel] = useRemembered('answers', () => carry || {});
   const [editing, setEditing] = useRemembered('editing', false); // changing one answer from the summary
   const [brief, setBrief] = useRemembered('brief', '');
   const [recs, setRecs] = useState(null);
@@ -145,7 +157,7 @@ export default function Finder() {
   const [picked, setPicked] = useState(null);
   const done = step >= QUESTIONS.length;
   // After a change made from the summary, go straight back to it instead of through the rest.
-  const advance = () => { if (editing) { setEditing(false); go(QUESTIONS.length); } else go(step + 1); };
+  const advance = () => { if (editing) { setEditing(false); go(QUESTIONS.length); } else go(nextOpen(step, sel, carried)); };
   const change = (i) => { setEditing(true); go(i); };
   const q = QUESTIONS[step];
 
@@ -208,12 +220,21 @@ export default function Finder() {
 
   if (!done) {
     const val = sel[q.id];
-    const hasAnswer = Array.isArray(val) ? val.length > 0 : Boolean(val);
+    const hasAnswer = answered(val);
+    let prev = step - 1; // Back passes over carried answers too
+    while (prev >= 0 && carried.includes(QUESTIONS[prev].id) && answered(sel[QUESTIONS[prev].id])) prev--;
     return (
       <div className="wrap finder">
+        <h1 className="sr-only">Find a method</h1>
+        <ModeSwitch mode="one" link={planLink(sel)} />
         <div className="progress" aria-hidden="true">
-          {QUESTIONS.map((_, i) => <span key={i} className={i <= step ? 'done' : ''} />)}
+          {QUESTIONS.map((_, i) => <span key={i} className={i <= step || (carried.includes(QUESTIONS[i].id) && answered(sel[QUESTIONS[i].id])) ? 'done' : ''} />)}
         </div>
+        {carried.length > 0 && !editing && (
+          <p className="carry-note">
+            {carried.length === 1 ? 'One answer' : `${carried.length} answers`} came over from your study plan, so those questions are skipped. Change any of them from your answers at the end.
+          </p>
+        )}
         <div key={step} className={`question-stage${leaving ? ' leaving' : ''}`} style={{ '--dir': dir }}>
         <p className="eyebrow">Question {step + 1} of {QUESTIONS.length}</p>
         <div className="question">
@@ -235,7 +256,7 @@ export default function Finder() {
         <div className="finder-nav question-nav">
           {editing
             ? <button className="btn ghost" onClick={() => { setEditing(false); go(QUESTIONS.length); }}>Back to your answers</button>
-            : <button className="btn ghost" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0}>Back</button>}
+            : <button className="btn ghost" onClick={() => go(prev)} disabled={prev < 0}>Back</button>}
           <div className="question-nav-end">
             <button type="button" className="skip-link" onClick={() => { setSel({ ...sel, [q.id]: undefined }); advance(); }}>
               {editing ? 'Clear this answer' : 'Skip this question'}
@@ -253,6 +274,8 @@ export default function Finder() {
 
   return (
     <div className="wrap finder">
+      <h1 className="sr-only">Find a method</h1>
+      <ModeSwitch mode="one" link={planLink(sel)} />
       <div className="question-stage finder-done" style={{ '--dir': dir }}>
       <div className="progress" aria-hidden="true">
         {QUESTIONS.map((_, i) => <span key={i} className="done" />)}
@@ -325,15 +348,7 @@ export default function Finder() {
 
 // Hands the finder answers to the study planner, so the roadmap starts from the same situation.
 function PlanCta({ sel }) {
-  const a = {
-    goal: sel.goal?.length ? sel.goal : undefined,
-    material: sel.material,
-    participants: sel.participants !== 'any' ? sel.participants : undefined,
-    time: sel.time,
-    approach: ['qualitative', 'quantitative', 'mixed'].includes(sel.data) ? sel.data : undefined,
-    expertise: sel.level,
-  };
-  const known = Object.fromEntries(Object.entries(a).filter(([, v]) => v));
+  const link = planLink(sel);
   return (
     <aside className="plan-cta">
       <div>
@@ -341,7 +356,7 @@ function PlanCta({ sel }) {
         <h2>Turn these methods into a study plan.</h2>
         <p>Frame the question, add your constraints, and get a phased roadmap from framing to reporting, with similar methods to swap in.</p>
       </div>
-      <Link to={`/plan?a=${encodeURIComponent(JSON.stringify(known))}`} className="btn accent">Plan my study</Link>
+      <Link to={link.to} state={link.state} onClick={link.onClick} className="btn accent">Plan a whole study</Link>
     </aside>
   );
 }

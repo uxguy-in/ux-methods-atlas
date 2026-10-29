@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { post, STATIC } from '../api.js';
 import { useMethods } from '../hooks.js';
 import { Status } from '../components/MethodCard.jsx';
+import ModeSwitch, { PLAN_STORE as STORE, findLink } from '../components/ModeSwitch.jsx';
 import { QUESTIONS as FINDER } from './Finder.jsx';
 import { ACCESS, APPROACH, BUDGET, COLLECT, EXPERTISE, FRAMEWORKS, LIMITS, TIME, draftQuestion, planMarkdown, suggestFramework } from '../../../server/lib/plan.js';
 
 // The answers live in the URL (?a=...&step=...), so a plan can be bookmarked, shared and revisited.
 // The last plan is also kept for this browser session, for visitors who come back through the nav.
-const STORE = 'atlas-study-plan';
+// This is the "Plan a whole study" mode of Find a method; ModeSwitch carries answers to and from the finder.
 const GOAL_Q = FINDER.find((q) => q.id === 'goal');
 const MATERIAL_Q = FINDER.find((q) => q.id === 'material');
 const STEPS = ['Your question', 'Constraints', 'Approach', 'Material and goals'];
@@ -28,11 +29,15 @@ const plannerInput = (s) => ({
 
 export default function Plan() {
   const [params, setParams] = useSearchParams();
+  const { state: navState } = useLocation();
   const fromUrl = parse(params.get('a'));
   const [stored, setStored] = useState(() => { try { return parse(sessionStorage.getItem(STORE)); } catch { return null; } });
   const s = fromUrl || stored || {};
   const step = Math.min(Math.max(Number(params.get('step')) || 0, 0), STEPS.length);
   const done = step >= STEPS.length;
+  // Material and goals are the finder's own questions: once answered there (or here), the steps go straight past them.
+  const hasMaterial = Boolean(s.material && s.goal?.length);
+  const last = hasMaterial && step < STEPS.length - 1 ? STEPS.length - 2 : STEPS.length - 1;
 
   const write = (next, nextStep = step, push = false) => {
     const c = compact(next);
@@ -40,7 +45,7 @@ export default function Plan() {
     const p = {};
     if (Object.keys(c).length) p.a = JSON.stringify(c);
     if (nextStep) p.step = String(nextStep);
-    setParams(p, { replace: !push });
+    setParams(p, { replace: !push, state: navState }); // keeps the note on answers brought over from the finder
   };
   const set = (patch) => write({ ...s, ...patch });
   const go = (to) => { write(s, to, true); scrollTo(0, 0); };
@@ -48,21 +53,35 @@ export default function Plan() {
 
   return (
     <div className="wrap finder plan-page">
+      <h1 className="sr-only">Find a method: plan a whole study</h1>
+      <ModeSwitch mode="study" link={findLink(s)} />
       <div className="progress no-print" aria-hidden="true">
-        {[...STEPS, 'Plan'].map((_, i) => <span key={i} className={i <= step ? 'done' : ''} />)}
+        {[...STEPS, 'Plan'].map((_, i) => <span key={i} className={i <= step || (i === 3 && hasMaterial) ? 'done' : ''} />)}
       </div>
       {done ? <Roadmap s={s} set={set} go={go} reset={reset} /> : (
         <>
-          <p className="eyebrow">Plan my study · Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
+          <p className="eyebrow">Plan a whole study · Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
+          {step === 0 && navState?.carried > 0 && (
+            <p className="carry-note">
+              {navState.carried === 1 ? 'One answer' : `${navState.carried} answers`} came over from One method and {navState.carried === 1 ? 'is' : 'are'} filled in below.
+              {hasMaterial && ' What you have and what you need to find out are already answered, so that step is skipped.'}
+            </p>
+          )}
           {step === 0 && <QuestionStep s={s} set={set} />}
           {step === 1 && <ConstraintsStep s={s} set={set} />}
           {step === 2 && <ApproachStep s={s} set={set} />}
           {step === 3 && <MaterialStep s={s} set={set} />}
+          {step === last && last < STEPS.length - 1 && (
+            <p className="carry-note carry-after">
+              Already answered: {[MATERIAL_Q.options.find((o) => o.v === s.material)?.label, ...s.goal.map((g) => GOAL_Q.options.find((o) => o.v === g)?.label)].filter(Boolean).join(' · ')}.{' '}
+              <button type="button" className="linklike" onClick={() => go(STEPS.length - 1)}>Change</button>
+            </p>
+          )}
           <div className="finder-nav question-nav">
             <button className="btn ghost" onClick={() => go(step - 1)} disabled={step === 0}>Back</button>
             <div className="question-nav-end">
               {step === 0 && Object.keys(s).length > 0 && <button type="button" className="skip-link" onClick={reset}>Start over</button>}
-              <button className="btn accent" onClick={() => go(step + 1)}>{step === STEPS.length - 1 ? 'Build my plan' : 'Next'}</button>
+              <button className="btn accent" onClick={() => go(step === last ? STEPS.length : step + 1)}>{step === last ? 'Build my plan' : 'Next'}</button>
             </div>
           </div>
         </>
@@ -324,7 +343,7 @@ function Roadmap({ s, set, go, reset }) {
             </section>
           ))}
           <p className="muted plan-foot no-print">
-            This plan is a starting point built from rules, not a substitute for judgement. For a direction written for your exact problem, describe it in the <Link to="/find">method finder</Link>.
+            This plan is a starting point built from rules, not a substitute for judgement. For a direction written for your exact problem, switch to <Link {...findLink(s)}>One method</Link> and describe it there.
           </p>
         </>
       )}
