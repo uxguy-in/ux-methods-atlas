@@ -1,7 +1,7 @@
 // Checks the calculator statistics against published worked examples and values from scipy, statsmodels and
 // pingouin. Run with `npm run check:calc`. Reference values were produced with scipy 1.18, statsmodels 0.15 and
 // pingouin 0.7 on the same data; published examples are cited next to each check.
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as S from '../../client/src/calc/stats.js';
@@ -414,7 +414,9 @@ same('LCA-style persona text uses class-conditional probabilities', /^\d+% likel
 // ── The shared catalog matches the calculators page: every calculator has a component, and the methods each one
 // lists in calc/catalog.js are exactly the methods its "How this is calculated" section links to.
 // ── Every atlas method a calculator links to exists.
-const src = readFileSync(path.join(root, 'client', 'src', 'pages', 'Calculators.jsx'), 'utf8');
+// The tools in client/src/calc/tools are separate files; read them with the page so their links are checked too.
+const toolsDir = path.join(root, 'client', 'src', 'calc', 'tools');
+const src = [path.join(root, 'client', 'src', 'pages', 'Calculators.jsx'), ...readdirSync(toolsDir).filter((f) => f.endsWith('.jsx')).map((f) => path.join(toolsDir, f))].map((f) => readFileSync(f, 'utf8')).join('\n// ── \n');
 const linked = new Set([...src.matchAll(/method="([a-z0-9-]+)"/g)].map((m) => m[1]));
 // Conditional links: the strings after ? and : in method={cond ? 'a' : 'b'}; extra links: the first string of each pair in links={[...]}.
 for (const m of src.matchAll(/method=\{[^}]*\}/g)) for (const x of m[0].matchAll(/[?:] '([a-z0-9-]+)'/g)) linked.add(x[1]);
@@ -435,7 +437,7 @@ const drift = CATALOG.filter((c) => !compOf[c.id] || JSON.stringify(idsIn(bodyOf
 same(`Catalog matches the page for all ${CATALOG.length} calculators`, drift, []);
 same('Catalog ids are unique', new Set(CATALOG.map((c) => c.id)).size, CATALOG.length);
 same('Every catalog method id exists', Object.keys(CALCS_BY_METHOD).filter((id) => !kinds.byId.has(id)), []);
-same('Reverse map: calculators for lostness-metric', (CALCS_BY_METHOD['lostness-metric'] || []).map((c) => c.id), ['lostness']);
+same('Reverse map: calculators for lostness-metric', (CALCS_BY_METHOD['lostness-metric'] || []).map((c) => c.id), ['lostness', 'tree-test']);
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
