@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import * as S from '../calc/stats.js';
+import * as SM from '../calc/summaries.js';
+import StudySummary from '../components/StudySummary.jsx';
 import * as CL from '../calc/cluster.js';
 import { CATALOG } from '../calc/catalog.js';
 
@@ -109,7 +111,7 @@ function CompletionRate() {
         <>
           <Result big={`${pct(r.aw.lo, 0)} – ${pct(r.aw.hi, 0)}`} label={`${conf * 100}% adjusted-Wald interval for the completion rate`}>
             <IntervalBar lo={r.aw.lo} hi={r.aw.hi} point={r.best.value} />
-            <p>{X} of {N} succeeded ({pct(X / N, 0)}). You can be {conf * 100}% confident that between {pct(r.aw.lo, 0)} and {pct(r.aw.hi, 0)} of all users would complete this task. The best single estimate is {pct(r.best.value, 0)} ({r.best.name}).</p>
+            <p>The best single estimate is {pct(r.best.value, 0)} ({r.best.name}).</p>
           </Result>
           <Stats rows={[
             ['Observed rate', pct(X / N)],
@@ -119,6 +121,7 @@ function CompletionRate() {
             ['Wilson score', `${pct(r.wi.lo)} – ${pct(r.wi.hi)}`],
             ['Wald (not for small samples)', `${pct(r.wa.lo)} – ${pct(r.wa.hi)}`],
           ]} />
+          <StudySummary {...SM.completionRate({ x: X, n: N, conf })} />
         </>
       )}
       <About method="adjusted-wald-confidence-interval-for-completion-rates">
@@ -151,9 +154,6 @@ function TaskTime() {
           <Result big={`${secs(lo)} – ${secs(hi)}`} label={`${conf * 100}% interval for the ${useMed ? 'median' : 'typical (geometric mean)'} task time`}
             tone={Number.isFinite(T) ? (hi < T ? 'good' : lo > T ? 'bad' : '') : ''}>
             <IntervalBar lo={lo} hi={hi} point={pt} min={0} max={Math.max(...times, T || 0) * 1.05} bench={T} fmt={(v) => `${Math.round(v)} s`} benchLabel="Target" />
-            <p>
-              The typical user takes about {secs(pt)}. {Number.isFinite(T) && (hi < T ? `The whole interval is under the ${secs(T)} target, so the target is met.` : lo > T ? `The whole interval is above the ${secs(T)} target, so the target is missed.` : `The target of ${secs(T)} falls inside the interval, so you cannot tell yet whether it is met.`)}
-            </p>
           </Result>
           <Stats rows={[
             ['Participants', r.n],
@@ -163,6 +163,7 @@ function TaskTime() {
             Number.isFinite(r.medLo) && ['Median interval', `${secs(r.medLo)} – ${secs(r.medHi)}`],
             ['Recommended summary', r.recommend === 'geometric' ? 'Geometric mean (fewer than 25 times)' : 'Median (25 or more times)'],
           ]} />
+          <StudySummary {...SM.taskTime({ times, conf, target: T })} />
         </>
       )}
       <About method="confidence-intervals-for-task-time-log-transformed-and-median">
@@ -207,7 +208,6 @@ function Rating() {
           <Result big={`${num(ci.lo)} – ${num(ci.hi)}`} label={`${conf * 100}% confidence interval for the mean ${label} score`}
             tone={t ? (ci.lo > B ? 'good' : ci.hi < B ? 'bad' : '') : ''}>
             <IntervalBar lo={ci.lo} hi={ci.hi} point={M} min={lo0} max={hi0} bench={B} fmt={(v) => num(v, preset === 'seq' || preset === 'custom' ? 1 : 0)} />
-            {t && <p>The mean of {num(M)} is {M > B ? 'above' : 'below'} the benchmark of {num(B)}. {t.pOne < 1 - conf && M > B ? `It is statistically higher (one-sided p = ${pv(t.pOne)}), so you can claim the benchmark is beaten.` : M > B ? `It is not yet statistically higher (one-sided p = ${pv(t.pOne)}); a larger sample may settle it.` : `The two-sided p-value for the difference is ${pv(t.pTwo)}.`}</p>}
           </Result>
           <Stats rows={[
             ['Mean', num(M, 2)], ['Standard deviation', num(SD, 2)], ['Sample size', N],
@@ -217,6 +217,7 @@ function Rating() {
             t && ['p (two-sided)', pv(t.pTwo)],
             preset === 'sus' && ['Grade (Sauro-Lewis)', `${S.susGrade(M)[1]}, about the ${S.susPercentile(M)}th percentile`],
           ]} />
+          <StudySummary {...SM.rating({ preset, label, min: lo0, max: hi0, M, SD, N, B, conf })} />
         </>
       )}
       <About method="testing-against-a-benchmark-one-sample-tests">
@@ -248,7 +249,6 @@ function SUS() {
         <>
           <Result big={num(M)} label={`Mean SUS score from ${scores.length} participant${scores.length > 1 ? 's' : ''}`} tone={M >= 68 ? 'good' : 'bad'}>
             {ci && <IntervalBar lo={ci.lo} hi={ci.hi} point={M} min={0} max={100} bench={68} fmt={(v) => num(v, 0)} benchLabel="Average" />}
-            <p>Grade {g[1]} on the Sauro-Lewis curved scale, roughly the {S.susPercentile(M)}th percentile of products tested. In words: {S.susAdjective(M).toLowerCase()}. {M >= 68 ? 'That is above the average SUS of 68.' : 'That is below the average SUS of 68.'}</p>
           </Result>
           <Stats rows={[
             ci && [`${conf * 100}% interval`, `${num(ci.lo)} – ${num(ci.hi)}`],
@@ -256,6 +256,7 @@ function SUS() {
             ['Grade', `${g[1]} (percentile range ${g[2]})`],
             ['Individual scores', scores.map((s) => num(s, 1)).join(', ')],
           ]} />
+          <StudySummary {...SM.sus({ scores, conf })} />
         </>
       )}
       <About method="system-usability-scale-sus">
@@ -294,6 +295,7 @@ function UMUXLite() {
             <p>{form === 'lite' ? `On the SUS scale this is about ${num(sus)} (grade ${S.susGrade(sus)[1]}), using the regression-adjusted conversion.` : `The UMUX tracks SUS closely (r = 0.96 in Finstad's validation), so read it against SUS norms: grade ${S.susGrade(sus)[1]}.`}</p>
           </Result>
           <Stats rows={[ci && ['95% interval', `${num(ci.lo)} – ${num(ci.hi)}`], ['SUS-equivalent', num(sus)], ['Grade', S.susGrade(sus)[1]], ['Individual scores', scores.map((v) => num(v, 0)).join(', ')]]} />
+          <StudySummary {...SM.umux({ form, scores })} />
         </>
       )}
       <About method={form === 'lite' ? 'umux-lite' : 'umux-usability-metric-for-user-experience'}>
@@ -330,7 +332,6 @@ function NPS() {
         <>
           <Result big={num(r.score * 100, 0)} label={`Net Promoter Score from ${r.n} responses`}>
             <IntervalBar lo={r.lo * 100} hi={r.hi * 100} point={r.score * 100} min={-100} max={100} fmt={(v) => num(v, 0)} />
-            <p>With {conf * 100}% confidence the true NPS lies between {num(r.lo * 100, 0)} and {num(r.hi * 100, 0)}. {r.hi - r.lo > 0.3 ? 'That is a wide range; treat small changes between waves with caution.' : ''}</p>
           </Result>
           <div className="nps-split" aria-hidden="true">
             <span className="d" style={{ flex: r.pctDet || 0.0001 }}>{pct(r.pctDet, 0)}</span>
@@ -338,6 +339,7 @@ function NPS() {
             <span className="p" style={{ flex: r.pctProm || 0.0001 }}>{pct(r.pctProm, 0)}</span>
           </div>
           <Stats rows={[['Promoters', `${P} (${pct(r.pctProm)})`], ['Passives', `${PA} (${pct(r.pctPass)})`], ['Detractors', `${D} (${pct(r.pctDet)})`], [`${conf * 100}% interval`, `${num(r.lo * 100)} to ${num(r.hi * 100)}`]]} />
+          <StudySummary {...SM.nps({ P, PA, D, conf })} />
         </>
       )}
       <About method="net-promoter-score">
@@ -369,10 +371,10 @@ function CompareRates() {
           <>
             <Result big={`p = ${pv(r.p)}`} label="N-1 two-proportion test" tone={r.p < 1 - conf ? 'good' : ''}>
               <IntervalBar lo={-r.hi} hi={-r.lo} point={-r.diff} min={-1} max={1} bench={0} fmt={(v) => `${v > 0 ? '+' : ''}${Math.round(v * 100)} pts`} benchLabel="No difference" />
-              <p>Design B {r.diff < 0 ? 'beats' : r.diff > 0 ? 'trails' : 'matches'} design A by {num(Math.abs(r.diff) * 100, 0)} points ({pct(r.p2, 0)} vs {pct(r.p1, 0)}). {r.p < 1 - conf ? `The difference is statistically significant at the ${conf * 100}% level.` : `The difference is not statistically significant at the ${conf * 100}% level.`} The difference is plausibly between {num(-r.hi * 100, 0)} and {num(-r.lo * 100, 0)} points.</p>
             </Result>
             {r.minExpected < 1 && <Problem>An expected cell count is below 1, so the N−1 test is not reliable here. Use the Fisher exact p-value of {pv(fisher)} instead.</Problem>}
             <Stats rows={[['Design A', pct(r.p1)], ['Design B', pct(r.p2)], ['z (N−1 adjusted)', num(r.z, 3)], ['p (two-sided)', pv(r.p)], ['Fisher exact p (conservative)', pv(fisher)], [`${conf * 100}% interval, B − A`, `${num(-r.hi * 100)} to ${num(-r.lo * 100)} points`]]} />
+            <StudySummary {...SM.compareRatesBetween({ x1: X1, n1: N1, x2: X2, n2: N2, conf })} />
           </>
         )}
       </>
@@ -394,9 +396,9 @@ function CompareRates() {
           <>
             <Result big={`p = ${pv(r.midP)}`} label="McNemar exact test (mid-p)" tone={r.midP < 1 - conf ? 'good' : ''}>
               <IntervalBar lo={-r.hi} hi={-r.lo} point={-r.adjDiff} min={-1} max={1} bench={0} fmt={(v) => `${v > 0 ? '+' : ''}${Math.round(v * 100)} pts`} benchLabel="No difference" />
-              <p>The same {A + B + C + D} people tried both designs: {pct(r.pA, 0)} succeeded on A and {pct(r.pB, 0)} on B. {r.midP < 1 - conf ? 'The difference is statistically significant.' : 'The difference is not statistically significant yet.'} Only the {B + C} people who succeeded on one design but not the other carry information about the difference.</p>
             </Result>
             <Stats rows={[['Design A', pct(r.pA)], ['Design B', pct(r.pB)], ['Exact p', pv(r.exact)], ['Mid-p (recommended)', pv(r.midP)], [`${conf * 100}% interval, B − A`, `${num(-r.hi * 100)} to ${num(-r.lo * 100)} points`]]} />
+            <StudySummary {...SM.compareRatesWithin({ a: A, b: B, c: C, d: D, conf })} />
           </>
         )}
       </>
@@ -438,9 +440,9 @@ function CompareMeans() {
           <>
             <Result big={`p = ${pv(r.p)}`} label="Welch two-sample t-test" tone={r.p < 1 - conf ? 'good' : ''}>
               <IntervalBar lo={r.lo} hi={r.hi} point={r.diff} min={Math.min(r.lo, -Math.abs(r.hi)) * 1.2} max={Math.max(r.hi, Math.abs(r.lo)) * 1.2} bench={0} fmt={(x) => num(x, 1)} benchLabel="No difference" />
-              <p>Design B is {num(Math.abs(r.diff))} points {r.diff >= 0 ? 'higher' : 'lower'} than design A. {r.p < 1 - conf ? 'The difference is statistically significant.' : 'The difference is not statistically significant.'} The true difference is plausibly between {num(r.lo)} and {num(r.hi)}.</p>
             </Result>
             <Stats rows={[['Difference (B − A)', num(r.diff, 2)], ['t', `t(${num(r.df, 1)}) = ${num(r.t, 3)}`], ['p (two-sided)', pv(r.p)], [`${conf * 100}% interval`, `${num(r.lo, 2)} to ${num(r.hi, 2)}`], ["Cohen's d", `${num(es.d, 2)} (${num(es.dLo, 2)} to ${num(es.dHi, 2)}), ${S.effectLabel(es.d)}`], ["Hedges' g", `${num(es.g, 2)} (${num(es.gLo, 2)} to ${num(es.gHi, 2)})`]]} />
+            <StudySummary {...SM.compareMeansBetween({ m1: v[0], s1: v[1], n1: v[2], m2: v[3], s2: v[4], n2: v[5], conf })} />
           </>
         )}
       </>
@@ -460,10 +462,9 @@ function CompareMeans() {
         </div>
         {bad ? <Problem>Enter at least two pairs of values, and make sure they are not all identical differences.</Problem> : (
           <>
-            <Result big={`p = ${pv(r.p)}`} label="Paired t-test" tone={r.p < 1 - conf ? 'good' : ''}>
-              <p>{logT ? `Design B times are ${shown(r.diff)} relative to design A (negative means faster).` : `On average design B scores ${num(Math.abs(r.diff), 2)} ${r.diff >= 0 ? 'higher' : 'lower'} than design A.`} {r.p < 1 - conf ? 'The difference is statistically significant.' : 'The difference is not statistically significant.'} Plausible range: {shown(r.lo)} to {shown(r.hi)}.</p>
-            </Result>
+            <Result big={`p = ${pv(r.p)}`} label="Paired t-test" tone={r.p < 1 - conf ? 'good' : ''} />
             <Stats rows={[['Participants', r.n], ['Mean difference', shown(r.diff)], ['SD of differences', num(r.sd, 3)], ['t', `t(${r.df}) = ${num(r.t, 3)}`], ['p (two-sided)', pv(r.p)], ['Effect size dz (mean ÷ SD of differences)', `${num(r.diff / r.sd, 2)}, ${S.effectLabel(r.diff / r.sd)}`]]} />
+            <StudySummary {...SM.compareMeansWithin({ diffs, logT, conf })} />
           </>
         )}
       </>
@@ -500,9 +501,9 @@ function RateBenchmark() {
         <>
           <Result big={met ? 'Benchmark beaten' : 'Not yet shown'} label={`${r.large ? 'Normal approximation' : 'Exact mid-p binomial test'}, one-sided p = ${pv(r.p)}`} tone={met ? 'good' : X / N < B ? 'bad' : ''}>
             <IntervalBar lo={ci.lo} hi={1} point={X / N} bench={B} />
-            <p>{X} of {N} ({pct(X / N, 0)}) succeeded. {met ? `You can be ${conf * 100}% confident that more than ${pct(B, 0)} of all users would succeed.` : `You cannot yet claim that more than ${pct(B, 0)} of all users would succeed. ${X / N > B ? 'The sample is above the benchmark, so more participants may settle it.' : 'The sample is below the benchmark.'}`}</p>
           </Result>
           <Stats rows={[['Observed', pct(X / N)], ['Exact p', pv(r.exact)], ['Mid-p', pv(r.midP)], ['Normal approximation p', `${pv(r.pNormal)}${r.large ? ' (used: large sample)' : ''}`], [`${conf * 100}% one-sided lower bound`, pct(ci.lo)]]} />
+          <StudySummary {...SM.rateBenchmark({ x: X, n: N, b: B, conf })} />
         </>
       )}
       <About method="testing-against-a-benchmark-one-sample-tests">
@@ -519,26 +520,25 @@ function SampleSize() {
   const [margin, setMargin] = useState('10'); const [prop, setProp] = useState('50'); const [conf, setConf] = useState(0.9);
   const [sdv, setSdv] = useState('17.7'); const [diff, setDiff] = useState('10'); const [power, setPower] = useState(0.8);
   const [pa, setPa] = useState('50'); const [pb, setPb] = useState('70'); const [design, setDesign] = useState('between');
-  let res = null; let note = ''; let table = null;
+  let res = null; let table = null;
   if (goal === 'discovery') {
     const P = n_(p) / 100, W = n_(want) / 100;
     if (P > 0 && P < 1 && W > 0 && W < 1) {
       res = [S.discoveryN(P, W), 'participants'];
-      note = `With ${res[0]} participants you have a ${pct(S.discoveryProb(P, res[0]), 0)} chance of seeing, at least once, any problem that affects ${pct(P, 0)} of users.`;
       table = [1, 3, 5, 8, 10, 15, 20].map((nn) => [nn, S.discoveryProb(P, nn)]);
     }
   } else if (goal === 'rate') {
     const M = n_(margin) / 100, P = n_(prop) / 100;
-    if (M > 0 && M < 0.5 && P > 0 && P < 1) { res = [S.nForProportion(P, M, conf), 'participants']; note = `Estimates a completion rate to within ±${pct(M, 0)} at ${conf * 100}% confidence. Use 50% if you have no idea of the rate; it gives the largest sample.`; }
+    if (M > 0 && M < 0.5 && P > 0 && P < 1) { res = [S.nForProportion(P, M, conf), 'participants']; }
   } else if (goal === 'mean') {
     const SD = n_(sdv), M = n_(margin);
-    if (SD > 0 && M > 0) { res = [S.nForMean(SD, M, conf), 'participants']; note = `Estimates a mean to within ±${num(M)} at ${conf * 100}% confidence. The SD of SUS scores is typically about 17.7.`; }
+    if (SD > 0 && M > 0) { res = [S.nForMean(SD, M, conf), 'participants']; }
   } else if (goal === 'means') {
     const SD = n_(sdv), D = n_(diff);
-    if (SD > 0 && D > 0) { const nn = S.nForMeans(SD, D, conf, power, design); res = [nn, design === 'between' ? 'per group' : 'participants']; note = `Detects a difference of ${num(D)} with ${power * 100}% power at ${conf * 100}% confidence (two-sided). ${design === 'between' ? `Total: ${nn * 2}.` : 'Within subjects, use the SD of the differences if you know it; otherwise this is conservative.'}`; }
+    if (SD > 0 && D > 0) { const nn = S.nForMeans(SD, D, conf, power, design); res = [nn, design === 'between' ? `per group (${nn * 2} in total)` : 'participants']; }
   } else if (goal === 'rates') {
     const A = n_(pa) / 100, B = n_(pb) / 100;
-    if (A > 0 && A < 1 && B > 0 && B < 1 && A !== B) { const nn = S.nForProportions(A, B, conf, power); res = [nn, 'per group']; note = `Detects a change from ${pct(A, 0)} to ${pct(B, 0)} with ${power * 100}% power at ${conf * 100}% confidence (two-sided), with different people in each group. Total: ${nn * 2}.`; }
+    if (A > 0 && A < 1 && B > 0 && B < 1 && A !== B) { const nn = S.nForProportions(A, B, conf, power); res = [nn, `per group (${nn * 2} in total)`]; }
   }
   return (
     <>
@@ -567,7 +567,7 @@ function SampleSize() {
       </div>
       {!res ? <Problem>Check the inputs: percentages must be between 1 and 99 and other values above zero.</Problem> : (
         <>
-          <Result big={res[0]} label={res[1]}><p>{note}</p></Result>
+          <Result big={res[0]} label={res[1]} />
           {table && (
             <div className="disc-table" role="table" aria-label="Chance of seeing the problem by sample size">
               {table.map(([nn, pr]) => (
@@ -579,6 +579,7 @@ function SampleSize() {
               ))}
             </div>
           )}
+          <StudySummary {...SM.sampleSize({ goal, p: n_(p) / 100, want: n_(want) / 100, margin: goal === 'rate' ? n_(margin) / 100 : n_(margin), prop: n_(prop) / 100, sd: n_(sdv), diff: n_(diff), pa: n_(pa) / 100, pb: n_(pb) / 100, conf, power, design })} />
         </>
       )}
       <About method={goal === 'discovery' ? 'problem-discovery-sample-size-model-1-1-p-n' : 'sample-size-planning-for-summative-ux-studies'}>
@@ -611,9 +612,9 @@ function Discovery() {
       {bad ? <Problem>Each count must be a whole number between 1 and the number of participants.</Problem> : (
         <>
           <Result big={pct(r.found, 0)} label="Estimated share of problems already found">
-            <p>You found {counts.length} problems. After adjusting for small-sample inflation, the average problem affects about {pct(r.pAdj, 0)} of users, so there are probably around {Math.round(r.total)} problems in total and about {r.remaining} not yet seen. To reach 90% discovery you would need about {r.more[0]} more participants; for 95%, about {r.more[1]} more.</p>
           </Result>
           <Stats rows={[['Raw p (average problem frequency)', pct(r.pEst)], ['Problems seen only once', pct(r.once, 0)], ['Adjusted p (Lewis 2001)', pct(r.pAdj)], ['Estimated total problems', num(r.total, 1)]]} />
+          <StudySummary {...SM.discovery({ N, counts })} />
         </>
       )}
       <About method="problem-discovery-sample-size-model-1-1-p-n" links={[['capture-recapture-estimation-of-usability-problems', 'Capture-recapture estimation of usability problems']]}>
@@ -653,9 +654,9 @@ function TopBox() {
         <>
           <Result big={pct(r.x / r.n, 0)} label={`${r.x} of ${r.n} chose ${C} or higher`} tone={r.test.midP < 1 - conf ? 'good' : ''}>
             <IntervalBar lo={r.ci.lo} hi={r.ci.hi} point={r.x / r.n} bench={B} benchLabel="Target" />
-            <p>There is a {pct(1 - r.test.p, 1)} chance that at least {pct(B, 0)} of all users would agree. {r.test.p < 1 - conf ? 'That clears your confidence level, so the target is met.' : 'That is not enough to claim the target is met.'} Analysed as a mean instead, the average of {num(r.M, 2)} gives a {r.t ? pct(1 - r.t.pOne, 1) : '—'} chance that the true mean is above {C}, because the mean keeps the strength of agreement that top-box throws away.</p>
           </Result>
           <Stats rows={[['Top-box share', pct(r.x / r.n)], [`${conf * 100}% interval`, `${pct(r.ci.lo)} – ${pct(r.ci.hi)}`], [`p (${r.test.large ? 'normal' : 'mid-p binomial'})`, pv(r.test.p)], ['Mean rating', `${num(r.M, 2)} (SD ${num(r.SD, 2)})`], r.t && [`p (mean above ${C})`, pv(r.t.pOne)]]} />
+          <StudySummary {...SM.topBox({ xs, C, B, conf })} />
         </>
       )}
       <About method="top-box-analysis-of-rating-scales">
@@ -703,9 +704,7 @@ function Expectation() {
               {tasks.map((t, i) => { const [q, c] = quad(t); return <li key={i}><b>{t.name}</b> <span className={`qtag ${c}`}>{q}</span><br /><span className="muted">expected {num(t.e)}, experienced {num(t.x)} ({t.x - t.e >= 0 ? '+' : ''}{num(t.x - t.e)})</span></li>; })}
             </ol>
           </div>
-          <Result label="Where to start">
-            <p>{(() => { const fix = tasks.filter((t) => quad(t)[1] === 'fix').sort((a, b) => (a.x - a.e) - (b.x - b.e)); return fix.length ? `Fix "${fix[0].name}" first: users expected it to be easy (${num(fix[0].e)}) but found it hard (${num(fix[0].x)}). Gaps like this cause the most dissatisfaction.` : 'No task falls in the fix-it-fast quadrant. Look at the big-opportunity tasks next.'; })()}</p>
-          </Result>
+          <StudySummary {...SM.expectation({ tasks, mid: Mid })} />
         </>
       )}
       <About method="expectation-ratings-expected-vs-experienced-difficulty">
@@ -743,8 +742,8 @@ function SUM() {
                 <div key={k}><span>{label[k]}</span><span className="bar"><i style={{ width: pct(v, 0) }} /></span><b>{pct(v, 0)}</b></div>
               ))}
             </div>
-            <p>{(() => { const [k, v] = Object.entries(r.parts).sort((a, b) => a[1] - b[1])[0]; return `The weakest component is ${label[k].split(' (')[0].toLowerCase()} at ${pct(v, 0)}, so that is where this task loses most of its score.`; })()}</p>
           </Result>
+          <StudySummary {...SM.sum({ x: X, n: N, parts: r.parts, sum: r.sum })} />
         </>
       )}
       <About method="single-usability-metric-sum">
@@ -763,7 +762,6 @@ function Correlation() {
   if (kind === 'spearman') { xs = S.ranks(xs); ys = S.ranks(ys); }
   const bad = rows.length < 4 || S.sd(xs) === 0 || S.sd(ys) === 0;
   const r = bad ? null : S.correlation(xs, ys, conf);
-  const size = (v) => { const a = Math.abs(v); return a >= 0.5 ? 'strong' : a >= 0.3 ? 'moderate' : a >= 0.1 ? 'weak' : 'negligible'; };
   return (
     <>
       <div className="calc-inputs">
@@ -775,9 +773,9 @@ function Correlation() {
         <>
           <Result big={`r = ${num(r.r, 2)}`} label={`${kind === 'pearson' ? 'Pearson' : 'Spearman'} correlation from ${r.n} pairs`} tone={r.p < 1 - conf ? 'good' : ''}>
             <IntervalBar lo={r.lo} hi={r.hi} point={r.r} min={-1} max={1} bench={0} fmt={(v) => num(v, 1)} benchLabel="No relationship" />
-            <p>A {size(r.r)} {r.r >= 0 ? 'positive' : 'negative'} relationship. {r.p < 1 - conf ? 'It is statistically significant.' : 'It is not statistically significant.'} The true correlation is plausibly between {num(r.lo, 2)} and {num(r.hi, 2)}{r.hi - r.lo > 0.6 ? ', which is wide, so treat the strength with caution' : ''}. Correlation alone does not show which measure drives the other.</p>
           </Result>
           <Stats rows={[['r', num(r.r, 3)], ['r² (shared variance)', pct(r.r2)], ['t', `t(${r.n - 2}) = ${num(r.t, 3)}`], ['p (two-sided)', pv(r.p)], [`${conf * 100}% interval`, `${num(r.lo, 3)} to ${num(r.hi, 3)}`]]} />
+          <StudySummary {...SM.correlation({ xs, ys, kind, conf })} />
         </>
       )}
       <About method="correlation-analysis-with-confidence-intervals">
@@ -813,7 +811,6 @@ function InterCoder() {
         <>
           <Result big={`α = ${num(a, 3)}`} label={`Krippendorff's alpha (${numeric ? level : 'nominal'}), ${coders} coders, ${kr.units} segments`} tone={a >= 0.8 ? 'good' : a < 0.667 ? 'bad' : ''}>
             {kap && <IntervalBar lo={kap.lo} hi={kap.hi} point={kap.kappa} min={Math.min(0, kap.lo)} max={1} bench={0.8} fmt={(v) => num(v, 1)} benchLabel="Reliable" />}
-            <p>The coders agree on {pct(agree.value, 0)} of segments. {a >= 0.8 ? 'Alpha is at or above 0.8, the level Krippendorff recommends before relying on the codes.' : a >= 0.667 ? 'Alpha is between 0.667 and 0.8: good enough for tentative conclusions, not for firm ones. Refine the code definitions and recode a fresh sample.' : 'Alpha is below 0.667, so the codes are not being applied consistently. Discuss disagreements, sharpen the codebook and recode before analysing.'} {kap && `Cohen's kappa for the two coders is ${num(kap.kappa, 2)}, plausibly between ${num(kap.lo, 2)} and ${num(kap.hi, 2)}.`}</p>
           </Result>
           <Stats rows={[
             ['Percent agreement', `${pct(agree.value)} of ${agree.units} segments`],
@@ -825,6 +822,7 @@ function InterCoder() {
             ['Codes in use', kr.cats.length <= 8 ? kr.cats.join(', ') : `${kr.cats.length} codes`],
             !kap && coders > 2 && ['Cohen kappa', 'Two coders only; use alpha'],
           ]} />
+          <StudySummary {...SM.intercoder({ rows, level, numeric, conf })} />
         </>
       )}
       <About method="cohens-kappa-and-krippendorffs-alpha-inter-rater-reliability" links={[['heuristic-evaluation-with-inter-evaluator-reliability', 'Inter-evaluator reliability for heuristic evaluation'], ['start-list-coding-with-a-structured-codebook-and-check-coding', 'Codebook coding with check-coding']]}>
@@ -854,7 +852,6 @@ function Saturation() {
       {bad ? <Problem>Enter at least two interviews and a look-back of at least one interview.</Problem> : (
         <>
           <Result big={pct(r.coverage, 0)} label="Good-Turing sample coverage" tone={r.newLast.length === 0 && r.coverage >= 0.9 ? 'good' : r.coverage < 0.75 ? 'bad' : ''}>
-            <p>If you ran one more interview, about {pct(r.coverage, 0)} of the code mentions it produced would be codes you already have. You have {r.S} codes; the Chao estimate puts the total at about {num(r.chao, 0)}, so roughly {pct(r.S / r.chao, 0)} of the codes this kind of interview can produce are already in hand. {r.newLast.length === 0 ? `The last ${r.k} interviews added no new codes.` : `The last ${r.k} interview${r.k > 1 ? 's' : ''} still added ${r.newLast.length} new code${r.newLast.length > 1 ? 's' : ''}: ${r.newLast.join(', ')}.`}</p>
           </Result>
           <div className="disc-table" role="table" aria-label="Code accumulation by interview">
             {r.curve.map((c) => (
@@ -872,6 +869,7 @@ function Saturation() {
             [`New in the last ${r.k}`, r.newLast.length ? r.newLast.join(', ') : 'None'],
             r.once.length > 0 && ['Codes seen only once', r.once.join(', ')],
           ]} />
+          <StudySummary {...SM.saturation({ lists, k: K })} />
         </>
       )}
       <About method="species-accumulation-and-good-turing-coverage-for-saturation" links={[['saturation-detection', 'Saturation detection'], ['saturation-monitoring', 'Saturation monitoring'], ['theoretical-sampling-and-saturation', 'Theoretical sampling and saturation']]}>
@@ -908,13 +906,14 @@ function Reliability() {
         <>
           <Result big={`α = ${num(r.alpha, 2)}`} label={`Cronbach's alpha from ${r.n} respondents and ${r.k} items`} tone={r.alpha >= 0.7 ? 'good' : r.alpha < 0.6 ? 'bad' : ''}>
             <IntervalBar lo={Math.max(0, r.lo)} hi={r.hi} point={Math.max(0, r.alpha)} min={0} max={1} bench={0.7} fmt={(v) => num(v, 1)} benchLabel="Common minimum" />
-            <p>With {conf * 100}% confidence the scale's reliability lies between {num(r.lo, 2)} and {num(r.hi, 2)}. {r.alpha >= 0.9 ? 'That is very high; check the items are not near-duplicates of each other.' : r.alpha >= 0.7 ? 'That is acceptable for comparing groups.' : 'That is below the usual 0.7, so the items may not measure one thing. Check the items flagged below.'} {Number.isFinite(r.omega.omega) ? `McDonald's omega, which does not assume every item measures the construct equally well, is ${num(r.omega.omega, 2)}.` : r.omega.reason}</p>
+            {!Number.isFinite(r.omega.omega) && <p>{r.omega.reason}</p>}
           </Result>
           <Stats rows={[
             [`${conf * 100}% interval (Feldt)`, `${num(r.lo, 3)} to ${num(r.hi, 3)}`],
             ["McDonald's omega (total)", Number.isFinite(r.omega.omega) ? num(r.omega.omega, 3) : 'Not reported'],
             ...r.items.map((it) => [`Item ${it.item}${revSet.has(it.item) ? ' (reversed)' : ''}`, <>r = {num(it.rCorrected, 2)} · α if deleted {num(it.alphaIfDeleted, 2)}{Number.isFinite(r.omega.loadings?.[it.item - 1]) ? ` · loading ${num(r.omega.loadings[it.item - 1], 2)}` : ''} {(it.rCorrected < 0.3 || it.alphaIfDeleted > r.alpha + 0.01) && <span className="qtag fix">Review</span>}</>]),
           ]} />
+          <StudySummary {...SM.reliability({ r, reversed: [...revSet], conf })} />
         </>
       )}
       <About method="reliability-analysis-cronbachs-alpha-split-half-omega" links={[['cronbachs-and-mcdonalds', "Cronbach's α and McDonald's ω"]]}>
@@ -947,16 +946,18 @@ function MarginOfError() {
         <>
           <Result big={`± ${num(r.moe * 100, 1)} pts`} label={`${conf * 100}% margin of error for a proportion near ${pct(P, 0)}`}>
             <IntervalBar lo={r.lo} hi={r.hi} point={P} />
-            <p>If {pct(P, 0)} of your {Nn} respondents choose an answer, the population figure is plausibly between {pct(r.lo, 1)} and {pct(r.hi, 1)}. {D > 1 ? `The design effect of ${num(D, 1)} means the sample is worth only about ${Math.floor(r.neff)} simple random responses.` : ''} {r.fpc < 0.95 ? `Because you surveyed a large share of a small population, the margin shrinks by ${pct(1 - r.fpc, 0)}.` : ''} Subgroups have wider margins: half the sample gives about {num(r.moe * Math.SQRT2 * 100, 1)} points.</p>
+            {r.fpc < 0.95 && <p>Because you surveyed a large share of a small population, the margin shrinks by {pct(1 - r.fpc, 0)}.</p>}
           </Result>
           <Stats rows={[['Margin of error', `± ${num(r.moe * 100, 2)} points`], ['Effective sample size', num(r.neff, 0)], ['Finite population correction', num(r.fpc, 3)], [`${conf * 100}% interval`, `${pct(r.lo)} – ${pct(r.hi)}`]]} />
+          <StudySummary {...SM.marginOfError({ mode, n: Nn, p: P, N: Npop, deff: D, conf })} />
         </>
       ) : (
         <>
           <Result big={r.n} label={`completed responses for ± ${num(E * 100, 1)} points at ${conf * 100}% confidence`}>
-            <p>Plan for about {r.n} completed responses. {D > 1 ? `That includes the design effect of ${num(D, 1)}; a simple random sample would need ${Math.ceil(r.nFpc - 1e-9)}.` : ''} {Number.isFinite(Npop) ? `The population of ${Npop} reduces the requirement from ${Math.ceil(r.n0 - 1e-9)}.` : ''} Divide by your expected response rate to get the number of invitations.</p>
+            <p>{D > 1 ? `That includes the design effect of ${num(D, 1)}; a simple random sample would need ${Math.ceil(r.nFpc - 1e-9)}.` : ''} {Number.isFinite(Npop) ? `The population of ${Npop} reduces the requirement from ${Math.ceil(r.n0 - 1e-9)}.` : ''}</p>
           </Result>
           <Stats rows={[['Before corrections (Cochran n₀)', num(r.n0, 1)], ['After finite population correction', num(r.nFpc, 1)], ['With design effect', r.n]]} />
+          <StudySummary {...SM.marginOfError({ mode, e: E, p: P, N: Npop, deff: D, conf })} />
         </>
       )}
       <About method="probability-sampling" links={[['design-effects-and-design-based-analysis-of-complex-samples', 'Design effects and design-based analysis']]}>
@@ -995,9 +996,9 @@ function NasaTLX() {
               <div className="sum-bars">
                 {S.TLX_DIMS.map((d, i) => <div key={d}><span>{d} (weight {w[i]})</span><span className="bar"><i style={{ width: `${R[i]}%` }} /></span><b>{num(R[i], 0)}</b></div>)}
               </div>
-              <p>The raw (unweighted) TLX is {num(raw, 1)}. {(() => { const i = w.indexOf(Math.max(...w)); return `This person judged ${S.TLX_DIMS[i].toLowerCase()} the biggest contributor to workload, and rated it ${num(R[i], 0)}.`; })()}</p>
             </Result>
             <Stats rows={[['Weighted TLX', num(wt, 1)], ['Raw TLX', num(raw, 1)], ['Weights (sum 15)', w.join(' · ')]]} />
+            <StudySummary {...SM.nasaTlxOne({ R, w, raw, weighted: wt })} />
           </>
         )}
       </>
@@ -1028,9 +1029,9 @@ function NasaTLX() {
               <div className="sum-bars">
                 {S.TLX_DIMS.map((d, i) => { const m = S.mean(people.map((p) => p.r[i])); return <div key={d}><span>{d}</span><span className="bar"><i style={{ width: `${m}%` }} /></span><b>{num(m, 0)}</b></div>; })}
               </div>
-              <p>{(() => { const ms = S.TLX_DIMS.map((_, i) => S.mean(people.map((p) => p.r[i]))); const i = ms.indexOf(Math.max(...ms)); return `${S.TLX_DIMS[i]} is the highest-rated source of workload on average (${num(ms[i], 0)}).`; })()} {mc && `With 95% confidence the mean workload is between ${num(mc.lo, 0)} and ${num(mc.hi, 0)}.`}</p>
             </Result>
             <Stats rows={[cr && ['Raw TLX (95% interval)', `${num(S.mean(raws), 1)} (${num(cr.lo, 1)} – ${num(cr.hi, 1)})`], !cr && ['Raw TLX', num(S.mean(raws), 1)], wts.length > 0 && ['Weighted TLX', `${num(S.mean(wts), 1)}${cw ? ` (${num(cw.lo, 1)} – ${num(cw.hi, 1)})` : ''}`], ['Individual scores', people.map((p) => num(Number.isFinite(p.wt) ? p.wt : p.raw, 0)).join(', ')]]} />
+            <StudySummary {...SM.nasaTlxMany({ people, useW })} />
           </>
         )}
       </>
@@ -1072,12 +1073,12 @@ function UEQ() {
             <div className="sum-bars">
               {scales.map((s) => <div key={s.name}><span>{s.name} <span className={`qtag ${BAND_TAG[s.band]}`}>{s.band}</span></span><span className="bar"><i style={{ width: pct((s.mean + 3) / 6, 0) }} /></span><b>{num(s.mean, 2)}</b></div>)}
             </div>
-            <p>Against the UEQ benchmark of 452 products, attractiveness is {att.band.toLowerCase()}. {(() => { const w = [...scales].sort((a, b) => a.mean - b.mean)[0]; return `The weakest scale is ${w.name.toLowerCase()} (${num(w.mean, 2)}, ${w.band.toLowerCase()}).`; })()} Means between −0.8 and +0.8 are neutral; above +0.8 is a positive impression.</p>
           </Result>
           <Stats rows={[
             ...scales.map((s) => [s.name, `${num(s.mean, 2)}${Number.isFinite(s.lo) ? ` (${num(s.lo, 2)} to ${num(s.hi, 2)})` : ''}${Number.isFinite(s.alpha) ? ` · α ${num(s.alpha, 2)}` : ''}`]),
             ['Pragmatic quality', num(pq, 2)], ['Hedonic quality', num(hq, 2)],
           ]} />
+          <StudySummary {...SM.ueq({ scales, n: rows.length })} />
         </>
       )}
       <About method="ueq-user-experience-questionnaire">
@@ -1108,7 +1109,6 @@ function SEQ() {
         <>
           <Result big={num(M, 2)} label={`Mean SEQ from ${xs.length} ratings`} tone={ci.lo > B ? 'good' : ci.hi < B ? 'bad' : ''}>
             <IntervalBar lo={ci.lo} hi={ci.hi} point={M} min={1} max={7} bench={B} fmt={(v) => num(v, 1)} benchLabel="Average" />
-            <p>{ci.lo > B ? `This task is easier than average: the whole interval is above ${num(B, 1)}.` : ci.hi < B ? `This task is harder than average: the whole interval is below ${num(B, 1)}. Look at what made it difficult.` : `The interval (${num(ci.lo, 1)} to ${num(ci.hi, 1)}) includes the average of ${num(B, 1)}, so you cannot yet say it differs from a typical task.`}</p>
           </Result>
           <div className="disc-table" role="table" aria-label="Ratings by scale point">
             {counts.map((c, i) => (
@@ -1120,6 +1120,7 @@ function SEQ() {
             ))}
           </div>
           <Stats rows={[[`${conf * 100}% interval`, `${num(ci.lo, 2)} – ${num(ci.hi, 2)}`], ['Standard deviation', num(SD, 2)], ['t against benchmark', `t(${t.df}) = ${num(t.t, 2)}`], ['p (two-sided)', pv(t.pTwo)], ['Rated 6 or 7', pct(xs.filter((x) => x >= 6).length / xs.length, 0)]]} />
+          <StudySummary {...SM.seq({ xs, B, conf })} />
         </>
       )}
       <About method="single-ease-question-seq-benchmarking">
@@ -1162,7 +1163,7 @@ function AttrakDiff() {
               <text x={12} y={W / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${W / 2})`}>Hedonic quality →</text>
             </svg>
             <Result big={region ? region[0].toUpperCase() + region.slice(1) : 'Between regions'} label={`Portfolio position from ${rows.length} participant${rows.length > 1 ? 's' : ''}`} tone={region === 'desired' ? 'good' : region === 'superfluous' ? 'bad' : ''}>
-              <p>Pragmatic quality is {num(PQ.m, 2)} and hedonic quality {num(HQ.m, 2)}, on a scale from −3 to +3. {PQ.m - HQ.m > 0.5 ? 'People see it as useful and usable more than as stimulating or expressive.' : HQ.m - PQ.m > 0.5 ? 'People find it stimulating or expressive more than usable.' : 'Pragmatic and hedonic qualities are about balanced.'} Attractiveness is {num(ATT.m, 2)}.</p>
+              <p>Pragmatic quality is {num(PQ.m, 2)} and hedonic quality {num(HQ.m, 2)}, on a scale from −3 to +3.</p>
             </Result>
           </div>
           <Stats rows={[
@@ -1171,6 +1172,7 @@ function AttrakDiff() {
             ['HQ identity', num(HQI.m, 2)], ['HQ stimulation', num(HQS.m, 2)],
             ['Attractiveness (ATT)', `${num(ATT.m, 2)}${ATT.ci ? ` (${num(ATT.ci.lo, 2)} to ${num(ATT.ci.hi, 2)})` : ''}`],
           ]} />
+          <StudySummary {...SM.attrakdiff({ PQ, HQ, ATT, region, n: rows.length })} />
         </>
       )}
       <About method="attrakdiff">
@@ -1208,9 +1210,9 @@ function EffectSize() {
         <>
           <Result big={`g = ${num(r.g, 2)}`} label={`Hedges' g, ${conf * 100}% interval ${num(r.gLo, 2)} to ${num(r.gHi, 2)}`} tone={r.gLo > 0 || r.gHi < 0 ? 'good' : ''}>
             <IntervalBar lo={r.gLo} hi={r.gHi} point={r.g} min={Math.min(-1, r.gLo * 1.2)} max={Math.max(1, r.gHi * 1.2)} bench={0} fmt={(x) => num(x, 1)} benchLabel="No difference" />
-            <p>Design B is {num(Math.abs(r.g), 2)} standard deviations {r.g >= 0 ? 'higher' : 'lower'} than design A, a {S.effectLabel(r.g)} effect by Cohen's rules of thumb. Put another way, a randomly chosen person from B scores higher than one from A about {pct(cl, 0)} of the time. {r.gLo > 0 || r.gHi < 0 ? 'The interval excludes zero.' : 'The interval includes zero, so the direction is not settled.'}</p>
           </Result>
           <Stats rows={[["Cohen's d", `${num(r.d, 3)} (${num(r.dLo, 2)} to ${num(r.dHi, 2)})`], ["Hedges' g (small-sample corrected)", `${num(r.g, 3)} (${num(r.gLo, 2)} to ${num(r.gHi, 2)})`], ['Pooled SD', num(r.sp, 2)], ['Difference (B − A)', num(v[3] - v[0], 2)], ['Probability of superiority', pct(cl)]]} />
+          <StudySummary {...SM.effectSize({ m1: v[0], s1: v[1], n1: v[2], m2: v[3], s2: v[4], n2: v[5], conf })} />
         </>
       )}
       <About method="effect-size-calculation">
@@ -1239,9 +1241,9 @@ function Nonparametric() {
           <>
             {(r.n1 < 8 || r.n2 < 8) && <Problem>With fewer than about eight per group the normal approximation is rough; treat the p-value as a guide only.</Problem>}
             <Result big={`p = ${pv(r.p)}`} label="Mann-Whitney U test (normal approximation)" tone={sig(r.p) ? 'good' : ''}>
-              <p>The typical value is {num(r.med1, 1)} for A and {num(r.med2, 1)} for B. {sig(r.p) ? `B's values tend to be ${r.z < 0 ? 'higher' : 'lower'} than A's, and the difference is statistically significant at the ${conf * 100}% level.` : `The difference in ranks is not statistically significant at the ${conf * 100}% level.`} The effect size r = {num(Math.abs(r.r), 2)} is {Math.abs(r.r) >= 0.5 ? 'large' : Math.abs(r.r) >= 0.3 ? 'medium' : Math.abs(r.r) >= 0.1 ? 'small' : 'negligible'}.</p>
             </Result>
             <Stats rows={[['U (A)', num(r.U1, 1)], ['U (B)', num(r.U2, 1)], ['z (tie and continuity corrected)', num(r.z, 3)], ['p (two-sided)', pv(r.p)], ['Effect size r = |z|/√N', num(Math.abs(r.r), 3)], ['Rank-biserial correlation (B over A)', num(-r.rankBiserial, 3)], ['Medians', `A ${num(r.med1, 2)} · B ${num(r.med2, 2)}`]]} />
+            <StudySummary {...SM.nonparametricBetween({ A, B, conf })} />
           </>
         )}
       </>
@@ -1258,9 +1260,9 @@ function Nonparametric() {
           <>
             {r.n < 10 && <Problem>With fewer than about ten non-zero differences the normal approximation is rough; treat the p-value as a guide only.</Problem>}
             <Result big={`p = ${pv(r.p)}`} label="Wilcoxon signed-rank test (normal approximation)" tone={sig(r.p) ? 'good' : ''}>
-              <p>The median change from A to B is {num(r.medDiff, 2)}. {sig(r.p) ? `Values on B are reliably ${r.z > 0 ? 'higher' : 'lower'} than on A at the ${conf * 100}% level.` : `The change is not statistically significant at the ${conf * 100}% level.`} {r.zeros > 0 && `${r.zeros} participant${r.zeros > 1 ? 's' : ''} with no difference ${r.zeros > 1 ? 'were' : 'was'} left out, as Wilcoxon's method requires.`} The effect size r = {num(Math.abs(r.r), 2)}.</p>
             </Result>
             <Stats rows={[['W+ (B higher)', num(r.Wp, 1)], ['W− (A higher)', num(r.Wm, 1)], ['Pairs used', `${r.n} of ${rows.length}`], ['z (tie and continuity corrected)', num(r.z, 3)], ['p (two-sided)', pv(r.p)], ['Effect size r = |z|/√n', num(Math.abs(r.r), 3)]]} />
+            <StudySummary {...SM.nonparametricWithin({ diffs, total: rows.length, conf })} />
           </>
         )}
       </>
@@ -1301,7 +1303,7 @@ function BayesAB() {
         <>
           <Result big={pct(r.pBbeatsA, 1)} label="Probability that B has the higher conversion rate" tone={pick ? 'good' : ''}>
             <IntervalBar lo={r.ciB[0]} hi={r.ciB[1]} point={r.mB} min={0} max={Math.min(1, Math.max(r.ciA[1], r.ciB[1]) * 1.5)} bench={r.mA} benchLabel="A" fmt={(v) => pct(v, 1)} />
-            <p>{pick ? `Choose ${pick}. If ${pick} is in fact the worse version, you expect to give up only ${pts(pick === 'B' ? r.lossB : r.lossA)} of conversion, within the ${pts(T)} you said you can accept.` : `Keep the test running. Picking B now risks ${pts(r.lossB)} on average and picking A risks ${pts(r.lossA)}, both above the ${pts(T)} you can accept.`} The bar shows B's {conf * 100}% credible interval against A's posterior mean.</p>
+            <p>{pick ? `Choose ${pick}.` : 'Keep the test running.'} The bar shows B's {conf * 100}% credible interval against A's posterior mean.</p>
           </Result>
           <Stats rows={[
             ['A posterior mean', `${pct(r.mA, 2)} (${pct(r.ciA[0], 2)} – ${pct(r.ciA[1], 2)})`],
@@ -1311,6 +1313,7 @@ function BayesAB() {
             ['Expected loss if you choose A', pts(r.lossA)],
             ['Posteriors', `A Beta(${r.aA}, ${r.bA}) · B Beta(${r.aB}, ${r.bB})`],
           ]} />
+          <StudySummary {...SM.bayesAB({ xa: XA, na: NA, xb: XB, nb: NB, T, conf })} />
         </>
       )}
       <About method="bayesian-a-b-testing-with-expected-loss">
@@ -1342,13 +1345,14 @@ function SPRT() {
       {bad ? <Problem>The rate worth detecting must be above the baseline, both between 0% and 100%, and conversions between 0 and the trials.</Problem> : (
         <>
           <Result big={verdict} label={`Wald SPRT after ${N} trials, log-likelihood ratio ${num(r.llr, 2)}`} tone={r.decision === 'h1' ? 'good' : r.decision === 'h0' ? 'bad' : ''}>
-            <p>{r.decision === 'continue' ? `After ${N} trials, stop and accept the lift once conversions reach ${Math.ceil(r.upper(N) - 1e-9)}, or stop for no lift if they are ${Math.floor(r.lower(N) + 1e-9)} or fewer. You have ${X}.` : r.decision === 'h1' ? `${X} conversions in ${N} trials crosses the upper boundary of ${num(r.upper(N), 1)}, so the evidence favours ${pct(P1, 0)} over ${pct(P0, 0)} with the error rates you set.` : `${X} conversions in ${N} trials is at or below the lower boundary of ${num(r.lower(N), 1)}, so the evidence favours the baseline of ${pct(P0, 0)}.`} On average the test stops after about {Math.ceil(r.asn0)} trials if there is no lift and {Math.ceil(r.asn1)} if there is.</p>
+            <p>{r.decision === 'continue' ? `After ${N} trials, stop and accept the lift once conversions reach ${Math.ceil(r.upper(N) - 1e-9)}, or stop for no lift if they are ${Math.floor(r.lower(N) + 1e-9)} or fewer. You have ${X}.` : r.decision === 'h1' ? `${X} conversions in ${N} trials crosses the upper boundary of ${num(r.upper(N), 1)}, so the evidence favours ${pct(P1, 0)} over ${pct(P0, 0)} with the error rates you set.` : `${X} conversions in ${N} trials is at or below the lower boundary of ${num(r.lower(N), 1)}, so the evidence favours the baseline of ${pct(P0, 0)}.`}</p>
           </Result>
           <Stats rows={[
             ...marks.map((t) => [`After ${t} trials${t === N ? ' (now)' : ''}`, `stop for no lift at ≤ ${r.lower(t) < 0 ? '—' : Math.floor(r.lower(t) + 1e-9)} · stop for lift at ≥ ${Math.ceil(r.upper(t) - 1e-9) > t ? '—' : Math.ceil(r.upper(t) - 1e-9)}`]),
             ['Boundaries on log scale', `${num(r.B, 3)} and ${num(r.A, 3)}`],
             ['Boundary lines (conversions)', `${num(r.hLo, 2)} + ${num(r.slope, 4)}n and ${num(r.hUp, 2)} + ${num(r.slope, 4)}n`],
           ]} />
+          <StudySummary {...SM.sprt({ p0: P0, p1: P1, alpha, beta, X, N })} />
         </>
       )}
       <About method="sequential-testing-sprt-and-group-sequential-designs">
@@ -1408,9 +1412,9 @@ function CaptureRecapture() {
             {M < 3 && <Problem>With fewer than three problems in common the estimate is very unstable. Treat it as a rough order of magnitude.</Problem>}
             <Result big={`about ${num(r.chapman, 0)} problems`} label={`Chapman estimate of the total, ${conf * 100}% interval ${num(r.lo, 0)} to ${num(r.hi, 0)}`} tone={r.remaining / r.chapman < 0.15 ? 'good' : r.remaining / r.chapman > 0.4 ? 'bad' : ''}>
               <IntervalBar lo={r.lo} hi={r.hi} point={r.chapman} min={0} max={Math.max(r.hi, r.seen) * 1.1} bench={r.seen} benchLabel="Found" fmt={(v) => num(v, 0)} />
-              <p>Between them the two evaluators found {r.seen} different problems. Their overlap suggests about {num(r.chapman, 0)} in total, so roughly {num(r.remaining, 0)} ({pct(r.remaining / r.chapman, 0)}) have not been found yet. Each evaluator found about {pct(r.pA, 0)} and {pct(r.pB, 0)} of the estimated total. The less the two lists overlap, the more is still out there.</p>
             </Result>
             <Stats rows={[['Found so far', r.seen], ['Lincoln-Petersen estimate', Number.isFinite(r.lp) ? num(r.lp, 1) : 'Not defined (no overlap)'], ['Chapman estimate (less biased)', num(r.chapman, 1)], ['Standard error (Seber)', num(r.se, 2)], [`${conf * 100}% interval for the total`, `${num(r.lo, 1)} – ${num(r.hi, 1)}`], ['Estimated not yet found', num(r.remaining, 1)]]} />
+            <StudySummary {...SM.captureTwo({ A, B, M, conf })} />
           </>
         )}
       </>
@@ -1435,7 +1439,6 @@ function CaptureRecapture() {
             {r.Q2 === 0 && <Problem>No problem was found by exactly two evaluators, so Chao's estimator falls back to its bias-corrected form and the estimate is rough.</Problem>}
             <Result big={`about ${num(r.chao, 0)} problems`} label={`Chao estimate of the total from ${r.T} evaluators, ${conf * 100}% interval ${num(r.lo, 0)} to ${num(r.hi, 0)}`} tone={r.remaining / r.chao < 0.15 ? 'good' : r.remaining / r.chao > 0.4 ? 'bad' : ''}>
               <IntervalBar lo={r.lo} hi={r.hi} point={r.chao} min={0} max={Math.max(r.hi, r.S) * 1.1} bench={r.S} benchLabel="Found" fmt={(v) => num(v, 0)} />
-              <p>The {r.T} evaluators found {r.S} different problems. {r.Q1} were found by only one evaluator, which is the sign that more remain: the estimate is about {num(r.chao, 0)} in total, or {num(r.remaining, 0)} still to find. On average each evaluator found {pct(r.pMean, 0)} of the estimated total{r.pMean < 0.3 ? ', so adding evaluators will keep turning up new problems' : ''}.</p>
             </Result>
             <div className="disc-table" role="table" aria-label="Problems by number of evaluators who found them">
               {r.freq.map((c, i) => (
@@ -1453,6 +1456,7 @@ function CaptureRecapture() {
               ['Problems per evaluator', r.perEvaluator.join(' · ')],
               r.pair && ['Chapman (two evaluators)', num(r.pair.chapman, 1)],
             ]} />
+            <StudySummary {...SM.captureMany({ rows: full, conf })} />
           </>
         )}
       </>
@@ -1495,7 +1499,6 @@ function KLM() {
             <div className="sum-bars">
               {Object.keys(NAMES).filter((o) => r.counts[o]).map((o) => <div key={o}><span>{NAMES[o]} × {r.counts[o]}</span><span className="bar"><i style={{ width: pct(r.time[o] / r.total, 0) }} /></span><b>{num(r.time[o], 2)} s</b></div>)}
             </div>
-            <p>An expert who makes no errors would take about {secs(r.total)}. {r.time.M / r.total > 0.4 ? `Thinking time (M) is ${pct(r.time.M / r.total, 0)} of the total, so fewer decisions or steps would save the most.` : r.time.P / r.total > 0.35 ? `Pointing is ${pct(r.time.P / r.total, 0)} of the total; keyboard shortcuts or larger, closer targets would save the most.` : 'Compare this with an alternative design by writing its sequence the same way.'}</p>
           </Result>
           <Stats rows={[
             ['Sequence used', ops.map((o) => (o.op === 'R' ? `R(${o.t})` : o.op)).join(' ')],
@@ -1503,6 +1506,7 @@ function KLM() {
             ['Without mental operators', secs(r.total - r.time.M)],
             ['K used', `${k} s per keystroke`],
           ]} />
+          <StudySummary {...SM.klm({ total: r.total, counts: r.counts, time: r.time, nOps: ops.length, k })} />
         </>
       )}
       <About method="keystroke-level-model-klm" links={[['goms-klm', 'GOMS / KLM']]}>
@@ -1554,7 +1558,6 @@ function Fitts() {
       {bad ? <Problem>{ab === 'fit' ? 'Enter at least three calibration conditions with different distances or widths.' : 'Distance and width must be above zero, and b above zero.'}</Problem> : (
         <>
           <Result big={secs(r.mt)} label={`Predicted movement time, index of difficulty ${num(r.id, 2)} bits`}>
-            <p>Moving {num(n_(d), 1)} {mode === 'touch' ? unit : 'px'} to a target {num(n_(w), 1)} {mode === 'touch' ? unit : 'px'} wide is a {num(r.id, 2)}-bit task. Halving the distance or doubling the width saves about {num(B * (r.id - S.fittsId(D / 2, Wd)), 2)} s{ab === 'default' ? ' with these illustrative constants' : ''}. {r.id > 4 ? 'This is a hard target: make it bigger or bring it closer if people use it often.' : r.id < 2 ? 'This is an easy target.' : ''}</p>
           </Result>
           {mode === 'touch' && sigma > 0 && (
             <div className="disc-table" role="table" aria-label="Chance a tap lands inside a square target, by size">
@@ -1579,6 +1582,7 @@ function Fitts() {
             mode === 'touch' && sigma > 0 && ['Chance a tap lands in this target', `${pct(S.hitRate(Wd, sigma, 2), 1)} for a ${num(Wd, 1)} mm square (σ = ${num(sigma, 2)} mm)`],
             mode === 'touch' && sigma > 0 && ['Square size for 95% of taps', `${num(S.widthForHit(0.95, sigma, 2), 1)} mm (about ${num(S.widthForHit(0.95, sigma, 2) / 0.15875, 0)} dp)`],
           ]} />
+          <StudySummary {...SM.fitts({ mode, ab, id: r.id, mt: r.mt, saving: B * (r.id - S.fittsId(D / 2, Wd)), fitR, unitLabel: mode === 'touch' ? unit : 'px', D: n_(d), W: n_(w), sigma, hit: mode === 'touch' && sigma > 0 ? S.hitRate(Wd, sigma, 2) : NaN, size95: mode === 'touch' && sigma > 0 ? S.widthForHit(0.95, sigma, 2) : NaN })} />
         </>
       )}
       <About method={mode === 'touch' ? 'touch-target-fitts-law-calibration-for-mobile' : 'fitts-law-modelling'} links={[['fitts-law-modelling', "Fitts' law modelling"], ['touch-target-fitts-law-calibration-for-mobile', 'Touch target calibration for mobile']]}>
@@ -1611,7 +1615,6 @@ function Hick() {
       {bad ? <Problem>Enter at least one choice and a slope above zero.</Problem> : (
         <>
           <Result big={secs(A + B * H)} label={`Predicted decision time for ${nn} choices, ${num(H, 2)} bits`}>
-            <p>Choosing among {nn} {mode === 'equal' ? 'equally likely' : 'unequally used'} options carries {num(H, 2)} bits of uncertainty, so the decision takes about {secs(A + B * H)}. {mode === 'weighted' ? `If all ${nn} were equally likely it would be ${secs(A + B * S.hickBits(nn))}; putting the common choices first is what makes the difference.` : `Doubling to ${nn * 2} choices adds only about ${num(B * (S.hickBits(nn * 2) - H), 2)} s: decision time grows with the logarithm of the number of options, not in proportion.`}</p>
           </Result>
           <div className="disc-table" role="table" aria-label="Predicted decision time by number of equally likely choices">
             {sizes.map((s) => (
@@ -1623,6 +1626,7 @@ function Hick() {
             ))}
           </div>
           <Stats rows={[['Information (H)', `${num(H, 3)} bits`], ['Decision time, a + b·H', secs(A + B * H)], mode === 'weighted' && ['Equally likely, same number', `${num(S.hickBits(nn), 3)} bits`]]} />
+          <StudySummary {...SM.hick({ mode, n: nn, H, a: A, b: B, equalH: S.hickBits(nn) })} />
         </>
       )}
       <About method="hicks-law-analysis">
@@ -1652,7 +1656,7 @@ function VanWestendorp() {
       {bad ? <Problem>Enter at least two respondents with four prices each.</Problem> : (
         <>
           <Result big={range ? `${money(r.pmc.x)} – ${money(r.pme.x)}` : 'No clear range'} label={`Acceptable price range from ${r.n} respondents`}>
-            <p>{range ? `Below ${money(r.pmc.x)} more people think the price is suspiciously cheap than think it is no longer cheap; above ${money(r.pme.x)} more think it is too expensive than think it is not expensive.` : 'The curves do not cross in a way that gives a range; collect more responses.'} {r.opp && `The optimal price point, where as many say "too cheap" as "too expensive", is ${money(r.opp.x)}.`} {r.ipp && `The indifference price, where as many call it cheap as expensive, is ${money(r.ipp.x)}.`}</p>
+            <p>{r.opp && `The optimal price point, where as many say "too cheap" as "too expensive", is ${money(r.opp.x)}.`}</p>
           </Result>
           <Curves xs={r.prices} label="Van Westendorp price sensitivity curves" xFmt={money}
             series={[
@@ -1671,6 +1675,7 @@ function VanWestendorp() {
             ['Point of marginal expensiveness (PME)', r.pme ? money(r.pme.x) : 'Curves do not cross'],
             ['Respondents used', r.n],
           ]} />
+          <StudySummary {...SM.vanWestendorp({ r })} />
         </>
       )}
       <About method="van-westendorp-price-sensitivity-meter">
@@ -1701,12 +1706,13 @@ function GaborGranger() {
       {bad ? <Problem>Enter at least two different prices, each with a share who would buy between 0% and 100%.</Problem> : (
         <>
           <Result big={money(r.bestRevenue.price)} label="Revenue-maximising price among those tested">
-            <p>At {money(r.bestRevenue.price)}, {pct(r.bestRevenue.demand, 0)} say they would buy, giving the highest revenue per person asked ({money(r.bestRevenue.revenue)}). {C > 0 && `With a unit cost of ${money(C)}, profit per person asked peaks at ${money(r.bestProfit.price)}.`} {r.bestRevenue === r.points[r.points.length - 1] ? 'That is the highest price you tested, so revenue may keep rising above it: test higher prices.' : r.bestRevenue === r.points[0] ? 'That is the lowest price you tested, so test lower prices too.' : ''}</p>
+            <p>Revenue per person asked at that price: {money(r.bestRevenue.revenue)}.</p>
           </Result>
           <Curves xs={r.points.map((p) => p.price)} label="Demand and revenue by price" xFmt={money} yLabel="Share (revenue as share of its peak)"
             series={[{ name: 'Would buy', ys: r.points.map((p) => p.demand), color: 'var(--accent)' }, { name: 'Revenue (share of the peak)', ys: r.points.map((p) => p.revenue / maxRev), color: 'var(--ok)', dash: '6 4' }]}
             marks={[{ x: r.bestRevenue.price, y: 1, label: 'Peak revenue' }]} />
           <Stats rows={r.points.map((p) => [`At ${money(p.price)}`, <>{pct(p.demand, 0)} would buy · revenue {money(p.revenue)}{C > 0 ? ` · profit ${money(p.profit)}` : ''}{Number.isFinite(p.elasticity) ? ` · elasticity ${num(p.elasticity, 2)}` : ''} {p === r.bestRevenue && <span className="qtag promote">Peak revenue</span>}</>])} />
+          <StudySummary {...SM.gaborGranger({ r, cost: C, nAsked: (() => { const b = pts.find((q) => q.price === r.bestRevenue.price); return b && b.n ? b.n : null; })() })} />
         </>
       )}
       <About method="gabor-granger-pricing">
@@ -1756,14 +1762,8 @@ function Kano() {
               {feats.map((f, i) => <li key={i}><b>{f.name}</b> <span className={`qtag ${KANO_TAG[f.category]}`}>{S.KANO_NAMES[f.category]}</span><br /><span className="muted">Better {num(f.better, 2)}, Worse {num(f.worse, 2)} · {Object.entries(f.counts).filter(([, c]) => c).map(([k, c]) => `${k} ${c}`).join(', ')}</span></li>)}
             </ol>
           </div>
-          <Result label="What to do first">
-            <p>{(() => {
-              const mb = feats.filter((f) => f.category === 'M'), at = feats.filter((f) => f.category === 'A');
-              const q = feats.filter((f) => (f.counts.Q + f.counts.R) / f.n > 0.2);
-              return `${mb.length ? `Make sure ${mb.map((f) => `"${f.name}"`).join(', ')} ${mb.length > 1 ? 'are' : 'is'} in place: people expect ${mb.length > 1 ? 'them' : 'it'} and will be dissatisfied without ${mb.length > 1 ? 'them' : 'it'}, but ${mb.length > 1 ? 'they' : 'it'} will not delight. ` : ''}${at.length ? `${at.map((f) => `"${f.name}"`).join(', ')} could delight without being missed if absent. ` : ''}${q.length ? `Check ${q.map((f) => `"${f.name}"`).join(', ')}: over 20% of answers are reverse or questionable, which often means the question was misunderstood.` : ''}`.trim() || 'No feature is clearly must-be or attractive; look at the Better and Worse scores.';
-            })()}</p>
-          </Result>
           <Stats rows={feats.map((f, i) => [`${i + 1}. ${f.name} (${f.n} answers)`, `${S.KANO_NAMES[f.category]} · CS+ ${num(f.better, 2)} · CS− ${num(f.worse, 2)}`])} />
+          <StudySummary {...SM.kano({ feats })} />
         </>
       )}
       <About method="kano-analysis">
@@ -1801,9 +1801,10 @@ function MaxDiff() {
             <div className="sum-bars">
               {rows.map((r) => <div key={r.item}><span>{r.item}</span><span className="bar"><i style={{ width: pct((r.norm + 1) / 2, 0) }} /></span><b>{num(r.norm, 2)}</b></div>)}
             </div>
-            <p>Bars show best minus worst divided by the number of times each item was shown, from −1 (always picked as worst) to +1 (always best). {rows[0].item} leads; {rows[rows.length - 1].item} is least preferred. {showShare && `On the ratio scale, ${rows[0].item} would be chosen about ${num(rows[0].share / rows[rows.length - 1].share, 1)} times as often as ${rows[rows.length - 1].item}.`}</p>
+            <p>Bars show best minus worst divided by the number of times each item was shown, from −1 (always picked as worst) to +1 (always best).</p>
           </Result>
           <Stats rows={rows.map((r) => [r.item, `best ${r.best} · worst ${r.worst} · shown ${r.shown} · B − W ${r.bw > 0 ? '+' : ''}${r.bw}${showShare ? ` · share ${num(r.share, 1)}%` : ''}`])} />
+          <StudySummary {...SM.maxdiff({ rows, tasks: ok.length })} />
         </>
       )}
       <About method="maxdiff-best-worst-scaling">
@@ -1836,7 +1837,7 @@ function TURF() {
       {bad ? <Problem>Enter at least two respondents and two different items.</Problem> : (
         <>
           <Result big={pct(lastBest.reach, 0)} label={`Best reach with ${last.k} item${last.k > 1 ? 's' : ''}: ${label(lastBest)}`}>
-            <p>{label(lastBest)} together reach {pct(lastBest.reach, 0)} of the {people.length} respondents, meaning each of them would find at least one item they want; those reached like {num(lastBest.freq, 2)} of the items on average. {res.length > 1 && `Going from ${res.length - 1} to ${res.length} items adds ${num((lastBest.reach - (res[res.length - 2].exhaustive || res[res.length - 2].greedy).reach) * 100, 0)} points of reach.`} {res.some((r) => r.exhaustive && r.exhaustive.reach > r.greedy.reach + 1e-12) ? 'The greedy search missed the best set at some sizes, which is why the exhaustive search is shown where it is feasible.' : ''}</p>
+            {res.some((r) => r.exhaustive && r.exhaustive.reach > r.greedy.reach + 1e-12) && <p>The greedy search missed the best set at some sizes, which is why the exhaustive search is shown where it is feasible.</p>}
           </Result>
           <div className="disc-table" role="table" aria-label="Reach of each item on its own">
             {single.map((s) => (
@@ -1851,6 +1852,7 @@ function TURF() {
             [`Best ${r.k}, exhaustive search`, r.exhaustive ? `${label(r.exhaustive)} · reach ${pct(r.exhaustive.reach, 1)} · frequency ${num(r.exhaustive.freq, 2)}` : `Skipped: ${r.combos.toLocaleString()} combinations`],
             [`Best ${r.k}, greedy search`, `${label(r.greedy)} · reach ${pct(r.greedy.reach, 1)} · frequency ${num(r.greedy.freq, 2)}`],
           ])} />
+          <StudySummary {...SM.turf({ best: { ...lastBest, label: label(lastBest) }, k: last.k, people: people.length, single: single[0], prev: res.length > 1 ? (res[res.length - 2].exhaustive || res[res.length - 2].greedy) : null })} />
         </>
       )}
       <About method="turf-analysis">
@@ -1888,7 +1890,7 @@ function UXROI() {
             <div className="sum-bars">
               {Object.entries(r.parts).filter(([, x]) => x > 0).map(([k, x]) => <div key={k}><span>{LABEL[k]}</span><span className="bar"><i style={{ width: pct(x / r.annual, 0) }} /></span><b>{pct(x / r.annual, 0)}</b></div>)}
             </div>
-            <p>The change would be worth about {money(r.annual)} a year against {money(N.running)} a year to run and {money(N.oneOff)} up front. {Number.isFinite(r.paybackYears) ? `It pays back in about ${num(r.paybackYears * 12, 0)} months.` : 'At these figures it never pays back.'} Discounted at {num(N.rate, 1)}% a year, it is worth {money(r.npv)} today {r.npv > 0 ? 'more than it costs' : 'less than it costs'}. {(() => { const [k, x] = Object.entries(r.parts).sort((p, q) => q[1] - p[1])[0]; return x > 0 ? `${LABEL[k]} is the biggest benefit (${pct(x / r.annual, 0)}), so that is the assumption to check hardest.` : ''; })()}</p>
+            <p>The change would be worth about {money(r.annual)} a year against {money(N.running)} a year to run and {money(N.oneOff)} up front, discounted at {num(N.rate, 1)}% a year.</p>
           </Result>
           <Stats rows={[
             ['Annual benefit', money(r.annual)], ['Net annual benefit (after running costs)', money(r.net)],
@@ -1896,6 +1898,7 @@ function UXROI() {
             ['ROI (undiscounted)', pct(r.roi, 1)], ['Simple payback', Number.isFinite(r.paybackYears) ? `${num(r.paybackYears * 12, 1)} months` : 'Never'],
             ...r.flows.map((f) => [`Year ${f.year}: present value · cumulative NPV`, `${money(f.pv)} · ${money(f.cumulative)}`]),
           ]} />
+          <StudySummary {...SM.uxRoi({ r, years: N.years, rate: N.rate / 100, oneOff: N.oneOff, running: N.running })} />
         </>
       )}
       <About method="ux-roi-and-cost-benefit-calculation">
@@ -1932,7 +1935,6 @@ function Lostness() {
       {ok.length === 0 ? <Problem>Enter at least one participant.</Problem> : (
         <>
           <Result big={num(M, 2)} label={`Mean lostness from ${ok.length} participant${ok.length > 1 ? 's' : ''}`} tone={M < 0.4 ? 'good' : M > 0.5 ? 'bad' : ''}>
-            <p>{ok.filter((p) => p.L > 0.5).length} of {ok.length} participants were lost (above 0.5) and {ok.filter((p) => p.L < 0.4).length} were not (below 0.4). {M > 0.5 ? 'On average people wandered: look at where paths diverged from the shortest route.' : M < 0.4 ? 'On average people found their way efficiently.' : 'On average navigation was borderline; look at the individual paths.'} Median {num(S.median(L), 2)}.</p>
           </Result>
           <div className="disc-table" role="table" aria-label="Lostness per participant">
             {ok.map((p) => (
@@ -1944,6 +1946,7 @@ function Lostness() {
             ))}
           </div>
           <Stats rows={ok.map((p) => [`Participant ${p.i + 1}${p.path ? ' (path)' : ''}`, <>N {p.N} · S {p.S} · R {p.R} · L = {num(p.L, 3)} <span className={`qtag ${tag(p.L)[1]}`}>{tag(p.L)[0]}</span></>])} />
+          <StudySummary {...SM.lostness({ L })} />
         </>
       )}
       <About method="lostness-metric">
@@ -1973,7 +1976,6 @@ function Readability() {
         <>
           <Result big={num(r.fre, 0)} label={`Flesch Reading Ease (0 to 100, higher is easier): ${band[0].toLowerCase()}`} tone={r.fre >= 60 ? 'good' : r.fre < 30 ? 'bad' : ''}>
             <IntervalBar lo={Math.max(0, Math.min(100, r.fre))} hi={Math.max(0, Math.min(100, r.fre))} point={Math.max(0, Math.min(100, r.fre))} min={0} max={100} bench={60} benchLabel="Plain English" fmt={(v) => num(v, 0)} />
-            <p>The text averages {num(r.wps, 1)} words per sentence and {num(r.spw, 2)} syllables per word, which puts it at about US school grade {num(r.fkgl, 1)} ({band[1]}). {r.long.length ? `${r.long.length} sentence${r.long.length > 1 ? 's are' : ' is'} longer than ${LA} words; splitting ${r.long.length > 1 ? 'them' : 'it'} is usually the quickest gain.` : `No sentence is longer than ${LA} words.`} Plain English for a general audience usually means a score of 60 or more.</p>
           </Result>
           {r.long.length > 0 && (
             <ol className="exp-list">
@@ -1981,6 +1983,7 @@ function Readability() {
             </ol>
           )}
           <Stats rows={[['Flesch Reading Ease', num(r.fre, 1)], ['Flesch-Kincaid grade', num(r.fkgl, 1)], ['Sentences', r.sentences], ['Words', r.words], ['Syllables (approximate)', r.syllables], ['Words per sentence', num(r.wps, 1)], ['Syllables per word', num(r.spw, 2)], ['Longest sentence', `${Math.max(...r.list.map((s) => s.words))} words`]]} />
+          <StudySummary {...SM.readability({ r, longAt: LA })} />
         </>
       )}
       <About method="readability-analysis" links={[['readability-testing', 'Readability testing']]}>
@@ -2598,6 +2601,7 @@ function ClusterPersonas() {
           ]} />
             </>
           )}
+          <StudySummary {...SM.clusterPersonas({ r, profs, names: nameList, stab, algo: res.opts.algo })} />
           <h2 className="clu-h">4. Personas</h2>
           <p className="calc-warn">Clusters are a starting point, not personas. Interview a few people from each cluster to learn the goals, contexts and stories behind the numbers before you write the persona (see <Link to="/methods/personas">Personas</Link> and <Link to="/methods/cluster-validation-with-qualitative-investigation">validating clusters with qualitative research</Link>).</p>
           <div className="clu-actions no-print">
