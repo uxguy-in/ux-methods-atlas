@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { post, STATIC } from '../api.js';
 import { useMethods } from '../hooks.js';
+import { ShowMoreList } from '../components/ShowMore.jsx';
 import { Status } from '../components/MethodCard.jsx';
 import ModeSwitch, { PLAN_STORE as STORE, findLink } from '../components/ModeSwitch.jsx';
 import { QUESTIONS as FINDER } from './Finder.jsx';
@@ -326,7 +327,7 @@ function Roadmap({ s, set, go, reset }) {
             <section key={g.key} className="guide-block">
               <h2>{g.title}</h2>
               <p className="guide-intro">{g.intro}</p>
-              <div className="guide-grid">
+              <ShowMoreList className="guide-grid" limit={4} keep={(i) => g.options[i].recommended} noun="options">
                 {g.options.map((o) => (
                   <div key={o.head} className={`guide-opt${o.recommended ? ' rec' : ''}`}>
                     <h3>{o.head}{o.recommended && <span className="flag">Suggested</span>}</h3>
@@ -339,7 +340,7 @@ function Roadmap({ s, set, go, reset }) {
                     )}
                   </div>
                 ))}
-              </div>
+              </ShowMoreList>
             </section>
           ))}
           <p className="muted plan-foot no-print">

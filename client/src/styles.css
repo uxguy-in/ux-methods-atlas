@@ -268,6 +268,24 @@ a.tag:hover .tag-kind { color: inherit; }
 .related-list a { text-decoration: none; font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .related-list a:hover { color: var(--accent); }
 
+/* Method actions sit in the hero, so the finder and calculators are in view before the long content on every screen. */
+.method-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 30px; }
+.method-calcs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.method-calcs a { color: var(--accent); font-weight: 700; font-size: 15px; }
+@media (max-width: 640px) {
+  .method-hero { padding: 40px 0 32px; }
+  .method-actions .btn { width: 100%; white-space: normal; text-align: center; }
+}
+
+/* Show more (components/ShowMore.jsx): a quiet toggle under a long list or section. Printing opens everything. */
+.show-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 4px 0; background: none; border: 0; font: 800 12px/1.3 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); cursor: pointer; }
+.show-more:hover { color: var(--ink); }
+.show-more:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.show-more-icon { display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid currentColor; border-radius: var(--radius-sm); font-size: 13px; line-height: 1; }
+.block .show-more { margin-top: 0; }
+.sm-clamp { max-height: 12em; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent); mask-image: linear-gradient(to bottom, #000 55%, transparent); }
+.guide-block > .show-more { margin-top: 14px; }
+
 /* ── Finder ── */
 .finder { padding-top: 56px; padding-bottom: 96px; }
 .progress { display: flex; gap: 6px; margin: 0 0 36px; }
@@ -656,4 +674,5 @@ a.mode-opt:hover { background: var(--bg-sunk); }
   .guide-block { margin-top: 28px; }
   .guide-grid { grid-template-columns: 1fr 1fr; }
   a { text-decoration: none; color: #000 !important; }
+  .sm-clamp { max-height: none; -webkit-mask-image: none; mask-image: none; }
 }

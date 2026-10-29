@@ -49,18 +49,18 @@ export const EXPERTISE = { beginner: 'New to research', intermediate: 'Mid-level
 // The one name for practices that sit beside the research atlas (kind: 'design').
 export const DESIGN_KIND = 'Design & product';
 
-// Reading lists from the library spreadsheet, in sentence case. Values that only name the folder a book was filed
-// in ("New in Books folder", "Books for now folder", "Old Backup UX folder") say nothing about the book, so they are
-// not shown as labels or offered as filters.
-const READING_LISTS = {
-  'Must Read': 'Must read',
-  'Class Reading': 'Class reading',
-  'Self Reading': 'Self reading',
-  'Going Deep into UXR': 'Going deep into UX research',
-  'Knowledge Add On': 'Knowledge add-on',
-  'Deep cuts': 'Deep cuts',
+// Public reading levels for the library, mapped from the source spreadsheet's list names. Lists that describe
+// how the books were filed or studied (class or self reading, and the "... folder" values) get no label and
+// no filter. The spreadsheet's reading status is never shown.
+const READING_LEVELS = {
+  'Must Read': 'Essential',
+  'Going Deep into UXR': 'Deep dive',
+  'Deep cuts': 'Deep cut',
+  'Knowledge Add On': 'Background',
 };
-export const readingList = (v) => READING_LISTS[v] || '';
+export const readingLevel = (v) => READING_LEVELS[v] || '';
+// The books marked 80/20 core in the data.
+export const CORE_LABEL = 'Core reading';
 
 export const slug = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 

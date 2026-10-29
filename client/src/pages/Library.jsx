@@ -3,7 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useApi, useMethods, useRemembered } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status } from '../components/MethodCard.jsx';
-import { DESIGN_KIND, readingList } from '../vocab.js';
+import { ShowMoreList } from '../components/ShowMore.jsx';
+import { CORE_LABEL, DESIGN_KIND, readingLevel } from '../vocab.js';
+
+// Books listed at a time; "Show more books" adds the next batch.
+const BOOK_PAGE = 40;
 
 function csvCell(v) { return `"${String(v ?? '').replace(/"/g, '""')}"`; }
 
@@ -18,7 +22,7 @@ function MethodIndex() {
     return w ? numbered.filter((m) => [m.name, ...(m.aka || []), m.family].join(' ').toLowerCase().includes(w)) : numbered;
   }, [numbered, q]);
   const download = () => {
-    const rows = [['#', 'Method', 'Discipline', 'Status', 'Books in your library', 'Sources']]
+    const rows = [['#', 'Method', 'Discipline', 'Status', 'Books in the library', 'Sources']]
       .concat(numbered.map((m) => [m.n, m.name, m.family, m.status, (m.bookIds || []).length, (m.sources || []).join(' | ')]));
     const blob = new Blob([rows.map((r) => r.map(csvCell).join(',')).join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
@@ -97,15 +101,16 @@ function BookList({ counts }) {
   const [withMethods, setWithMethods] = useRemembered('withMethods', false);
   const [type, setType] = useRemembered('type', '');
   const [core, setCore] = useRemembered('core', false);
+  const [limit, setLimit] = useRemembered('limit', BOOK_PAGE);
 
   const genres = useMemo(() => [...new Set((books || []).map((b) => b.genre).filter(Boolean))].sort(), [books]);
-  const types = useMemo(() => [...new Set((books || []).map((b) => readingList(b.readingType)).filter(Boolean))].sort(), [books]);
+  const types = useMemo(() => [...new Set((books || []).map((b) => readingLevel(b.readingType)).filter(Boolean))].sort(), [books]);
   const list = useMemo(() => {
     const w = q.toLowerCase();
     return (books || []).filter((b) =>
       (!genre || b.genre === genre) &&
       (!withMethods || b.methods?.length) &&
-      (!type || readingList(b.readingType) === type) &&
+      (!type || readingLevel(b.readingType) === type) &&
       (!core || b.core) &&
       (!w || [b.title, b.fullTitle, b.author, ...(b.methods || []).map((m) => m.name)].join(' ').toLowerCase().includes(w))
     );
@@ -118,10 +123,10 @@ function BookList({ counts }) {
         <div className="wrap">
           <p className="eyebrow">The library</p>
           <h1 className="h1">{books.length} books behind the methods.</h1>
-          <p className="lede">The reading list the atlas was mined from. Books with methods attached show you exactly what each one teaches.</p>
+          <p className="lede">The books the atlas was mined from. Books with methods attached show you exactly what each one teaches.</p>
           <div className="stats">
             <div className="stat"><b>{books.filter((b) => b.methods?.length).length}</b><span>books with methods</span></div>
-            <div className="stat"><b>{books.filter((b) => b.core).length}</b><span>80/20 core books</span></div>
+            <div className="stat"><b>{books.filter((b) => b.core).length}</b><span>{CORE_LABEL.toLowerCase()} books</span></div>
           </div>
           <ViewSwitch view="books" counts={counts} />
         </div>
@@ -137,35 +142,42 @@ function BookList({ counts }) {
               <option value="">All subjects</option>
               {genres.map((g) => <option key={g} value={g}>{g}</option>)}
             </select>
-            <select className="select" value={type} onChange={(e) => setType(e.target.value)} aria-label="Reading list">
-              <option value="">Any reading list</option>
+            <select className="select" value={type} onChange={(e) => setType(e.target.value)} aria-label="Reading level">
+              <option value="">Any reading level</option>
               {types.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
-            <button className={`chip${core ? ' on' : ''}`} onClick={() => setCore((v) => !v)} aria-pressed={core}>80/20 core</button>
+            <button className={`chip${core ? ' on' : ''}`} onClick={() => setCore((v) => !v)} aria-pressed={core}>{CORE_LABEL}</button>
             <button className={`chip${withMethods ? ' on' : ''}`} onClick={() => setWithMethods((v) => !v)} aria-pressed={withMethods}>Only books with methods</button>
           </div>
         </div>
       </div>
       <div className="wrap" style={{ paddingBottom: 88 }}>
         <div className="results-line"><span><b>{list.length}</b> books</span></div>
-        {list.map((b) => (
+        {list.slice(0, limit).map((b) => (
           <div key={b.id} className="book-row">
             <div>
               <h3>{b.title}</h3>
               {b.fullTitle && <div className="by" style={{ marginTop: 2 }}>{b.fullTitle}</div>}
               <div className="by">{b.author}{b.genre ? ` · ${b.genre}` : ''}</div>
               <div className="book-meta">
-                {b.core && <span className="badge core">80/20 core</span>}
-                {readingList(b.readingType) && <span className="badge">{readingList(b.readingType)}</span>}
+                {b.core && <span className="badge core">{CORE_LABEL}</span>}
+                {readingLevel(b.readingType) && <span className="badge">{readingLevel(b.readingType)}</span>}
               </div>
             </div>
-            <div className="tags" style={{ alignContent: 'flex-start' }}>
-              {(b.methods || []).map((m) => (
-                <Link key={m.id} className="tag" to={`/methods/${m.id}`}>{m.name}{m.kind === 'design' && <span className="tag-kind"> · {DESIGN_KIND}</span>}</Link>
-              ))}
+            <div>
+              <ShowMoreList className="tags" limit={6} noun="methods">
+                {(b.methods || []).map((m) => (
+                  <Link key={m.id} className="tag" to={`/methods/${m.id}`}>{m.name}{m.kind === 'design' && <span className="tag-kind"> · {DESIGN_KIND}</span>}</Link>
+                ))}
+              </ShowMoreList>
             </div>
           </div>
         ))}
+        {list.length > limit && (
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <button className="btn ghost" onClick={() => setLimit((l) => l + BOOK_PAGE)}>Show {Math.min(BOOK_PAGE, list.length - limit)} more books</button>
+          </div>
+        )}
       </div>
     </>
   );

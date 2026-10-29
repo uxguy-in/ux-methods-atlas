@@ -20,13 +20,16 @@ export const metaPayload = (meta, kinds, books) => ({
   counts: { methods: kinds.research.length, design: kinds.design.length, books: books.length },
 });
 
+// The source spreadsheet's personal reading status stays out of everything the site serves.
+export const publicBook = ({ readingStatus, ...b }) => b;
+
 // Books may source both kinds; each listed method says which it is.
-export const booksPayload = (books, byId) => books.map((b) => (b.methods?.length
+export const booksPayload = (books, byId) => books.map(publicBook).map((b) => (b.methods?.length
   ? { ...b, methods: b.methods.map((x) => (isDesign(byId.get(x.id) || {}) ? { ...x, kind: 'design' } : x)) }
   : b));
 
 export function methodPayload(rec, byId, books) {
   const related = (rec.relatedIds || []).map((id) => byId.get(id)).filter(Boolean).map(listFields);
-  const sourceBooks = (rec.bookIds || []).map((id) => books.find((b) => b.id === id)).filter(Boolean);
+  const sourceBooks = (rec.bookIds || []).map((id) => books.find((b) => b.id === id)).filter(Boolean).map(publicBook);
   return { ...rec, related, sourceBooks };
 }

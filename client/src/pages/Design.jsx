@@ -5,7 +5,8 @@ import { Status } from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
 import { DESIGN_KIND } from '../vocab.js';
 
-const PAGE = 60;
+// Cards listed at a time; "Show N more" adds the next batch.
+const PAGE = 30;
 
 function matches(m, words) {
   if (!words.length) return true;

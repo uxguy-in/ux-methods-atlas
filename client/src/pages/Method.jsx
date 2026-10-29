@@ -4,9 +4,15 @@ import { calculatorsFor } from '../calc/catalog.js';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
+import { ShowMoreList, ShowMoreText } from '../components/ShowMore.jsx';
+import { mergeSources } from '../sources.js';
 import { DATA, DESIGN_KIND, EFFORT, EXPERTISE, GOALS, PARTICIPANTS, STAGES, STATUS, SUBMIT_URL, VALIDATION, slug } from '../vocab.js';
 
 const paras = (t) => (t || '').split(/\n{2,}/).filter(Boolean);
+
+// Text longer than this is cut to a few lines behind "Show more".
+const LONG_EXAMPLE = 600;
+const LONG_NOTES = 300;
 
 export default function Method() {
   const { id } = useParams();
@@ -20,6 +26,7 @@ export default function Method() {
   const design = m.kind === 'design';
   // Calculators whose "How this is calculated" section links to this method (reverse map from calc/catalog.js).
   const calcs = calculatorsFor(m.id || id);
+  const sources = mergeSources(m.sourceBooks, m.sources);
   const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
 
   return (
@@ -55,10 +62,21 @@ export default function Method() {
             {f.effort && <div><dt>Effort</dt><dd>{EFFORT[f.effort]}</dd></div>}
             {f.expertise && <div><dt>Level</dt><dd>{EXPERTISE[f.expertise]}</dd></div>}
           </dl>
+          <div className="method-actions">
+            {design
+              ? <Link to="/design" className="btn ghost">More design & product methods</Link>
+              : <Link to="/find" className="btn accent">Is this right for my problem?</Link>}
+            {calcs.length > 0 && (
+              <div className="method-calcs">
+                <span className="label">Calculate it</span>
+                {calcs.map((c) => <Link key={c.id} to={`/calculators/${c.id}`}>{c.name}</Link>)}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      <div className="wrap method-body">
+      <div className="wrap method-body" key={m.id}>
         <article>
           <section className="block">
             <h2>What it is</h2>
@@ -100,43 +118,35 @@ export default function Method() {
           {m.example && (
             <section className="block">
               <h2>Example</h2>
-              <p>{m.example}</p>
+              <ShowMoreText long={m.example.length > LONG_EXAMPLE}>
+                {paras(m.example).map((p, i) => <p key={i}>{p}</p>)}
+              </ShowMoreText>
             </section>
           )}
 
           {m.extra && Object.keys(m.extra).length > 0 && (
             <section className="block">
               <h2>Notes from the compendium</h2>
-              {Object.entries(m.extra).map(([k, v]) => <p key={k}><b>{k}.</b> {v}</p>)}
+              <ShowMoreText long={Object.entries(m.extra).reduce((n, [k, v]) => n + k.length + String(v).length, 0) > LONG_NOTES}>
+                {Object.entries(m.extra).map(([k, v]) => <p key={k}><b>{k}.</b> {v}</p>)}
+              </ShowMoreText>
             </section>
           )}
         </article>
 
         <aside>
-          {calcs.length > 0 && (
-            <div className="aside-box">
-              <h3>Calculate it</h3>
-              <div className="related-list">
-                {calcs.map((c) => <Link key={c.id} to={`/calculators/${c.id}`}><span>{c.name}</span><span className="badge kind">{c.group}</span></Link>)}
-              </div>
-            </div>
-          )}
           {(f.goals?.length > 0 || f.stage?.length > 0) && (
             <div className="aside-box">
               <h3>Good for</h3>
-              <div className="tags">
-                {design ? (
-                  <>
-                    {(f.goals || []).map((g) => <span key={g} className="tag">{GOALS[g] || g}</span>)}
-                    {(f.stage || []).map((s) => <span key={s} className="tag">{STAGES[s] || s}</span>)}
-                  </>
-                ) : (
-                  <>
-                    {(f.goals || []).map((g) => <Link key={g} className="tag" to={`/methods?goal=${g}`}>{GOALS[g] || g}</Link>)}
-                    {(f.stage || []).map((s) => <Link key={s} className="tag" to={`/methods?stage=${s}`}>{STAGES[s] || s}</Link>)}
-                  </>
-                )}
-              </div>
+              <ShowMoreList className="tags" noun="tags">
+                {design ? [
+                  ...(f.goals || []).map((g) => <span key={`g:${g}`} className="tag">{GOALS[g] || g}</span>),
+                  ...(f.stage || []).map((st) => <span key={`s:${st}`} className="tag">{STAGES[st] || st}</span>),
+                ] : [
+                  ...(f.goals || []).map((g) => <Link key={`g:${g}`} className="tag" to={`/methods?goal=${g}`}>{GOALS[g] || g}</Link>),
+                  ...(f.stage || []).map((st) => <Link key={`s:${st}`} className="tag" to={`/methods?stage=${st}`}>{STAGES[st] || st}</Link>),
+                ]}
+              </ShowMoreList>
             </div>
           )}
           {m.status === 'community' && (
@@ -156,31 +166,26 @@ export default function Method() {
               <p className="ref" style={{ margin: 0 }}>{m.reference}</p>
             </div>
           )}
-          {m.sourceBooks?.length > 0 && (
+          {sources.length > 0 && (
             <div className="aside-box">
-              <h3>In your library</h3>
-              <ul>{m.sourceBooks.map((b) => <li key={b.id}><Link to={`/library?q=${encodeURIComponent(b.title)}`}>{b.title}</Link>{b.author ? `, ${b.author}` : ''}</li>)}</ul>
-            </div>
-          )}
-          {m.sources?.length > 0 && (
-            <div className="aside-box">
-              <h3>Found in</h3>
-              <ul>{m.sources.map((s) => <li key={s}>{s}</li>)}</ul>
+              <h3>Sources</h3>
+              <ShowMoreList as="ul" className="source-list" noun="sources">
+                {sources.map((s) => (s.book
+                  ? <li key={s.key}><Link to={`/library?q=${encodeURIComponent(s.book.title)}`}>{s.book.title}</Link>{s.book.author ? `, ${s.book.author}` : ''}</li>
+                  : <li key={s.key}>{s.text}</li>))}
+              </ShowMoreList>
             </div>
           )}
           {m.related?.length > 0 && (
             <div className="aside-box">
               <h3>Related methods</h3>
-              <div className="related-list">
+              <ShowMoreList className="related-list" noun="related methods">
                 {m.related.map((r) => (
                   <Link key={r.id} to={`/methods/${r.id}`}><span>{r.name}</span>{r.kind === 'design' ? <span className="badge kind">{DESIGN_KIND}</span> : <Status value={r.status} />}</Link>
                 ))}
-              </div>
+              </ShowMoreList>
             </div>
           )}
-          {design
-            ? <Link to="/design" className="btn ghost" style={{ width: '100%' }}>More design & product methods</Link>
-            : <Link to="/find" className="btn accent" style={{ width: '100%' }}>Is this right for my problem?</Link>}
         </aside>
       </div>
     </>

@@ -1,6 +1,6 @@
 # UX Methods Atlas
 
-A React + Node.js website holding every UX research method from Vivek Gopinath's library of books, treatises,
+A React + Node.js website holding every UX research method curated by Vivek Gopinath from books, treatises,
 compendia and playbooks, including the rigorous methods the field lost and the ones borrowed from other disciplines.
 It asks a few questions, reads a short problem brief with Claude, and recommends a research direction.
 It also has UX calculators (sample size, confidence intervals, SUS/UMUX-Lite/NPS scoring and significance tests) and
@@ -31,7 +31,7 @@ For development with hot reload: `npm run dev` (Vite on http://localhost:5173, A
 | `server/lib/recommend.js` | Rule-based finder: scores each method against goal, material, access, time and evidence, then deals newcomer, mid-level, specialist and lost-method shelves with seeded variety |
 | `server/lib/brief.js` | AI brief: sends the brief plus the best-matching slice of the atlas to Claude (`claude-opus-5-5`) and returns a structured plan that only uses methods in the atlas |
 | `server/data/methods.json` | The methods, one record each (see schema below) |
-| `server/data/books.json` | The 253-book library, linked to the methods each book sources |
+| `server/data/books.json` | The source books, linked to the methods each book sources. `readingStatus` is internal: the API and the Pages copy leave it out |
 | `server/data/meta.json` | Disciplines, loss taxonomy, causes of method death, UX epidemiology glossary |
 | `client/` | React app (Vite). Theme tokens are at the top of `client/src/styles.css` |
 
