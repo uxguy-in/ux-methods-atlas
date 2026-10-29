@@ -17,6 +17,7 @@
     "check:calc": "node server/scripts/check-calc.js",
     "check:summaries": "node server/scripts/check-summaries.js",
     "check:tools": "node server/scripts/check-tools.js",
+    "check:studytools": "node server/scripts/check-studytools.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {
