@@ -20,6 +20,11 @@ import SurveystatsValidity from '../calc/tools/SurveystatsValidity.jsx';
 import SurveystatsDrivers from '../calc/tools/SurveystatsDrivers.jsx';
 import SurveystatsCrosstab from '../calc/tools/SurveystatsCrosstab.jsx';
 import ConjointStudio from '../calc/tools/Conjoint.jsx';
+import ExpAbHealth from '../calc/tools/expanalytics-AbHealth.jsx';
+import ExpMultiCompare from '../calc/tools/expanalytics-MultiCompare.jsx';
+import ExpDecisionMatrix from '../calc/tools/expanalytics-DecisionMatrix.jsx';
+import ExpRetentionFunnel from '../calc/tools/expanalytics-RetentionFunnel.jsx';
+import ExpMetaAnalysis from '../calc/tools/expanalytics-MetaAnalysis.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2681,6 +2686,7 @@ const COMPONENTS = {
   'card-sort': CardSort, 'first-click': FirstClick,
   'factor-analysis': SurveystatsFactor, 'scale-validity': SurveystatsValidity, 'key-drivers': SurveystatsDrivers, crosstab: SurveystatsCrosstab,
   conjoint: ConjointStudio,
+  'ab-health': ExpAbHealth, 'multi-compare': ExpMultiCompare, 'decision-matrix': ExpDecisionMatrix, 'retention-funnel': ExpRetentionFunnel, 'meta-analysis': ExpMetaAnalysis,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
