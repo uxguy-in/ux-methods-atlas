@@ -5,14 +5,19 @@ import { useMeta } from '../hooks.js';
 export default function About() {
   const { data: meta } = useMeta();
   return (
-    <section className="section">
-      <div className="wrap prose">
+    <>
+    <section className="hero">
+      <div className="wrap">
         <p className="eyebrow">About</p>
         <h1 className="h1">Why this exists.</h1>
-        <p className="lede" style={{ marginTop: 24 }}>
+        <p className="lede">
           People treat UX research as talking to users and reporting it. That is journalism, not research. Research goes
           deeper, past the obvious.
         </p>
+      </div>
+    </section>
+    <section className="section">
+      <div className="wrap prose">
         <p>
           UX research was never really taught; it was adapted. Its methods came from human factors, cognitive psychology,
           ethnography, statistics, epidemiology, linguistics, economics and engineering, and many of the most rigorous
@@ -37,12 +42,19 @@ export default function About() {
         <h2>The loss taxonomy</h2>
         <p>
           Methods are tagged active, vestigial, siloed, renamed, latent, extinct or unmigrated, following the taxonomy in
-          <em> Lost Methods in UX</em>. New frameworks put forward by practitioners are marked community-proposed, and each
+          <em> Lost Methods in UX</em>. Frameworks put forward by practitioners are marked community-proposed, and each
           one says whether it has been tested (published evidence of use beyond the person who proposed it) or not yet tested.
           Anyone can <a href={SUBMIT_URL} target="_blank" rel="noreferrer">submit a method</a>.
+        </p>
+        <h2>Copyright</h2>
+        <p>
+          Copyright © 2026 Vivek Gopinath and Danny Hope. All rights reserved. This covers the site, its code and the
+          method write-ups. Reusing, hosting or adapting any of it needs written permission from the copyright holders.
+          The books, papers and methods the atlas cites remain the work of their own authors.
         </p>
         <p style={{ marginTop: 32 }}><Link to="/find" className="btn accent">Find a method</Link></p>
       </div>
     </section>
+    </>
   );
 }

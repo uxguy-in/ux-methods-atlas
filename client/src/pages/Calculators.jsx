@@ -807,11 +807,11 @@ export default function Calculators() {
 
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 40 }}>
+      <section className="hero compact">
         <div className="wrap">
           <p className="eyebrow">UX calculators</p>
           <h1 className="h1">{current ? current.name : 'Do the maths properly.'}</h1>
-          <p className="lede" style={{ marginBottom: 0 }}>
+          <p className="lede">
             {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis. Everything runs in your browser; nothing you enter is sent anywhere.'}
           </p>
         </div>

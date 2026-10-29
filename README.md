@@ -37,7 +37,8 @@ For development with hot reload: `npm run dev` (Vite on http://localhost:5173, A
 
 ## Using it on another site
 
-See [docs/INTEGRATION.md](docs/INTEGRATION.md) for hosting it as a static folder, embedding it, or running the
+Running it elsewhere needs written permission from the copyright holders (see [Licence](#licence)). With permission,
+see [docs/INTEGRATION.md](docs/INTEGRATION.md) for hosting it as a static folder, embedding it, or running the
 Node server, and for how API keys and billing work in each case.
 
 ## The AI brief
@@ -81,4 +82,8 @@ Settings → Pages, set **Source** to **GitHub Actions** once.
 
 ## Licence
 
-Code: MIT (see `LICENSE`). Method write-ups and data in `server/data/`: CC BY 4.0 (see `LICENSE-CONTENT.md`).
+Copyright © 2026 Vivek Gopinath and Danny Hope. All rights reserved.
+
+This covers the code, the design and the method write-ups and data in `server/data/`. Copying, changing, hosting or
+redistributing any part of it needs written permission from the copyright holders (see `LICENSE`). The books, papers
+and methods the atlas cites remain the work of their own authors.

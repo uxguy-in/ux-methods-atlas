@@ -65,11 +65,11 @@ export default function Atlas() {
 
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 40 }}>
+      <section className="hero compact">
         <div className="wrap">
           <p className="eyebrow">The atlas</p>
           <h1 className="h1">{methods.length} methods.</h1>
-          <p className="lede" style={{ marginBottom: 0 }}>
+          <p className="lede">
             Search by name, discipline, idea or problem. Filter by what you need to learn and how much time you have.
             {meta?.counts?.design > 0 && <> Design and product practices are <Link to="/design">listed separately</Link>.</>}
           </p>
@@ -92,12 +92,12 @@ export default function Atlas() {
               <option value="">All disciplines</option>
               {(meta?.families || []).map((x) => <option key={x.name} value={slug(x.name)}>{x.name}</option>)}
             </select>
-            <select className="select" value={f.status} onChange={(e) => set('status', e.target.value)} aria-label="Loss type">
-              <option value="">Any loss type</option>
+            <select className="select" value={f.status} onChange={(e) => set('status', e.target.value)} aria-label="Status">
+              <option value="">Any status</option>
               {STATUS_ORDER.map((s) => <option key={s} value={s}>{STATUS[s].label}: {STATUS[s].short}</option>)}
             </select>
             {f.status === 'community' && (
-              <select className="select" value={f.validation} onChange={(e) => set('validation', e.target.value)} aria-label="Tested">
+              <select className="select" value={f.validation} onChange={(e) => set('validation', e.target.value)} aria-label="Validation">
                 <option value="">Tested or not</option>
                 {Object.entries(VALIDATION).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
@@ -130,7 +130,7 @@ export default function Atlas() {
             <select className="select" value={sort} onChange={(e) => set('sort', e.target.value === 'name' ? '' : e.target.value)}>
               <option value="name">A to Z</option>
               <option value="family">Discipline</option>
-              <option value="status">Loss type</option>
+              <option value="status">Status</option>
               <option value="donor">Donor field</option>
             </select>
           </label>

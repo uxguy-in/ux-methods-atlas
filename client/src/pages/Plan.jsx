@@ -145,7 +145,7 @@ function QuestionStep({ s, set }) {
             <div className="options compact" role="radiogroup" aria-label="Framework">
               {Object.entries(FRAMEWORKS).map(([k, f]) => (
                 <button key={k} type="button" className={`option${fwKey === k ? ' on' : ''}`} aria-pressed={fwKey === k} onClick={() => set({ framework: k })}>
-                  <b>{f.name}{k === suggested && <span className="plan-suggest">Suggested</span>}</b>
+                  <b>{f.name}{k === suggested && <span className="flag">Suggested</span>}</b>
                   <small>{f.suits}</small>
                 </button>
               ))}
@@ -161,7 +161,7 @@ function QuestionStep({ s, set }) {
           </div>
           {draft && (
             <div className="draft-q">
-              <span className="eyebrow">Draft question ({fw.name})</span>
+              <span className="label">Draft question ({fw.name})</span>
               <p>{draft}</p>
               {draft !== s.rq && !draft.includes('[') && <button type="button" className="btn ghost small" onClick={() => set({ rq: draft })}>Use this as my question</button>}
             </div>
@@ -176,7 +176,7 @@ function QuestionStep({ s, set }) {
             <label className="field"><span>Who is it about?</span><input value={s.who || ''} onChange={(e) => set({ who: e.target.value })} placeholder="e.g. first-time investors on mobile" /></label>
             <label className="field"><span>What do you need to know that you do not know now?</span><input value={s.needToKnow || ''} onChange={(e) => set({ needToKnow: e.target.value })} placeholder="e.g. where and why they give up" /></label>
           </div>
-          {draft && <div className="draft-q"><span className="eyebrow">A starting question</span><p>{draft}</p></div>}
+          {draft && <div className="draft-q"><span className="label">A starting question</span><p>{draft}</p></div>}
           {framing.length > 0 && (
             <p className="muted plan-note">
               Two methods help here: {framing.map((m, i) => <span key={m.id}>{i > 0 && ' and '}<Link to={`/methods/${m.id}`}>{m.name}</Link></span>)}. Your plan starts with one of them.
@@ -329,7 +329,7 @@ function Roadmap({ s, set, go, reset }) {
               <div className="guide-grid">
                 {g.options.map((o) => (
                   <div key={o.head} className={`guide-opt${o.recommended ? ' rec' : ''}`}>
-                    <h3>{o.head}{o.recommended && <span className="plan-suggest">Suggested for you</span>}</h3>
+                    <h3>{o.head}{o.recommended && <span className="flag">Suggested</span>}</h3>
                     <p>{o.text}</p>
                     {(o.ids.length > 0 || o.calcs?.length > 0) && (
                       <p className="guide-links">
@@ -357,7 +357,7 @@ function PhaseItem({ it, onSwap, onReset }) {
       {it.label && <span className="phase-label">{it.label}</span>}
       <h4>
         <Link to={`/methods/${it.method.id}`}>{it.method.name}</Link> <Status value={it.method.status} />
-        {it.picked && <span className="plan-suggest">Your pick</span>}
+        {it.picked && <span className="flag">Your pick</span>}
       </h4>
       <p className="phase-reason">{it.reason}</p>
       {it.calcs.length > 0 && (

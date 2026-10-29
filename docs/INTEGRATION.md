@@ -1,7 +1,7 @@
 # Integrating the UX Methods Atlas
 
-This guide is for teams, such as UX Brighton, who want to run the atlas on their own site. Everything is in this
-repository: the code, the data (2121 methods, 591 books) and the calculators.
+This guide is for teams, such as UX Brighton, who have permission from the copyright holders to run the atlas on
+their own site (see [Licence and permission](#licence-and-permission)). Everything is in this repository: the code, the data (2121 methods, 591 books) and the calculators.
 
 ## 1. Get the code
 
@@ -76,8 +76,11 @@ Rebuild after any change (`npm run build:pages` or `npm run build`).
   editing them.
 - New methods from the community arrive as GitHub issues through the site's **Submit a method** page.
 
-## Licence
+## Licence and permission
 
-- **Code:** MIT licence (`LICENSE`). Use, change and redistribute it freely; keep the copyright notice.
-- **Method write-ups and data** in `server/data/`: CC BY 4.0 (`LICENSE-CONTENT.md`). Reuse and adapt them, with
-  credit: "UX Methods Atlas by Vivek Gopinath, CC BY 4.0", linking back to this repository.
+Copyright © 2026 Vivek Gopinath and Danny Hope. All rights reserved (see `LICENSE`).
+
+The code, the design and the method write-ups and data in `server/data/` are not under an open licence. Running
+the atlas on your own site, embedding it, changing it or reusing any of its content needs written permission from
+the copyright holders, Vivek Gopinath and Danny Hope. Ask them before you follow the steps above. The books,
+papers and methods the atlas cites remain the work of their own authors.

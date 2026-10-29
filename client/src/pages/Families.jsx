@@ -34,7 +34,7 @@ export default function Families() {
                 <b>{counts[f.name]?.total || 0}</b>
                 <span>{f.name}</span>
                 <small>{f.blurb}</small>
-                {counts[f.name]?.lost > 0 && <small style={{ color: 'var(--accent)', fontWeight: 700 }}>{counts[f.name].lost} lost or borrowed</small>}
+                {counts[f.name]?.lost > 0 && <small className="tile-note">{counts[f.name].lost} lost or borrowed</small>}
               </Link>
             ))}
           </div>

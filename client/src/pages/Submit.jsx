@@ -15,7 +15,7 @@ function toMarkdown(f) {
   const sec = (h, v) => (v.trim() ? `### ${h}\n\n${v.trim()}\n\n` : '');
   const steps = f.steps.split('\n').map((s) => s.trim()).filter(Boolean).map((s, i) => `${i + 1}. ${s.replace(/^\d+[.)]\s*/, '')}`).join('\n');
   return (
-    sec('Type', f.kind === 'community' ? 'New community-proposed framework' : 'Existing method missing from the atlas') +
+    sec('Type', f.kind === 'community' ? 'Community-proposed framework' : 'Established method missing from the atlas') +
     sec('Also known as', f.aka) +
     sec('Discipline', f.family) +
     sec('Summary', f.summary) +
@@ -57,14 +57,14 @@ export default function Submit() {
 
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 40 }}>
+      <section className="hero compact">
         <div className="wrap">
           <p className="eyebrow">Community</p>
           <h1 className="h1">Submit a method.</h1>
-          <p className="lede" style={{ marginBottom: 0 }}>
+          <p className="lede">
             Know a method the atlas is missing, or have you built a framework of your own? Describe it here. Each submission
-            becomes a public GitHub issue that is reviewed before it is added. New frameworks are listed as
-            community-proposed and marked <b>tested</b> or <b>not yet tested</b>.
+            becomes a public GitHub issue and is reviewed first; accepted submissions may be included in the atlas. Frameworks
+            are listed as community-proposed and marked tested or not yet tested.
           </p>
         </div>
       </section>
@@ -72,7 +72,7 @@ export default function Submit() {
         <form onSubmit={(e) => { e.preventDefault(); open(); }} noValidate>
           <fieldset className="field">
             <legend>What are you submitting?</legend>
-            <label className="radio"><input type="radio" name="kind" value="community" checked={f.kind === 'community'} onChange={set('kind')} /> A new framework I or someone in the community proposed</label>
+            <label className="radio"><input type="radio" name="kind" value="community" checked={f.kind === 'community'} onChange={set('kind')} /> A framework I or someone in the community proposed</label>
             <label className="radio"><input type="radio" name="kind" value="existing" checked={f.kind === 'existing'} onChange={set('kind')} /> An established method the atlas is missing</label>
           </fieldset>
 
@@ -162,7 +162,7 @@ export default function Submit() {
           <ol className="plain-list">
             <li>Your submission is posted as an issue on the <a href={REPO_URL} target="_blank" rel="noreferrer">project on GitHub</a>.</li>
             <li>A maintainer checks it is not already in the atlas and asks questions there if needed.</li>
-            <li>Accepted methods are added with credit. New frameworks start as not yet tested.</li>
+            <li>Accepted submissions may be included in the atlas, with credit. Frameworks start as not yet tested.</li>
             <li>A framework moves to tested once there is evidence of use beyond the person who proposed it.</li>
           </ol>
           <p style={{ margin: '14px 0 0' }}><Link to="/methods?status=community">See community-proposed frameworks</Link></p>

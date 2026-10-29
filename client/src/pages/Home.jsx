@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useApi, useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
-import { STATUS, STATUS_ORDER, slug } from '../vocab.js';
+import { DESIGN_KIND, STATUS, STATUS_ORDER, slug } from '../vocab.js';
 
 const clip = (t, n = 200) => (t.length > n ? `${t.slice(0, t.lastIndexOf(' ', n))}…` : t);
 
@@ -61,14 +61,14 @@ export default function Home() {
           </div>
           <div className="stats">
             <div className="stat"><b>{methods ? methods.length : '—'}</b><span>methods</span></div>
-            <div className="stat"><b>{lost ?? '—'}</b><span>lost, siloed or borrowed</span></div>
+            <div className="stat"><b>{lost ?? '—'}</b><span>lost or borrowed</span></div>
             <div className="stat"><b>{meta?.families?.length ?? '—'}</b><span>disciplines</span></div>
             <div className="stat"><b>{meta?.counts?.books ?? '—'}</b><span>source books</span></div>
           </div>
           </div>
           <aside className="unearthed" aria-label="Unearthed methods" aria-live="polite">
             <div className="unearthed-head">
-              <p className="eyebrow" style={{ margin: 0 }}>Unearthed for you</p>
+              <p className="eyebrow">Unearthed for you</p>
               <button type="button" className="btn ghost small" onClick={() => setShownIds(shuffleIds())}>Show another</button>
             </div>
             {spotlight ? (
@@ -110,7 +110,7 @@ export default function Home() {
               ['03', 'Get a direction', 'A reframed problem, sharp research questions, a sequenced plan, and the lost or borrowed methods that add the rigour.'],
             ].map(([n, t, d]) => (
               <div key={n} className="card">
-                <span className="eyebrow" style={{ margin: 0 }}>{n}</span>
+                <span className="eyebrow">{n}</span>
                 <h3>{t}</h3>
                 <p>{d}</p>
               </div>
@@ -131,10 +131,10 @@ export default function Home() {
           </div>
           {meta?.counts?.design > 0 && (
             <Link to="/design" className="card design-card">
-              <span className="fam">Listed separately</span>
+              <span className="fam">{DESIGN_KIND} · listed separately</span>
               <h3>{meta.counts.design} design & product methods</h3>
               <p>Prototyping, ideation, critique, canvases, story mapping and workshops: the making and product practices that sit beside research.</p>
-              <div className="meta"><span className="badge kind-design">Browse design & product</span></div>
+              <span className="card-more">Browse design & product methods</span>
             </Link>
           )}
         </div>
@@ -184,7 +184,7 @@ export default function Home() {
           </div>
           <div className="ticker">
             {(meta?.families || []).map((f) => (
-              <Link key={f.name} to={`/methods?family=${slug(f.name)}`} className="chip" style={{ background: 'transparent', color: 'inherit', borderColor: 'color-mix(in srgb, currentColor 30%, transparent)' }}>
+              <Link key={f.name} to={`/methods?family=${slug(f.name)}`} className="chip">
                 {f.name} <span className="n">{counts.family[f.name] || 0}</span>
               </Link>
             ))}

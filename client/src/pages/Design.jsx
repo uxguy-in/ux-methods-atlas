@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useDesignMethods, useRemembered } from '../hooks.js';
 import { Status } from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
+import { DESIGN_KIND } from '../vocab.js';
 
 const PAGE = 60;
 
@@ -36,11 +37,11 @@ export default function Design() {
 
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 40 }}>
+      <section className="hero compact">
         <div className="wrap">
-          <p className="eyebrow">Design & product</p>
+          <p className="eyebrow">{DESIGN_KIND}</p>
           <h1 className="h1">Design & product methods.</h1>
-          <p className="lede" style={{ marginBottom: 0 }}>
+          <p className="lede">
             Prototyping, ideation, critique, canvases, storyboards, story mapping and workshops: {methods.length} making and
             product practices that sit beside research. They are listed here, separately from the{' '}
             <Link to="/methods">research atlas</Link>, and the method finder does not recommend them.
@@ -71,7 +72,7 @@ export default function Design() {
           <div className="grid">
             {list.slice(0, limit).map((m) => (
               <Link key={m.id} to={`/methods/${m.id}`} className="card">
-                <span className="fam">Design & product practice</span>
+                <span className="fam">{DESIGN_KIND}</span>
                 <h3>{m.name}</h3>
                 <p>{m.summary}</p>
                 <div className="meta">

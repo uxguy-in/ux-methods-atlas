@@ -1,7 +1,7 @@
 {
   "name": "ux-methods-atlas",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "private": true,
   "description": "A deep atlas of UX research methods, lost methods and cross-domain borrowings, with a guided method finder and an AI research brief.",
   "type": "module",

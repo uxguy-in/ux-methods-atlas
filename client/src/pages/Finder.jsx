@@ -304,7 +304,7 @@ export default function Finder() {
       <p className="lede" style={{ margin: '14px 0 22px' }}>
         Describe the product, the problem and the decision you need to make. Plain words are fine.
       </p>
-      <label htmlFor="brief" className="eyebrow" style={{ display: 'block', color: 'var(--ink-3)' }}>Problem brief</label>
+      <label htmlFor="brief" className="label brief-label">Problem brief</label>
       <textarea
         id="brief"
         className="brief"
@@ -423,7 +423,7 @@ function Shelves({ recs, level, onShuffle }) {
       {empty && <p className="notice">Nothing matched all of your answers. Try skipping a question or changing the time or access you have.</p>}
       {ordered.map((sh) => recs[sh.key]?.length > 0 && (
         <section key={sh.key} className="shelf">
-          <h2>{sh.title}{sh.level === level && <span className="your-level">Your level</span>}</h2>
+          <h2>{sh.title}{sh.level === level && <span className="flag">Your level</span>}</h2>
           <p>{sh.blurb}</p>
           <div className="grid">{recs[sh.key].map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
         </section>
@@ -444,7 +444,7 @@ function Plan({ plan }) {
     <article className="ai-plan" aria-live="polite">
       <p className="eyebrow">Research direction</p>
       <h2>{plan.decision}</h2>
-      <p className="lede" style={{ fontSize: 19, maxWidth: '70ch' }}>{plan.reframedProblem}</p>
+      <p className="lede plan-lede">{plan.reframedProblem}</p>
 
       <h3>Research questions</h3>
       <ul>{plan.researchQuestions.map((x) => <li key={x}>{x}</li>)}</ul>
@@ -462,7 +462,7 @@ function Plan({ plan }) {
           <div key={p.methodId + i} className="plan-step">
             <span className="num">{i + 1}</span>
             <div>
-              <span className="mono muted" style={{ fontSize: 13 }}>{p.phase}</span>
+              <span className="label">{p.phase}</span>
               <h4><Link to={`/methods/${p.methodId}`}>{p.method?.name || p.methodId}</Link> <Status value={p.method?.status} /></h4>
               <p><span className="lbl">Why</span>{p.why}</p>
               <p><span className="lbl">How</span>{p.how}</p>

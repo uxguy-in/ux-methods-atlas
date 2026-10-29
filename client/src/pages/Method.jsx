@@ -2,8 +2,8 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { cameFrom } from '../nav-trail.js';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
-import { Status } from '../components/MethodCard.jsx';
-import { DATA, EFFORT, EXPERTISE, GOALS, PARTICIPANTS, STAGES, STATUS, SUBMIT_URL, VALIDATION, slug } from '../vocab.js';
+import { Status, Validation } from '../components/MethodCard.jsx';
+import { DATA, DESIGN_KIND, EFFORT, EXPERTISE, GOALS, PARTICIPANTS, STAGES, STATUS, SUBMIT_URL, VALIDATION, slug } from '../vocab.js';
 
 const paras = (t) => (t || '').split(/\n{2,}/).filter(Boolean);
 
@@ -35,15 +35,15 @@ export default function Method() {
               <><Link to="/methods">Atlas</Link><span>/</span><Link to={`/methods?family=${slug(m.family)}`}>{m.family}</Link></>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
-            {design && <Link to="/design" className="badge kind-design">Design & product practice</Link>}
+          <div className="method-markers">
+            {design && <Link to="/design" className="badge kind">{DESIGN_KIND}</Link>}
             <Status value={m.status} />
-            {m.validation && <span className={`badge ${m.validation === 'tested' ? 'done' : 'untested'}`} title={VALIDATION[m.validation].short}>{VALIDATION[m.validation].label}</span>}
-            {m.proposedBy && <span className="muted" style={{ fontSize: 14 }}>Proposed by {m.proposedBy}</span>}
-            {m.donor && <span className="muted" style={{ fontSize: 14 }}>Borrowed from {m.donor}</span>}
+            <Validation value={m.validation} />
+            {m.proposedBy && <span className="hero-note">Proposed by {m.proposedBy}</span>}
+            {m.donor && <span className="hero-note">Borrowed from {m.donor}</span>}
           </div>
           <h1 className="h1" style={{ maxWidth: '20ch' }}>{m.name}</h1>
-          {m.aka?.length > 0 && <p className="muted" style={{ margin: '12px 0 0' }}>Also known as {m.aka.join(', ')}</p>}
+          {m.aka?.length > 0 && <p className="muted aka">Also known as {m.aka.join(', ')}</p>}
           <p className="lede">{m.summary}</p>
           <dl className="kv">
             {m.origin && <div><dt>Origin</dt><dd>{m.origin}</dd></div>}
@@ -130,7 +130,7 @@ export default function Method() {
           )}
           {m.status === 'community' && (
             <div className="aside-box">
-              <h3>{m.validation === 'tested' ? 'Tested' : 'Not yet tested'}</h3>
+              <h3>{VALIDATION[m.validation === 'tested' ? 'tested' : 'untested'].label}</h3>
               <p style={{ margin: 0 }}>
                 {m.validation === 'tested'
                   ? (m.validationNote || 'There is published evidence of this framework being used beyond the person who proposed it.')
@@ -162,7 +162,7 @@ export default function Method() {
               <h3>Related methods</h3>
               <div className="related-list">
                 {m.related.map((r) => (
-                  <Link key={r.id} to={`/methods/${r.id}`}><span>{r.name}</span>{r.kind === 'design' ? <span className="badge kind-design">Design</span> : <Status value={r.status} />}</Link>
+                  <Link key={r.id} to={`/methods/${r.id}`}><span>{r.name}</span>{r.kind === 'design' ? <span className="badge kind">{DESIGN_KIND}</span> : <Status value={r.status} />}</Link>
                 ))}
               </div>
             </div>

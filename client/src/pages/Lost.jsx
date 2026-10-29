@@ -23,7 +23,7 @@ export default function Lost() {
       <section className="hero">
         <div className="wrap">
           <p className="eyebrow">Lost methods</p>
-          <h1 className="display" style={{ fontSize: 'clamp(40px, 7vw, 88px)' }}>UX research has a <em>memory</em> problem.</h1>
+          <h1 className="h1">UX research has a <em>memory</em> problem.</h1>
           <p className="lede">
             Each generation of practitioners rediscovers, renames or quietly drops the methods that gave the field its rigour.
             Here is how methods get lost, and every one we have found.
@@ -62,7 +62,7 @@ export default function Lost() {
           <div className="wrap">
             <div className="section-head">
               <div>
-                <p className="eyebrow" style={{ color: `var(--s-${s})` }}>{byStatus[s].length} methods</p>
+                <p className="eyebrow">{byStatus[s].length} methods</p>
                 <h2 className="h2">{STATUS[s].label}</h2>
                 <p className="muted" style={{ maxWidth: '60ch', marginTop: 10 }}>{defs[s]?.definition || STATUS[s].short}</p>
               </div>
@@ -76,7 +76,7 @@ export default function Lost() {
       {meta.epidemiologyGlossary?.length > 0 && (
         <section className="section soft">
           <div className="wrap">
-            <div className="section-head"><div><p className="eyebrow">A new discipline</p><h2 className="h2">The vocabulary of UX epidemiology.</h2></div></div>
+            <div className="section-head"><div><p className="eyebrow">Borrowed from epidemiology</p><h2 className="h2">The vocabulary of UX epidemiology.</h2></div></div>
             <div className="grid">
               {meta.epidemiologyGlossary.map((g) => <div key={g.term} className="card"><h3>{g.term}</h3><p>{g.definition}</p></div>)}
             </div>
