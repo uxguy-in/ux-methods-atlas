@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import * as S from '../calc/stats.js';
 import * as CL from '../calc/cluster.js';
@@ -1996,9 +1996,9 @@ function Readability() {
 // so clusters never depend on colour alone. Noise points are grey.
 const CL_SHAPES = ['circle', 'square', 'triangle', 'diamond', 'down', 'plus', 'hex', 'star'];
 const clColor = (c) => (c < 0 ? 'var(--ink-3)' : `var(--c${(c % 8) + 1})`);
-function Marker({ x, y, c, r = 4.5, strong, title }) {
+function Marker({ x, y, c, r = 4.5, strong, title, alpha }) {
   const shape = c < 0 ? 'circle' : CL_SHAPES[c % 8];
-  const st = { fill: clColor(c), stroke: strong ? 'var(--ink)' : 'var(--bg)', strokeWidth: strong ? 2 : 0.75, opacity: c < 0 ? 0.6 : 0.9 };
+  const st = { fill: clColor(c), stroke: strong ? 'var(--ink)' : 'var(--bg)', strokeWidth: strong ? 2 : 0.75, opacity: alpha ?? (c < 0 ? 0.6 : 0.9) };
   const R = strong ? r * 1.9 : c < 0 ? r * 0.75 : r;
   const poly = (pts) => <polygon points={pts.map(([a, b]) => `${x + a * R},${y + b * R}`).join(' ')} style={st}>{title && <title>{title}</title>}</polygon>;
   if (shape === 'circle') return <circle cx={x} cy={y} r={R} style={st}>{title && <title>{title}</title>}</circle>;
@@ -2013,11 +2013,14 @@ function Marker({ x, y, c, r = 4.5, strong, title }) {
 function Swatch({ c }) { return <svg width="16" height="16" aria-hidden="true" style={{ verticalAlign: '-3px' }}><Marker x={8} y={8} c={c} r={5} /></svg>; }
 
 // Small line chart on the expectation-plot frame, with an optional highlighted x and a horizontal reference line.
-function MiniLine({ xs, ys, label, xLabel, yLabel, mark, hline, hlineLabel, fmtY = (v) => num(v, 2), fmtX = (v) => String(v), dots = true }) {
-  const W = 360, H = 230, L = 50, R = 12, T = 14, B = 38;
+// ys2 (optional) is a second series drawn dashed, named in a small legend with name1 and name2.
+function MiniLine({ xs, ys, ys2, name1, name2, label, xLabel, yLabel, mark, hline, hlineLabel, fmtY = (v) => num(v, 2), fmtX = (v) => String(v), dots = true }) {
+  const W = 360, H = 230, L = 50, R = 12, T = ys2 ? 26 : 14, B = 38;
   const ok = ys.map((y, i) => [xs[i], y]).filter(([, y]) => Number.isFinite(y));
+  const ok2 = ys2 ? ys2.map((y, i) => [xs[i], y]).filter(([, y]) => Number.isFinite(y)) : [];
   if (ok.length < 2) return null;
-  let y0 = Math.min(...ok.map((p) => p[1]), Number.isFinite(hline) ? hline : Infinity), y1 = Math.max(...ok.map((p) => p[1]), Number.isFinite(hline) ? hline : -Infinity);
+  const all = [...ok, ...ok2];
+  let y0 = Math.min(...all.map((p) => p[1]), Number.isFinite(hline) ? hline : Infinity), y1 = Math.max(...all.map((p) => p[1]), Number.isFinite(hline) ? hline : -Infinity);
   if (y1 - y0 < 1e-9) { y0 -= 0.5; y1 += 0.5; }
   const pad = (y1 - y0) * 0.08; y0 -= pad; y1 += pad;
   const x0 = Math.min(...xs), x1 = Math.max(...xs);
@@ -2030,6 +2033,9 @@ function MiniLine({ xs, ys, label, xLabel, yLabel, mark, hline, hlineLabel, fmtY
       {yt.map((t, i) => <g key={i}><line x1={L} x2={W - R} y1={sy(t)} y2={sy(t)} style={{ stroke: 'var(--line)' }} /><text x={L - 6} y={sy(t) + 4} className="ax" textAnchor="end">{fmtY(t)}</text></g>)}
       {xt.map((t) => <text key={t} x={sx(t)} y={H - B + 15} className="ax" textAnchor="middle">{fmtX(t)}</text>)}
       {Number.isFinite(hline) && <g><line x1={L} x2={W - R} y1={sy(hline)} y2={sy(hline)} style={{ stroke: 'var(--accent)', strokeWidth: 1.5, strokeDasharray: '5 4' }} /><text x={W - R - 4} y={sy(hline) - 5} className="dl" textAnchor="end">{hlineLabel}</text></g>}
+      {ok2.length > 1 && <polyline points={ok2.map(([x, y]) => `${sx(x)},${sy(y)}`).join(' ')} style={{ fill: 'none', stroke: 'var(--ink-3)', strokeWidth: 1.5, strokeDasharray: '5 4' }} />}
+      {ok2.length > 1 && ok2.map(([x, y]) => <rect key={`b${x}`} x={sx(x) - 2.5} y={sy(y) - 2.5} width={5} height={5} style={{ fill: 'var(--ink-3)' }}><title>{`k = ${x}: ${name2} ${fmtY(y)}`}</title></rect>)}
+      {ys2 && <g><line x1={L} x2={L + 18} y1={9} y2={9} style={{ stroke: 'var(--ink-2)', strokeWidth: 2 }} /><text x={L + 22} y={13} className="ax">{name1}</text><line x1={L + 100} x2={L + 118} y1={9} y2={9} style={{ stroke: 'var(--ink-3)', strokeWidth: 1.5, strokeDasharray: '5 4' }} /><text x={L + 122} y={13} className="ax">{name2}</text></g>}
       <polyline points={ok.map(([x, y]) => `${sx(x)},${sy(y)}`).join(' ')} style={{ fill: 'none', stroke: 'var(--ink-2)', strokeWidth: 2 }} />
       {dots && ok.map(([x, y]) => <circle key={x} cx={sx(x)} cy={sy(y)} r={x === mark ? 6 : 3.5} className={x === mark ? 'dot' : ''} style={x === mark ? undefined : { fill: 'var(--ink-2)' }}><title>{`k = ${x}: ${fmtY(y)}`}</title></circle>)}
       <text x={(L + W - R) / 2} y={H - 6} className="ax" textAnchor="middle">{xLabel}</text>
@@ -2039,16 +2045,21 @@ function MiniLine({ xs, ys, label, xLabel, yLabel, mark, hline, hlineLabel, fmtY
 }
 
 // 2D map of respondents: PCA scores or classical MDS coordinates, equal scale on both axes.
+// Mixture models: each point's opacity shows how certain its class is (fainter = less certain), and for the Gaussian
+// mixture each class's 95% ellipse is drawn, projected onto the two principal components.
 function ClusterMap({ r, names }) {
   const W = 560, H = 440, P = 34;
-  const pts = r.embed.points.map((a, t) => ({ a, x: r.embed.coords[t][0], y: r.embed.coords[t][1], c: r.sampleLabels[a] }));
-  const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const mix = r.mix, K = r.k;
+  const pts = r.embed.points.map((a, t) => ({ a, x: r.embed.coords[t][0], y: r.embed.coords[t][1], c: r.sampleLabels[a], cert: mix ? mix.sampleCert[a] : 1 }));
+  const ell = mix?.ellipses || null;
+  const xs = [...pts.map((p) => p.x), ...(ell ? ell.flatMap((e) => e.pts.map((q) => q[0])) : [])], ys = [...pts.map((p) => p.y), ...(ell ? ell.flatMap((e) => e.pts.map((q) => q[1])) : [])];
   const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
   const span = Math.max(Math.max(...xs) - Math.min(...xs), (Math.max(...ys) - Math.min(...ys)) * ((W - 2 * P) / (H - 2 * P)), 1e-9);
   const k = (W - 2 * P) / span;
   const sx = (v) => W / 2 + (v - cx) * k, sy = (v) => H / 2 - (v - cy) * k;
   const pos = new Map(pts.map((p) => [p.a, p]));
-  const centre = (c) => { const m = pts.filter((p) => p.c === c); return r.centroidMode ? { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) } : pos.get(r.reps[c]) || { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) }; };
+  const alpha = (cert) => (mix && K > 1 ? 0.15 + 0.8 * Math.max(0, Math.min(1, (cert - 1 / K) / (1 - 1 / K))) : undefined);
+  const centre = (c) => { if (ell) return { x: ell[c].centre[0], y: ell[c].centre[1] }; const m = pts.filter((p) => p.c === c); return r.centroidMode ? { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) } : pos.get(r.reps[c]) || { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) }; };
   const ax = r.embed.kind === 'pca'
     ? [`Component 1 (${pct(r.embed.ratio[0], 0)} of variance) →`, `Component 2 (${pct(r.embed.ratio[1], 0)}) →`]
     : ['MDS dimension 1 (no units) →', 'MDS dimension 2 (no units) →'];
@@ -2056,8 +2067,9 @@ function ClusterMap({ r, names }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={`Respondents on a ${r.embed.kind === 'pca' ? 'principal component' : 'multidimensional scaling'} map, marked by cluster`}>
       <rect x={P} y={P / 2} width={W - 2 * P} height={H - P * 1.5} className="q ok" />
       {pts.filter((p) => p.c < 0).map((p) => <Marker key={p.a} x={sx(p.x)} y={sy(p.y)} c={-1} title={`Row ${r.rowOf(p.a)}: noise`} />)}
-      {pts.filter((p) => p.c >= 0).map((p) => <Marker key={p.a} x={sx(p.x)} y={sy(p.y)} c={p.c} title={`Row ${r.rowOf(p.a)}: ${names[p.c]}`} />)}
-      {r.clusters.map((c) => { const m = centre(c); return <g key={c}><Marker x={sx(m.x)} y={sy(m.y)} c={c} r={5} strong title={`${r.centroidMode ? 'Centre' : 'Most typical member'} of ${names[c]}`} /><text x={sx(m.x) + 12} y={sy(m.y) - 9} className="dl">{c + 1}</text></g>; })}
+      {ell && ell.map((e) => <polygon key={`e${e.cluster}`} points={e.pts.map(([x, y]) => `${sx(x)},${sy(y)}`).join(' ')} style={{ fill: 'none', stroke: clColor(e.cluster), strokeWidth: 1.75, strokeDasharray: '6 3' }}><title>{`95% ellipse of ${names[e.cluster]}`}</title></polygon>)}
+      {pts.filter((p) => p.c >= 0).map((p) => <Marker key={p.a} x={sx(p.x)} y={sy(p.y)} c={p.c} alpha={alpha(p.cert)} title={`Row ${r.rowOf(p.a)}: ${names[p.c]}${mix ? ` (probability ${pct(p.cert, 0)})` : ''}`} />)}
+      {r.clusters.map((c) => { const m = centre(c); return <g key={c}><Marker x={sx(m.x)} y={sy(m.y)} c={c} r={5} strong title={`${ell ? 'Mean' : r.centroidMode ? 'Centre' : 'Most typical member'} of ${names[c]}`} /><text x={sx(m.x) + 12} y={sy(m.y) - 9} className="dl">{c + 1}</text></g>; })}
       <text x={W / 2} y={H - 6} className="ax" textAnchor="middle">{ax[0]}</text>
       <text x={12} y={H / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${H / 2})`}>{ax[1]}</text>
     </svg>
@@ -2128,7 +2140,156 @@ function LevelBar({ dist, levels }) {
   return <span className="clu-levels" aria-label={levels.map((l, i) => `${l}: ${pct(dist[i], 0)}`).join(', ')}>{dist.map((d, i) => d > 0 && <i key={i} title={`${levels[i]}: ${pct(d, 0)}`} style={{ flex: d, opacity: 0.25 + (0.75 * i) / Math.max(1, levels.length - 1) }} />)}</span>;
 }
 
-const CL_ALGOS = [['pam', 'k-medoids (PAM)'], ['kproto', 'k-prototypes'], ['kmeans', 'k-means'], ['dbscan', 'DBSCAN'], ['hier', 'Hierarchical']];
+// Item-response probabilities per class as small multiples: one panel per item, one row per answer option, a marker
+// per class at its probability of giving that answer, and a grey tick at the overall share. For the Gaussian mixture
+// and the mixed model, a panel of class means in standard deviations from the overall mean.
+function MixProfilePlot({ mix, names, k }) {
+  const W = 280, L = 104, R = 22, T = 8, rowH = 22, B = 26;
+  const cls = Array.from({ length: k }, (_, c) => c);
+  const short = (s, n = 13) => (String(s).length > n ? `${String(s).slice(0, n - 1)}…` : String(s));
+  const panel = (title, rows, x0, x1, ticks, fmt, refLabel, key) => {
+    const H = T + rows.length * rowH + B;
+    const sx = (v) => L + ((Math.max(x0, Math.min(x1, v)) - x0) / (x1 - x0)) * (W - L - R);
+    return (
+      <figure className="clu-panel" key={key}>
+        <figcaption>{title}</figcaption>
+        <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={`${title}: ${rows.map((rw) => `${rw.label}: ${cls.map((c) => `${names[c]} ${fmt(rw.vals[c])}`).join(', ')}; ${refLabel} ${fmt(rw.ref)}`).join('. ')}`}>
+          {ticks.map((t) => <g key={t}><line x1={sx(t)} x2={sx(t)} y1={T} y2={H - B} style={{ stroke: 'var(--line)' }} /><text x={sx(t)} y={H - B + 14} className="ax" textAnchor="middle">{fmt(t)}</text></g>)}
+          {rows.map((rw, i) => {
+            const y = T + i * rowH + rowH / 2;
+            return <g key={i}>
+              <text x={L - 6} y={y + 4} className="ax" textAnchor="end"><title>{rw.label}</title>{short(rw.label)}</text>
+              <line x1={L} x2={W - R} y1={y} y2={y} style={{ stroke: 'var(--line)', strokeDasharray: '2 3' }} />
+              <line x1={sx(rw.ref)} x2={sx(rw.ref)} y1={y - 8} y2={y + 8} style={{ stroke: 'var(--ink-3)', strokeWidth: 2.5 }}><title>{`${refLabel}: ${fmt(rw.ref)}`}</title></line>
+              {cls.map((c) => <Marker key={c} x={sx(rw.vals[c])} y={y} c={c} r={4} title={`${names[c]}: ${fmt(rw.vals[c])}`} />)}
+            </g>;
+          })}
+        </svg>
+      </figure>
+    );
+  };
+  const out = [];
+  if (mix.p) {
+    const sd = (d) => { const xs = mix.muZ.map((m) => m[d]); return xs; };
+    const rows = mix.numNames.map((nm, d) => ({ label: nm, vals: sd(d), ref: 0 }));
+    out.push(panel('Class means (SD from the overall mean)', rows, -2, 2, [-2, -1, 0, 1, 2], (v) => (v > 0 ? `+${num(v, 1)}` : num(v, 1)), 'Overall mean', 'num'));
+  }
+  mix.catNames.forEach((nm, j) => {
+    const rows = mix.catLevels[j].map((lv, l) => ({ label: lv, vals: cls.map((c) => mix.theta[c][j][l]), ref: mix.catShare[j][l] }));
+    out.push(panel(nm, rows, 0, 1, [0, 0.5, 1], (v) => pct(v, 0), 'Overall', `c${j}`));
+  });
+  return <div className="clu-multiples">{out}</div>;
+}
+
+// Average posterior probabilities: row = respondents whose most likely class is a, columns = their mean probability
+// of each class. The diagonal should be above 0.8.
+function AvePPTable({ mix, names, k }) {
+  return (
+    <div className="clu-scroll">
+      <table className="clu-table clu-num">
+        <thead><tr><th>Most likely class</th><th>Respondents</th>{Array.from({ length: k }, (_, c) => <th key={c}>p({c + 1})</th>)}</tr></thead>
+        <tbody>
+          {mix.avepp.map((row, a) => (
+            <tr key={a}>
+              <td><Swatch c={a} /> {a + 1}. {names[a]}</td>
+              <td>{mix.counts[a]}</td>
+              {row.map((v, c) => <td key={c} className={c === a ? 'diag' : ''}>{c === a ? <b>{num(v, 2)}</b> : num(v, 2)}{c === a && v < 0.8 && <> <span className="qtag opp">below 0.8</span></>}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Fit statistics for every k tried.
+function MixFitTable({ mix, k, bestK, n }) {
+  return (
+    <div className="clu-scroll">
+      <table className="clu-table clu-num">
+        <thead><tr><th>k</th><th>Log-likelihood</th><th>Parameters</th><th>BIC</th><th>AIC</th><th>Entropy R²</th><th>Smallest class</th><th>Best LL reached</th><th>Notes</th></tr></thead>
+        <tbody>
+          {mix.sweep.map((s) => (
+            <tr key={s.k} className={s.k === k ? 'on' : ''}>
+              <td><b>{s.k}</b>{s.k === bestK ? ' ★' : ''}</td>
+              <td>{num(s.ll, 1)}</td>
+              <td>{s.nParams}</td>
+              <td>{s.k === bestK ? <b>{num(s.bic, 1)}</b> : num(s.bic, 1)}</td>
+              <td>{num(s.aic, 1)}</td>
+              <td>{s.k > 1 ? num(s.entropyR2, 3) : '—'}</td>
+              <td>{pct(s.minW, 1)}</td>
+              <td>{s.k === 1 ? '—' : `${s.hits} of ${s.finalRuns}`}</td>
+              <td className="clu-tags">
+                {s.minW < 0.05 && <span className="qtag opp">class under 5%</span>}
+                {!s.converged && <span className="qtag fix">did not converge</span>}
+                {s.nParams * 10 > n && <span className="qtag opp" title="Fewer than 10 respondents per estimated parameter">n &lt; 10 × parameters</span>}
+                {s.k > 1 && s.hits < 2 && <span className="qtag opp" title="Only one run reached the best log-likelihood">local maxima</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Each respondent's posterior probability of each class, for the first rows.
+function SoftPreview({ r, names, rows = 8 }) {
+  const K = r.k, R = r.mix.R;
+  return (
+    <div className="clu-scroll">
+      <table className="clu-table clu-num">
+        <thead><tr><th>Row</th>{Array.from({ length: K }, (_, c) => <th key={c}>p({c + 1})</th>)}<th>Certainty</th><th>Most likely</th></tr></thead>
+        <tbody>
+          {Array.from({ length: Math.min(rows, r.N) }, (_, i) => (
+            <tr key={i}>
+              <td>{r.prepRow(i)}</td>
+              {Array.from({ length: K }, (_, c) => <td key={c}>{num(R[i * K + c], 3)}</td>)}
+              <td>{pct(r.mix.cert[i], 0)}</td>
+              <td><Swatch c={r.labels[i]} /> {names[r.labels[i]]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Runs the mixture sweep in Web Workers: each k goes to one of up to four workers, then one worker assembles the
+// result. Falls back to the main thread if workers are unavailable. Returns { promise, cancel }.
+function runMixtureAsync(prep, opts, onProgress) {
+  const kMax = CL.mixtureKMax(prep);
+  let workers = [], cancelled = false;
+  const stop = () => { workers.forEach((w) => w.terminate()); workers = []; };
+  const promise = new Promise((resolve, reject) => {
+    const mainThread = () => setTimeout(() => { if (cancelled) return; try { resolve(CL.runMixture(prep, opts, (k) => onProgress(k, kMax))); } catch (e) { reject(e); } }, 30);
+    try {
+      if (typeof Worker === 'undefined') throw new Error('no workers');
+      const size = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1, kMax));
+      for (let t = 0; t < size; t++) workers.push(new Worker(new URL('../calc/mixture.worker.js', import.meta.url), { type: 'module' }));
+    } catch { stop(); mainThread(); return; }
+    const queue = Array.from({ length: kMax }, (_, i) => kMax - i); // the slowest (largest k) first
+    const fits = new Array(kMax); let done = 0, failed = false;
+    const fail = (e) => { if (failed) return; failed = true; stop(); reject(e instanceof Error ? e : new Error(String(e))); };
+    const next = (w) => { const k = queue.shift(); if (k) w.postMessage({ id: k, type: 'fit', prep, opts, k }); };
+    workers.forEach((w) => {
+      w.onerror = (e) => { e.preventDefault?.(); if (!done && !failed) { failed = true; stop(); mainThread(); } else fail(e.message || 'Worker error'); };
+      w.onmessage = ({ data }) => {
+        if (cancelled || failed) return;
+        if (data.error) { fail(data.error); return; }
+        if (data.result) { stop(); resolve(data.result); return; }
+        fits[data.k - 1] = data.fit; done++; onProgress(done, kMax);
+        if (done === kMax) w.postMessage({ id: 0, type: 'finish', prep, opts, fits });
+        else next(w);
+      };
+      next(w);
+    });
+  });
+  return { promise, cancel: () => { cancelled = true; stop(); } };
+}
+
+const MIX_NAMES = { gmm: 'Gaussian mixture', lca: 'Latent class analysis', mixed: 'Mixed latent profile/class model' };
+const CL_ALGOS = [['pam', 'k-medoids (PAM)'], ['kproto', 'k-prototypes'], ['kmeans', 'k-means'], ['dbscan', 'DBSCAN'], ['hier', 'Hierarchical'], ['gmm', 'Gaussian mixture'], ['lca', 'Latent class (LCA)'], ['mixed', 'Mixed profile/class']];
 const CL_TYPES = [['continuous', 'Continuous'], ['ordinal', 'Ordinal'], ['nominal', 'Nominal'], ['ignore', 'Ignore (ID or free text)']];
 const textHash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return `${s.length}:${h}`; };
 const download = (name, text, type) => {
@@ -2154,18 +2315,47 @@ function ClusterPersonas() {
   const [eps, setEps] = useState(''); const [minPts, setMinPts] = useState('5'); const [seed, setSeed] = useState('1'); const [gammaScale, setGammaScale] = useState('1');
   const [res, setRes] = useState(null); const [busy, setBusy] = useState(false); const [err, setErr] = useState('');
   const [stab, setStab] = useState(null); const [names, setNames] = useState({});
+  const [covType, setCovType] = useState('diag'); const [progress, setProgress] = useState(null); const job = useRef(null);
+  const isMix = CL.isMixture(algo);
+  // The mixture models can leave missing answers out of the likelihood ('skip'); the other methods drop or fill in.
+  const missEff = isMix ? missing : missing === 'skip' ? 'impute' : missing;
+  const pickAlgo = (a) => {
+    if (CL.isMixture(a) && missing === 'impute') setMissing('skip');
+    if (!CL.isMixture(a) && missing === 'skip') setMissing('impute');
+    setAlgo(a);
+  };
 
   const spec = cols.filter((c) => c.type !== 'ignore').map((c) => ({ name: c.name, index: c.index, type: c.type, levels: c.levels }));
   const specKey = JSON.stringify(spec.map((s) => [s.index, s.type, s.type === 'ordinal' ? s.levels : 0]));
-  const prep = useMemo(() => (spec.length && table.rows.length ? CL.prepare(table, spec, missing) : null), [table, specKey, missing]);
+  const prep = useMemo(() => (spec.length && table.rows.length ? CL.prepare(table, spec, missEff) : null), [table, specKey, missEff]);
   const hasNom = spec.some((s) => s.type === 'nominal'), hasNum = spec.some((s) => s.type !== 'nominal');
-  const opts = { algo, distance, scaling, oneHot: oneHot === 'onehot', linkage, k: kMode === 'auto' ? 'auto' : int(kNum), eps: eps === '' ? NaN : n_(eps), minPts: Math.max(2, int(minPts) || 5), seed: Math.max(1, int(seed) || 1), gammaScale: n_(gammaScale) >= 0 ? n_(gammaScale) : 1 };
-  const runKey = `${textHash(text)}|${specKey}|${missing}|${JSON.stringify(opts)}`;
+  const hasCont = spec.some((s) => s.type === 'continuous'), hasOrd = spec.some((s) => s.type === 'ordinal');
+  const opts = { algo, distance, scaling, oneHot: oneHot === 'onehot', linkage, k: kMode === 'auto' ? 'auto' : int(kNum), eps: eps === '' ? NaN : n_(eps), minPts: Math.max(2, int(minPts) || 5), seed: Math.max(1, int(seed) || 1), gammaScale: n_(gammaScale) >= 0 ? n_(gammaScale) : 1, ...(algo === 'gmm' ? { cov: covType } : {}) };
+  const runKey = `${textHash(text)}|${specKey}|${missEff}|${JSON.stringify(opts)}`;
   const tooFew = !prep || prep.n < 4;
+  useEffect(() => () => job.current?.cancel(), []);
 
   const run = () => {
     if (tooFew) return;
     setBusy(true); setErr(''); setStab(null);
+    job.current?.cancel();
+    if (isMix) {
+      const t0 = Date.now();
+      setProgress({ done: 0, total: CL.mixtureKMax(prep) });
+      const j = runMixtureAsync(prep, opts, (done, total) => setProgress({ done, total }));
+      job.current = j;
+      j.promise.then((r) => {
+        if (job.current !== j) return;
+        r.ms = Date.now() - t0;
+        r.rowOf = (a) => prep.used[r.idx[a]] + 1;
+        r.prepRow = (i) => prep.used[i] + 1;
+        r.centroidMode = true;
+        setRes({ r, profs: CL.mixtureProfiles(prep, r.labels, r.mix), prep, table, key: runKey, opts });
+        setNames({});
+      }).catch((e) => { if (job.current === j) { setErr(e.message || String(e)); setRes(null); } })
+        .finally(() => { if (job.current === j) { job.current = null; setBusy(false); setProgress(null); } });
+      return;
+    }
     setTimeout(() => {
       try {
         const r = CL.run(prep, opts);
@@ -2189,7 +2379,12 @@ function ClusterPersonas() {
   const stale = res && res.key !== runKey;
   const algoName = (a) => CL_ALGOS.find(([v]) => v === a)[1];
   const moveLevel = (c, i, d) => { const lv = [...c.levels]; const j = i + d; if (j < 0 || j >= lv.length) return; [lv[i], lv[j]] = [lv[j], lv[i]]; setCol(c.name, { levels: lv }); };
-  const meta = r ? `${algoName(res.opts.algo)}, ${r.k} clusters, ${r.N} respondents, average silhouette ${num(r.sil.mean, 2)}. Made with the UX Methods Atlas cluster-to-personas calculator.` : '';
+  const mix = r?.mix;
+  const meta = !r ? '' : mix
+    ? `${MIX_NAMES[mix.model]}${mix.model === 'gmm' ? ` (${mix.cov} covariance)` : ''}, ${r.k} class${r.k === 1 ? '' : 'es'} (BIC suggests ${r.bestK}), ${r.N} respondents, entropy R² ${num(mix.fit.entropyR2, 2)}, BIC ${num(mix.fit.bic, 1)}. Made with the UX Methods Atlas cluster-to-personas calculator.`
+    : `${algoName(res.opts.algo)}, ${r.k} clusters, ${r.N} respondents, average silhouette ${num(r.sil.mean, 2)}. Made with the UX Methods Atlas cluster-to-personas calculator.`;
+  const minDiag = mix ? Math.min(...mix.avepp.map((row, a) => (mix.counts[a] ? row[a] : 1))) : NaN;
+  const smallCls = mix ? mix.w.map((w, c) => [w, c]).filter(([w]) => w < 0.05).map(([, c]) => c + 1) : [];
 
   return (
     <div className="clu-root">
@@ -2245,9 +2440,9 @@ function ClusterPersonas() {
             </table>
           </div>
           <div className="calc-inputs">
-            <Choice label="Missing values" value={missing} onChange={setMissing} options={[['drop', 'Drop the row'], ['impute', 'Fill in (median or mode)']]} />
+            <Choice label="Missing values" value={missEff} onChange={setMissing} options={[['drop', 'Drop the row'], ['impute', 'Fill in (median or mode)'], ...(isMix ? [['skip', 'Skip in the model (MAR)']] : [])]} />
           </div>
-          {prep && <p className="muted clu-note">Using {prep.n} of {table.rows.length} rows{prep.dropped ? `; ${prep.dropped} dropped for missing values` : ''}{prep.imputed ? `; ${prep.imputed} missing value${prep.imputed > 1 ? 's' : ''} filled in` : ''}. Clustering on {spec.length} column{spec.length === 1 ? '' : 's'}: {spec.filter((s) => s.type === 'continuous').length} continuous, {spec.filter((s) => s.type === 'ordinal').length} ordinal, {spec.filter((s) => s.type === 'nominal').length} nominal.</p>}
+          {prep && <p className="muted clu-note">Using {prep.n} of {table.rows.length} rows{prep.dropped ? `; ${prep.dropped} dropped for missing values` : ''}{prep.imputed ? `; ${prep.imputed} missing value${prep.imputed > 1 ? 's' : ''} filled in` : ''}{prep.skipped ? `; ${prep.skipped} missing value${prep.skipped > 1 ? 's are' : ' is'} left out of the model's likelihood (assumed missing at random) and filled in only to draw the map` : ''}. Clustering on {spec.length} column{spec.length === 1 ? '' : 's'}: {spec.filter((s) => s.type === 'continuous').length} continuous, {spec.filter((s) => s.type === 'ordinal').length} ordinal, {spec.filter((s) => s.type === 'nominal').length} nominal.</p>}
           {prep && prep.n > CL.MAX_ROWS && <Problem>There are {prep.n.toLocaleString()} rows. Distances between every pair of respondents grow with the square of the rows, so the clusters are found on a random {CL.MAX_ROWS.toLocaleString()} (CLARA-style) and every other row joins the cluster of its nearest sampled respondent.</Problem>}
         </>
       )}
@@ -2255,23 +2450,32 @@ function ClusterPersonas() {
 
       <h2 className="clu-h">2. Method</h2>
       <div className="calc-inputs">
-        <Choice label="Algorithm" value={algo} onChange={setAlgo} options={CL_ALGOS} />
+        <Choice label="Algorithm" value={algo} onChange={pickAlgo} options={CL_ALGOS} />
         {(algo === 'pam' || algo === 'dbscan' || (algo === 'hier' && linkage === 'average')) && <Choice label="Distance" value={distance} onChange={setDistance} options={[['gower', 'Gower (mixed data)'], ['euclid', 'Euclidean (scaled)']]} />}
         {algo === 'hier' && <Choice label="Linkage" value={linkage} onChange={setLinkage} options={[['average', 'Average'], ['ward', 'Ward (Euclidean)']]} />}
-        {(algo === 'kmeans' || algo === 'kproto' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && distance === 'euclid')) && hasNum && <Choice label="Scale numeric columns" value={scaling} onChange={setScaling} options={[['z', 'z-score'], ['minmax', 'Min-max (0 to 1)']]} />}
-        {hasNom && (algo === 'kmeans' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && algo !== 'kmeans' && distance === 'euclid')) && <Choice label="Nominal columns" value={oneHot} onChange={setOneHot} options={[['onehot', 'One-hot encode'], ['drop', 'Leave out']]} />}
+        {!isMix && (algo === 'kmeans' || algo === 'kproto' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && distance === 'euclid')) && hasNum && <Choice label="Scale numeric columns" value={scaling} onChange={setScaling} options={[['z', 'z-score'], ['minmax', 'Min-max (0 to 1)']]} />}
+        {hasNom && !isMix && (algo === 'kmeans' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && algo !== 'kmeans' && distance === 'euclid')) && <Choice label="Nominal columns" value={oneHot} onChange={setOneHot} options={[['onehot', 'One-hot encode'], ['drop', 'Leave out']]} />}
         {algo === 'kproto' && <Num label="Weight on nominal mismatches" value={gammaScale} onChange={setGammaScale} min={0} step="any" suffix="× mean SD" hint="γ: 1 means a mismatch counts as much as the average spread of a scaled numeric column." />}
-        {algo !== 'dbscan' && <Choice label="Number of clusters" value={kMode} onChange={setKMode} options={[['auto', 'Best by silhouette'], ['manual', 'Choose k']]} />}
-        {algo !== 'dbscan' && kMode === 'manual' && <Num label="k" value={kNum} onChange={setKNum} min={2} max={12} />}
+        {algo === 'gmm' && <Choice label="Covariance" value={covType} onChange={setCovType} options={[['diag', 'Diagonal (default)'], ['full', 'Full']]} />}
+        {algo !== 'dbscan' && <Choice label="Number of clusters" value={kMode} onChange={setKMode} options={[['auto', isMix ? 'Best by BIC' : 'Best by silhouette'], ['manual', 'Choose k']]} />}
+        {algo !== 'dbscan' && kMode === 'manual' && <Num label="k" value={kNum} onChange={setKNum} min={isMix ? 1 : 2} max={isMix ? 8 : 12} />}
         {algo === 'dbscan' && <Num label="eps (neighbourhood radius)" value={eps} onChange={setEps} min={0} step="any" hint="Leave blank to use the knee of the k-distance plot." />}
         {algo === 'dbscan' && <Num label="minPts" value={minPts} onChange={setMinPts} min={2} hint="Respondents (including itself) a core point needs within eps." />}
         {algo !== 'dbscan' && algo !== 'hier' && <Num label="Random seed" value={seed} onChange={setSeed} min={1} />}
       </div>
       {algo === 'kmeans' && hasNom && <Problem>k-means only understands numbers, so nominal columns are {oneHot === 'onehot' ? 'turned into 0/1 columns, which distorts distances' : 'left out'}. For survey data with categories, k-medoids on Gower distance or k-prototypes is usually a better choice.</Problem>}
+      {isMix && hasNom && hasNum && algo !== 'mixed' && <Problem>Your data mix numbers and categories. {algo === 'gmm' ? 'The Gaussian mixture leaves the nominal columns out.' : 'Latent class analysis leaves the continuous columns out.'} The mixed latent profile/class model uses every column and is the recommended model-based option here.</Problem>}
+      {algo === 'gmm' && hasOrd && <p className="muted clu-note">Ordinal columns are treated as numbers here. Rating scales have only a few distinct values, and a Gaussian component can shrink onto one of them, which BIC rewards; if BIC keeps choosing the largest k, try the mixed model, which treats ordinal answers as categories.</p>}
+      {isMix && (
+        <div className="clu-note muted clu-explain">
+          <p><b>What this means.</b> {algo === 'gmm' ? 'A Gaussian mixture' : algo === 'lca' ? 'Latent class analysis' : 'The mixed model'} assumes the sample is a blend of hidden groups, each with its own {algo === 'lca' ? 'chances of giving each answer' : algo === 'gmm' ? 'average and spread on every number' : 'averages for the numbers and chances of giving each answer'}. Instead of a hard label, every respondent gets a probability of belonging to each group, and the number of groups is chosen by a statistical criterion (BIC) rather than by eye. Answer probabilities are smoothed slightly (one pseudo-answer per question and class, spread over the options), so no probability is exactly 0.</p>
+          <p><b>When not to use it.</b> It needs larger samples: as a rough guide at least 10 respondents per estimated parameter{algo !== 'gmm' ? ', and at least about 200 respondents for latent class analysis' : ''}. EM can stop at a local best fit, so it uses 10 random starts and reports how many reach the same answer. Groups are assumed independent on every column within a class (local independence{algo === 'gmm' && covType === 'full' ? ', relaxed here by the full covariance' : ''}); strongly related questions can create extra classes.</p>
+        </div>
+      )}
       {algo === 'pam' && <p className="muted clu-note">Recommended for mixed survey data: every cluster is centred on a real respondent, and Gower distance handles continuous, ordinal and nominal answers together.</p>}
       <div className="clu-actions">
         <button type="button" className="btn small" onClick={run} disabled={busy || tooFew}>{busy ? 'Working…' : 'Run clustering'}</button>
-        {busy && <span className="muted" role="status">Clustering in your browser…</span>}
+        {busy && <span className="muted" role="status">{progress ? <>Fitting the model for k = 1 to {progress.total} in your browser: {progress.done} of {progress.total} done <progress className="clu-progress" max={progress.total} value={progress.done} /></> : 'Clustering in your browser…'}</span>}
         {stale && !busy && <span className="qtag opp">Settings changed: run again to update</span>}
       </div>
       {err && <Problem>{err}</Problem>}
@@ -2280,6 +2484,74 @@ function ClusterPersonas() {
         <>
           <h2 className="clu-h">3. Clusters</h2>
           {r.notes.map((t) => <Problem key={t}>{t}</Problem>)}
+          {mix ? (
+            <>
+              <Result big={`${r.k} class${r.k === 1 ? '' : 'es'}`} label={`${MIX_NAMES[mix.model]}${mix.model === 'gmm' ? ` (${mix.cov === 'full' ? 'full' : 'diagonal'} covariance)` : ''}, ${r.N} respondents`} tone={r.k === 1 ? '' : mix.fit.entropyR2 >= 0.8 && minDiag >= 0.8 ? 'good' : mix.fit.entropyR2 < 0.6 || minDiag < 0.7 ? 'bad' : ''}>
+                <p>
+                  {res.opts.k === 'auto' ? `BIC is lowest at k = ${r.bestK}.` : r.bestK !== r.k ? `You chose k = ${r.k}; BIC is lowest at k = ${r.bestK}.` : `BIC is also lowest at k = ${r.k}.`}{' '}
+                  {r.k === 1 ? 'One class fits best: the model finds no evidence of distinct groups. Choose k to explore anyway, but treat any split with caution.' : <>Entropy R² is {num(mix.fit.entropyR2, 2)} ({mix.fit.entropyR2 >= 0.8 ? 'respondents are assigned with high certainty' : mix.fit.entropyR2 >= 0.6 ? 'moderate certainty: some respondents sit between classes' : 'low certainty: the classes overlap a lot'}), and the lowest average posterior probability of the assigned class is {num(minDiag, 2)}{minDiag >= 0.8 ? ', above the usual 0.8.' : ', below the usual 0.8.'}</>}
+                </p>
+                {(smallCls.length > 0 || !mix.fit.converged || (r.k > 1 && mix.fit.hits < 2) || mix.fit.nParams * 10 > r.N || (mix.model !== 'gmm' && r.N < 200)) && (
+                  <ul className="plain-list">
+                    {smallCls.length > 0 && <li>Class{smallCls.length > 1 ? 'es' : ''} {smallCls.join(', ')} {smallCls.length > 1 ? 'are' : 'is'} smaller than 5% of the sample: probably too small to build a persona on.</li>}
+                    {!mix.fit.converged && <li>The best run did not converge within 500 iterations; the estimates may still move.</li>}
+                    {r.k > 1 && mix.fit.hits < 2 && <li>Only one of the {mix.fit.finalRuns} final runs reached the best log-likelihood: the fit has local maxima, so try other seeds and see whether the answer holds.</li>}
+                    {mix.fit.nParams * 10 > r.N && <li>The model estimates {mix.fit.nParams} parameters from {r.N} respondents, fewer than the rough guide of 10 per parameter: treat the classes as tentative.</li>}
+                    {mix.model !== 'gmm' && r.N < 200 && <li>Latent class models usually need about 200 respondents or more; with {r.N} the classes are fragile.</li>}
+                  </ul>
+                )}
+              </Result>
+              <div className="clu-charts">
+                <div><h3 className="clu-h3">BIC and AIC (lower is better)</h3>
+                  <MiniLine xs={mix.sweep.map((s) => s.k)} ys={mix.sweep.map((s) => s.bic)} ys2={mix.sweep.map((s) => s.aic)} name1="BIC" name2="AIC" mark={r.bestK} label="BIC and AIC by number of classes" xLabel="Number of classes, k" yLabel="Information criterion" fmtY={(v) => num(v, 0)} /></div>
+                <div><h3 className="clu-h3">Entropy R² (classification certainty)</h3>
+                  <MiniLine xs={mix.sweep.filter((s) => s.k > 1).map((s) => s.k)} ys={mix.sweep.filter((s) => s.k > 1).map((s) => s.entropyR2)} mark={r.k} hline={0.8} hlineLabel="0.8" label="Entropy R² by number of classes" xLabel="Number of classes, k" yLabel="Entropy R²" /></div>
+              </div>
+              <MixFitTable mix={mix} k={r.k} bestK={r.bestK} n={r.N} />
+              <p className="muted clu-note">★ lowest BIC, the suggested k. "Best LL reached" counts how many of the {mix.sweep[1]?.finalRuns ?? 3} runs carried to convergence (the best of 10 random starts after 20 iterations each) ended at the same highest log-likelihood; 1 means the answer depends on the start.</p>
+              <div className="exp-wrap clu-map">
+                <ClusterMap r={r} names={nameList} />
+                <ol className="exp-list clu-legend">
+                  {r.clusters.map((c) => <li key={c}><Swatch c={c} /> <b>{c + 1}. {nameList[c]}</b><br /><span className="muted">weight {pct(mix.w[c], 0)} · {mix.counts[c]} most likely · certainty {num(mix.avepp[c][c], 2)}</span></li>)}
+                  <li className="muted">{r.embed.kind === 'pca' ? `Principal components of the ${mix.model === 'gmm' ? 'z-scored numeric' : 'scaled'} columns; the two axes show ${pct(r.embed.ratio[0] + r.embed.ratio[1], 0)} of the variance.` : 'Classical multidimensional scaling of the Gower distances on the modelled columns. The axes have no units.'} Each respondent is drawn in their most likely class; fainter points are less certain.{mix.ellipses ? ' Dashed outlines are each class\'s 95% ellipse, projected onto the two components; large markers are the class means.' : ' Large outlined markers are class centres.'}{r.embed.points.length < r.n ? ` Showing a random ${r.embed.points.length} of ${r.n}.` : ''}</li>
+                </ol>
+              </div>
+              {r.k > 1 && <>
+                <h3 className="clu-h3">Average posterior probabilities (classification table)</h3>
+                <AvePPTable mix={mix} names={nameList} k={r.k} />
+                <p className="muted clu-note">Each row is the respondents whose most likely class is that class; the columns give their average probability of each class. The diagonal is how sure the model is about the people it put in that class; above 0.8 is usually taken as a clear separation.</p>
+              </>}
+              <h3 className="clu-h3">{mix.q ? 'Item-response probabilities by class' : 'Class profiles'}</h3>
+              <MixProfilePlot mix={mix} names={nameList} k={r.k} />
+              <p className="muted clu-note">{mix.q ? 'Each panel is one question: markers show how likely each class is to give each answer; the grey tick is the share of everyone who gave it. ' : ''}{mix.p ? 'The class-means panel shows each class\'s average in standard deviations from the overall mean (clipped at ±2).' : ''}</p>
+              <h3 className="clu-h3">Soft memberships</h3>
+              <SoftPreview r={r} names={nameList} />
+              <p className="muted clu-note">The first rows shown; the CSV download has every respondent's probabilities (p_cluster_1 … p_cluster_{r.k}) and certainty, the largest of them.</p>
+              {r.k > 1 && <div className="clu-charts">
+                <div><h3 className="clu-h3">Silhouette by respondent (distance view)</h3><SilhouettePlot r={r} />
+                  <p className="muted clu-note">For comparison with the distance-based methods, on {r.wd === 'gower' ? 'Gower distance' : 'Euclidean distance of the z-scored columns'}; the model does not optimise it. Average {num(r.sil.mean, 2)}.</p></div>
+              </div>}
+          <div className="clu-actions">
+            <button type="button" className="btn ghost small" onClick={checkStability} disabled={busy || stale}>Check stability</button>
+            {stab && <span><b>Adjusted Rand index {num(stab.mean, 2)}</b> on average across 10 reruns on random 80% subsamples (lowest {num(stab.min, 2)}). {stab.mean >= 0.8 ? 'The clusters come back almost the same: they look real.' : stab.mean >= 0.6 ? 'The clusters mostly come back, but some respondents move: treat the boundaries as soft.' : 'The clusters change a lot between reruns: they may be an artefact of this sample. Try another k or method.'}</span>}
+          </div>
+              <Stats rows={[
+                ['Respondents', `${r.N}`],
+                ['Log-likelihood', num(mix.fit.ll, 2)],
+                ['Parameters', String(mix.fit.nParams)],
+                ['BIC · AIC', `${num(mix.fit.bic, 1)} · ${num(mix.fit.aic, 1)}`],
+                ['ICL-BIC', num(mix.fit.icl, 1)],
+                r.k > 1 && ['Entropy R²', num(mix.fit.entropyR2, 3)],
+                ['EM iterations', `${mix.fit.iter}${mix.fit.converged ? ', converged' : ', not converged'}`],
+                r.k > 1 && ['Random starts', `${mix.fit.starts}; best ${mix.fit.finalRuns} to convergence; ${mix.fit.hits} reached the best`],
+                mix.model !== 'gmm' && ['Smoothing', `α = ${mix.alpha} pseudo-answer per question and class`],
+                mix.p > 0 && ['Variance floor (reg_covar)', String(mix.reg)],
+                (mix.missNum + mix.missCat) > 0 && mix.cov !== 'full' && ['Missing answers skipped', String(mix.missNum + mix.missCat)],
+                ['Time', `${r.ms} ms`],
+              ]} />
+            </>
+          ) : (
+            <>
           <Result big={`${r.k} cluster${r.k === 1 ? '' : 's'}`} label={`${algoName(res.opts.algo)}${res.opts.algo === 'hier' ? ` (${res.opts.linkage === 'ward' ? 'Ward' : 'average'} linkage)` : ''} on ${r.wd === 'gower' ? 'Gower distance' : 'scaled Euclidean distance'}, ${r.N} respondents`} tone={r.sil.mean > 0.5 ? 'good' : r.sil.mean <= 0.25 ? 'bad' : ''}>
             <p>The average silhouette is {num(r.sil.mean, 2)}, which by Kaufman and Rousseeuw's rule of thumb means {silWords(r.sil.mean)}. {r.bestK && (res.opts.k === 'auto' ? `k = ${r.bestK} gave the highest silhouette of the k values tried.` : r.bestK !== r.k ? `You chose k = ${r.k}; k = ${r.bestK} gave the highest silhouette.` : `k = ${r.k} also gave the highest silhouette.`)} {r.noise > 0 && `${r.noise} respondent${r.noise > 1 ? 's' : ''} (${pct(r.noise / r.n, 0)}) did not fit any dense group and ${r.noise > 1 ? 'are' : 'is'} marked as noise.`} {r.sampled && `Found on a random ${r.n} of the ${r.N} rows.`}</p>
           </Result>
@@ -2324,18 +2596,19 @@ function ClusterPersonas() {
             r.oneHot && ['Nominal columns', 'One-hot encoded'],
             ['Time', `${r.ms} ms`],
           ]} />
-
+            </>
+          )}
           <h2 className="clu-h">4. Personas</h2>
           <p className="calc-warn">Clusters are a starting point, not personas. Interview a few people from each cluster to learn the goals, contexts and stories behind the numbers before you write the persona (see <Link to="/methods/personas">Personas</Link> and <Link to="/methods/cluster-validation-with-qualitative-investigation">validating clusters with qualitative research</Link>).</p>
           <div className="clu-actions no-print">
             <button type="button" className="btn small" onClick={() => download('personas.md', CL.toMarkdown(profs, Object.fromEntries(profs.map((p) => [p.cluster, nameOf(p.cluster)])), meta), 'text/markdown')}>Download personas (Markdown)</button>
-            <button type="button" className="btn ghost small" onClick={() => download('data-with-clusters.csv', CL.toCSV(res.table, res.prep.used, r.labels, nameList), 'text/csv')}>Download data with clusters (CSV)</button>
+            <button type="button" className="btn ghost small" onClick={() => download('data-with-clusters.csv', CL.toCSV(res.table, res.prep.used, r.labels, nameList, mix ? { k: r.k, R: mix.R } : null), 'text/csv')}>Download data with clusters (CSV)</button>
             <button type="button" className="btn ghost small" onClick={() => window.print()}>Print personas</button>
           </div>
           <div className="persona-grid">
             {profs.map((p) => (
               <article key={p.cluster} className="persona" style={{ '--pc': clColor(p.cluster) }}>
-                <div className="persona-head"><Swatch c={p.cluster} /><span className="muted">Cluster {p.cluster + 1} · {p.size} respondents ({pct(p.share, 0)})</span></div>
+                <div className="persona-head"><Swatch c={p.cluster} /><span className="muted">{mix ? <>Class {p.cluster + 1} · {p.size} most likely ({pct(p.share, 0)}) · weight {pct(p.weight, 0)}</> : <>Cluster {p.cluster + 1} · {p.size} respondents ({pct(p.share, 0)})</>}</span></div>
                 <label className="persona-name"><span className="sr-only">Persona name</span><input value={nameOf(p.cluster)} onChange={(e) => setNames({ ...names, [p.cluster]: e.target.value })} aria-label={`Name for cluster ${p.cluster + 1}`} /></label>
                 <p>{p.summary}</p>
                 <h3 className="clu-h3">What sets them apart</h3>
@@ -2346,7 +2619,9 @@ function ClusterPersonas() {
                     {p.attrs.map((a) => (
                       <div key={a.name}>
                         <dt>{a.name}</dt>
-                        <dd>{a.type === 'continuous' ? <>mean {num(a.mean, 1)} vs {num(a.overall, 1)} overall · median {num(a.median, 1)}</>
+                        <dd>{a.model === 'cat' ? <>{a.cats.slice(0, 3).map((c) => `${c.cat} ${pct(c.share, 0)} (vs ${pct(c.overall, 0)})`).join(' · ')}{a.type === 'ordinal' && <LevelBar dist={a.probs.map((c) => c.share)} levels={a.probs.map((c) => c.cat)} />}</>
+                          : a.model === 'num' ? <>class mean {num(a.mean, 1)} vs {num(a.overall, 1)} overall</>
+                          : a.type === 'continuous' ? <>mean {num(a.mean, 1)} vs {num(a.overall, 1)} overall · median {num(a.median, 1)}</>
                           : a.type === 'ordinal' ? <>median {a.median} vs {a.overallMedian} overall<LevelBar dist={a.dist} levels={a.levels} /></>
                           : a.cats.slice(0, 3).map((c) => `${c.cat} ${pct(c.share, 0)} (vs ${pct(c.overall, 0)}${Number.isFinite(c.lift) ? `, lift ${num(c.lift, 1)}×` : ''})`).join(' · ')}</dd>
                       </div>
@@ -2359,13 +2634,16 @@ function ClusterPersonas() {
           </div>
         </>
       )}
-      <About method="cluster-analysis" links={[['personas', 'Personas'], ['gowers-distance-for-mixed-data-clustering', "Gower's distance"], ['dbscan-density-based-clustering', 'DBSCAN'], ['silhouette-scores-and-gap-statistic-validation', 'Silhouette validation'], ['cophenetic-and-matrix-correlation-checks-for-hierarchical-clustering', 'Checks for hierarchical clustering'], ['choosing-a-resemblance-coefficient-for-clustering', 'Choosing a resemblance coefficient'], ['k-means-vs-gmm-comparison', 'k-means vs GMM'], ['gaussian-mixture-models-for-user-segmentation', 'Gaussian mixture models'], ['gmm-behavioural-clustering', 'GMM behavioural clustering'], ['latent-class-analysis-for-personas', 'Latent class analysis for personas'], ['factor-analytic-and-correspondence-analytic-persona-development', 'Factor-analytic personas'], ['cluster-validation-with-qualitative-investigation', 'Validating clusters qualitatively'], ['persona-validation-against-behavioural-data', 'Persona validation'], ['pca', 'PCA'], ['multidimensional-scaling-and-perceptual-mapping', 'Multidimensional scaling'], ['hypersona-semi-automated-clustering-algorithm-selection', 'HyPersona']]}>
+      <About method="cluster-analysis" links={[['personas', 'Personas'], ['gowers-distance-for-mixed-data-clustering', "Gower's distance"], ['dbscan-density-based-clustering', 'DBSCAN'], ['silhouette-scores-and-gap-statistic-validation', 'Silhouette validation'], ['cophenetic-and-matrix-correlation-checks-for-hierarchical-clustering', 'Checks for hierarchical clustering'], ['choosing-a-resemblance-coefficient-for-clustering', 'Choosing a resemblance coefficient'], ['k-means-vs-gmm-comparison', 'k-means vs GMM'], ['gaussian-mixture-models-for-user-segmentation', 'Gaussian mixture models'], ['gmm-behavioural-clustering', 'GMM behavioural clustering'], ['latent-class-analysis-for-personas', 'Latent class analysis for personas'], ['factor-analytic-and-correspondence-analytic-persona-development', 'Factor-analytic personas'], ['cluster-validation-with-qualitative-investigation', 'Validating clusters qualitatively'], ['persona-validation-against-behavioural-data', 'Persona validation'], ['pca', 'PCA'], ['multidimensional-scaling-and-perceptual-mapping', 'Multidimensional scaling'], ['hypersona-semi-automated-clustering-algorithm-selection', 'HyPersona'], ['bic-model-selection-k-2-10', 'BIC model selection'], ['integrated-classification-likelihood-icl-and-entropy-criteria-for-the-number-of-', 'ICL and entropy criteria'], ['bootstrap-likelihood-ratio-test-for-the-number-of-mixture-components', 'Bootstrap likelihood ratio test'], ['gmm-cluster-interpretation', 'Interpreting GMM clusters'], ['em-algorithm-for-missing-session-data', 'EM for missing data']]}>
         <p><b>Data.</b> Continuous columns are used as numbers. Ordinal columns are ranked in the order shown (numbers in numeric order, recognised answer scales such as "Strongly disagree … Strongly agree" in scale order, bands such as "25–34" by their first number). Nominal columns are unordered categories. Missing values either drop the row or are filled with the column's median (continuous, ordinal) or most common answer (nominal).</p>
         <p><b>Gower distance</b> (Gower 1971) averages one dissimilarity per column, each between 0 and 1: |x − y| ÷ range for continuous columns, |rank − rank| ÷ (levels − 1) for ordinal columns, and 0 for the same answer or 1 for a different one on nominal columns. <b>Scaling</b> for Euclidean methods is the z-score (x − mean) ÷ SD or min-max (x − min) ÷ (max − min); one-hot encoding turns each category into a 0/1 column.</p>
         <p><b>k-means</b> minimises the within-cluster sum of squares Σ‖x − centre‖² with Lloyd's algorithm from k-means++ starts (the greedy version used by scikit-learn), keeping the best of 10 seeded restarts. <b>k-prototypes</b> (Huang 1997) minimises Σ‖x<sub>num</sub> − mean‖² + γ × (nominal mismatches with the cluster's modes), with γ = mean SD of the scaled numeric columns × your weight. <b>k-medoids</b> uses PAM (Kaufman and Rousseeuw): a greedy BUILD, then the swap of a medoid for a non-medoid that most lowers the total distance, repeated until no swap helps, using Schubert and Rousseeuw's FastPAM1 speed-up, which finds the same swaps. <b>DBSCAN</b> (Ester et al. 1996) grows clusters from core points with at least minPts respondents within eps; the rest are noise. <b>Hierarchical</b> clustering merges the closest pair of clusters step by step (nearest-neighbour chain with Lance-Williams updates); Ward's linkage merges the pair that least increases the within-cluster sum of squares, average linkage uses the mean distance between members. The tree is cut at k.</p>
         <p><b>Choosing k.</b> For k = 2 to 8 the calculator plots the method's cost (the elbow) and the average silhouette s = (b − a) ÷ max(a, b), where a is a respondent's mean distance to its own cluster and b to the nearest other cluster (Rousseeuw 1987). It suggests the k with the highest silhouette. Above 0.7 is strong structure, 0.5 to 0.7 reasonable, 0.25 to 0.5 weak, below that none (Kaufman and Rousseeuw 1990). <b>Stability</b> reclusters ten random 80% subsamples with new seeds and compares each with the full solution using the adjusted Rand index (1 is identical, 0 is chance agreement).</p>
         <p><b>The map</b> uses principal component analysis of the scaled columns when all columns are numeric, and classical (Torgerson) multidimensional scaling of the Gower distances otherwise: the top eigenvectors of −½ J D² J, scaled by the square root of their eigenvalues. <b>Personas</b> rank attributes by standardised difference, (cluster mean − overall mean) ÷ overall SD for continuous and ordinal columns, and (p<sub>cluster</sub> − p) ÷ √(p(1 − p)) for the most over-represented category of a nominal column, whose lift is p<sub>cluster</sub> ÷ p. Results match scikit-learn, scipy and numpy on test data (<code>npm run check:calc</code>).</p>
-        <p><b>When not to use it.</b> Clustering always returns clusters, even from data with no groups in it, so check the silhouette and the stability before believing them. With fewer than about 50 respondents, or many more columns than respondents, clusters are fragile. Clusters reflect the questions you asked: if the survey only asks about attitudes, the segments will be attitudinal. Use latent class analysis or Gaussian mixtures when you want probabilities of membership and a statistical test for the number of groups, and always ground the personas in qualitative research.</p>
+        <p><b>Model-based clustering.</b> A finite mixture says each respondent comes from one of k hidden classes with probabilities π<sub>1</sub> … π<sub>k</sub>, and that within a class the columns are independent (local independence): f(x) = Σ<sub>c</sub> π<sub>c</sub> Π<sub>d</sub> N(x<sub>d</sub> | μ<sub>cd</sub>, σ²<sub>cd</sub>) Π<sub>j</sub> θ<sub>cj</sub>(x<sub>j</sub>). The <b>Gaussian mixture</b> uses the continuous and ordinal columns, z-scored, with a diagonal covariance (the default) or a full covariance matrix per class in place of the product of normals. <b>Latent class analysis</b> uses the nominal and ordinal columns as categories, θ<sub>cj</sub>(v) being class c's probability of answer v to question j. The <b>mixed latent profile/class model</b> uses both: diagonal normals for continuous columns and categories for nominal and ordinal ones; with no categorical columns it is the diagonal Gaussian mixture, and with no continuous ones it is latent class analysis.</p>
+        <p><b>Fitting.</b> Expectation-maximisation: the E-step gives each respondent's posterior probability p<sub>ic</sub> = π<sub>c</sub> f<sub>c</sub>(x<sub>i</sub>) ÷ Σ π f(x<sub>i</sub>), computed on the log scale with log-sum-exp; the M-step sets π<sub>c</sub> = Σ<sub>i</sub> p<sub>ic</sub> ÷ n, means and variances to the p-weighted means and variances (plus reg_covar = 10⁻⁶ on every variance, as scikit-learn does), and θ<sub>cj</sub>(v) = (Σ p<sub>ic</sub>[x<sub>ij</sub> = v] + α ÷ L<sub>j</sub>) ÷ (Σ p<sub>ic</sub>[answered] + α), a Dirichlet prior with α = 1 pseudo-answer per question and class spread over its L<sub>j</sub> options, so no probability is exactly 0. Missing answers (with "Skip in the model") are left out of the product, which is right if they are missing at random; full covariance fills them with the median instead. EM stops when the mean log-likelihood per respondent changes by less than 10⁻⁶ (500 iterations at most). Ten random starts (k-means++-style seeds, each respondent given to the nearest seed, then one M-step) run 20 iterations each, the best three are run to convergence, and the highest likelihood is kept, as in Mplus. The Gaussian mixture matches scikit-learn's GaussianMixture, and latent class analysis and the mixed model match StepMix, to about 10⁻¹² from the same starting values (<code>npm run check:calc</code>); latent class analysis reproduces the published poLCA fit of the Stouffer-Toby data (log-likelihood −504.4677).</p>
+        <p><b>Choosing k for the mixtures.</b> For k = 1 (no groups, as a baseline) to 8: BIC = −2 log L + P ln n and AIC = −2 log L + 2P, lower is better; the suggested k has the lowest BIC. P counts free parameters: (k − 1) weights, k·p means, k·p variances (diagonal) or k·p(p + 1)/2 covariances (full), and k·Σ(L<sub>j</sub> − 1) answer probabilities. Entropy R² = 1 − Σ<sub>i</sub>Σ<sub>c</sub>(−p<sub>ic</sub> ln p<sub>ic</sub>) ÷ (n ln k) is 1 when every respondent is assigned with certainty; ICL-BIC = BIC + 2 × that entropy penalises fuzzy solutions. The classification table averages each class's members' posterior probabilities; the diagonal should be above 0.8. Respondents are assigned to their most likely class; the CSV keeps every probability. Persona cards describe categorical columns by θ against the overall share and continuous columns by the class mean.</p>
+        <p><b>When not to use it.</b> Clustering always returns clusters, even from data with no groups in it, so check the silhouette and the stability before believing them. With fewer than about 50 respondents, or many more columns than respondents, clusters are fragile. Clusters reflect the questions you asked: if the survey only asks about attitudes, the segments will be attitudinal. Use latent class analysis or Gaussian mixtures when you want probabilities of membership and a principled choice of k, but they need more data (roughly 10 respondents per parameter, and about 200 or more for latent class analysis), can stop at local maxima, and assume local independence, so related questions can split into extra classes. Always ground the personas in qualitative research.</p>
       </About>
     </div>
   );

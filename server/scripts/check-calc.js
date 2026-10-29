@@ -308,6 +308,109 @@ const exr = CL.run(exp, { algo: 'pam', distance: 'gower', scaling: 'z', k: 'auto
 same('Example survey: best k by silhouette (k-medoids on Gower)', exr.bestK, 4);
 same('Example survey: CSV export adds cluster and persona columns', CL.toCSV(ex, exp.used, exr.labels, []).split('\n')[0].endsWith(',cluster,persona'), true);
 
+// ── Model-based clustering (calc/cluster.js: fitMixture and friends). Reference values come from
+// server/scripts/mixture-reference.py (scikit-learn 1.9 GaussianMixture and StepMix 3.0), stored in mixture-reference.json.
+// Each fit starts from the same fixed parameters as the reference, so EM takes identical steps: after a fixed number of
+// iterations (tol = 0) and at convergence (tol 1e-12) the parameters agree to rounding error.
+const MX = JSON.parse(readFileSync(path.join(root, 'server', 'scripts', 'mixture-reference.json'), 'utf8'));
+const flat = (a) => (Array.isArray(a) || ArrayBuffer.isView(a) ? Array.from(a).flatMap(flat) : [a]);
+const gap = (a, b) => { const x = flat(a), y = flat(b); return x.length === y.length ? Math.max(...x.map((v, i) => Math.abs(v - y[i]))) : Infinity; };
+const G = MX.gmm, gmd = CL.rawMixtureData(G.X);
+for (const ct of ['diag', 'full']) for (const tag of ['fixed3', 'conv']) {
+  const ref = G[`${ct}_${tag}`];
+  const init = { w: G.weights, mu: G.means.map((m) => Float64Array.from(m)), cov: ct === 'diag' ? G.cov_diag.map((v) => Float64Array.from(v)) : G.cov_full.map((M) => M.map((r) => Float64Array.from(r))) };
+  const f = CL.fitMixture(gmd, 3, { model: 'gmm', cov: ct, init, maxIter: tag === 'conv' ? 2000 : 3, tol: tag === 'conv' ? 1e-12 : 0, reg: 1e-6, keepOrder: true });
+  const what = `GMM ${ct}, ${tag === 'conv' ? 'converged' : '3 EM steps'}`;
+  near(`${what}: weights, largest difference from sklearn`, gap(f.P.w, ref.weights), 0, 1e-9);
+  near(`${what}: means, largest difference from sklearn`, gap(f.P.mu, ref.means), 0, 1e-9);
+  near(`${what}: covariances, largest difference from sklearn`, gap(f.P.cov, ref.cov), 0, 1e-9);
+  near(`${what}: log-likelihood (sklearn score × n = ${ref.ll.toFixed(4)})`, f.ll, ref.ll, 1e-8);
+  near(`${what}: BIC (sklearn bic() = ${ref.bic.toFixed(4)})`, f.bic, ref.bic, 1e-8);
+  near(`${what}: AIC (sklearn aic())`, f.aic, ref.aic, 1e-8);
+  same(`${what}: parameter count (sklearn _n_parameters ${ref.nparams})`, f.nParams, ref.nparams);
+  if (tag === 'conv') same(`${what}: iterations and convergence (sklearn ${ref.n_iter})`, [f.iter, f.converged], [ref.n_iter, ref.converged]);
+}
+same('GMM parameter counts by hand: diag (k−1) + 2kp, full (k−1) + kp + kp(p+1)/2, p = 3, k = 3', [CL.mixtureParams(gmd, 3, 'diag'), CL.mixtureParams(gmd, 3, 'full')], [2 + 18, 2 + 9 + 18]);
+const gRun = CL.fitMixture(gmd, 3, { model: 'gmm', cov: 'full', nStarts: 10, seed: 2, tol: 1e-12, maxIter: 2000 });
+// The fixed start above stops at a local maximum; the best of 100 sklearn k-means++ starts (random_state 0–99) is −216.717949.
+near('GMM full from 10 seeded k-means++ restarts finds the best sklearn maximum over 100 starts', gRun.ll, -216.71794905551548, 1e-6);
+
+const LC = MX.lca;
+for (const which of ['complete', 'missing']) for (const tag of ['fixed5', 'conv']) {
+  const ref = LC[`${which}_${tag}`];
+  const md = CL.rawMixtureData(null, which === 'complete' ? LC.X : LC.Xm, LC.L);
+  const init = { w: [1 / 3, 1 / 3, 1 / 3], theta: (which === 'complete' ? LC.theta0 : LC.theta0m).map((t) => t.map((x) => Float64Array.from(x))) };
+  const f = CL.fitMixture(md, 3, { model: 'lca', init, maxIter: tag === 'conv' ? 5000 : 5, tol: tag === 'conv' ? 1e-12 : 0, alpha: 0, keepOrder: true });
+  const what = `LCA ${which === 'complete' ? '300 × 5 items' : 'with 6% missing answers (MAR, skipped)'}, ${tag === 'conv' ? 'converged' : '5 EM steps'}`;
+  const sizes = [0, 0, 0]; f.labels.forEach((l) => sizes[l]++);
+  near(`${what}: item-response probabilities, largest difference from StepMix`, gap(f.P.theta, ref.theta), 0, 1e-8);
+  near(`${what}: class weights, largest difference from StepMix`, gap(f.P.w, ref.w), 0, 1e-8);
+  near(`${what}: log-likelihood (StepMix ${ref.ll.toFixed(4)})`, f.ll, ref.ll, 1e-8);
+  near(`${what}: BIC (StepMix)`, f.bic, ref.bic, 1e-8);
+  near(`${what}: entropy R² (StepMix relative_entropy)`, f.entropyR2, ref.entropyR2, 1e-8);
+  same(`${what}: modal class sizes (StepMix ${JSON.stringify(ref.sizes)})`, sizes, ref.sizes);
+  same(`${what}: parameter count (StepMix ${ref.nparams})`, f.nParams, ref.nparams);
+  if (tag === 'conv') same(`${what}: iterations (StepMix ${ref.n_iter})`, f.iter, ref.n_iter);
+}
+// Stouffer and Toby (1951) role-conflict data (poLCA's `values`, n = 216, 4 yes/no items). Published 2-class fit
+// (Linzer and Lewis 2011, poLCA): log-likelihood −504.4677, AIC 1026.935, BIC 1057.313; Goodman (1974): classes of
+// about 28% and 72%.
+const V = LC.values, vRows = [];
+V.patterns.forEach((p, i) => { for (let t = 0; t < V.counts[i]; t++) vRows.push([...p].map((ch) => +ch - 1)); });
+const vf = CL.fitMixture(CL.rawMixtureData(null, vRows, [2, 2, 2, 2]), 2, { model: 'lca', nStarts: 20, nFinal: 20, seed: 1, alpha: 0, tol: 1e-12, maxIter: 5000 });
+near('Stouffer-Toby 2-class LCA: log-likelihood (poLCA −504.4677)', vf.ll, -504.4677, 1e-4);
+near('Stouffer-Toby 2-class LCA: AIC (poLCA 1026.935)', vf.aic, 1026.935, 1e-3);
+near('Stouffer-Toby 2-class LCA: BIC (poLCA 1057.313)', vf.bic, 1057.313, 1e-3);
+near('Stouffer-Toby 2-class LCA: smaller class (Goodman 0.28; StepMix)', vf.P.w[1], V.w[1], 1e-6);
+near('Stouffer-Toby 2-class LCA: P(yes) by item and class, largest difference from StepMix', gap(vf.P.theta.map((t) => t.map((x) => x[0])), V.p_first), 0, 1e-6);
+same('Stouffer-Toby: all 20 random starts reach the same maximum', vf.hits, 20);
+const vs = CL.fitMixture(CL.rawMixtureData(null, vRows, [2, 2, 2, 2]), 2, { model: 'lca', nStarts: 20, seed: 1, tol: 1e-10 });
+same('LCA smoothing (α = 1) keeps every item probability strictly between 0 and 1', flat(vs.P.theta).every((v) => v > 0 && v < 1), true);
+
+const MXD = MX.mixed, mmd = CL.rawMixtureData(MXD.Xn, MXD.Xc, MXD.L), R0 = Float64Array.from(MXD.R0.flat());
+for (const tag of ['fixed5', 'conv']) {
+  const ref = MXD[tag];
+  const init = { ...CL.mixtureMStep(mmd, R0, 3, { alpha: 0 }), w: [1 / 3, 1 / 3, 1 / 3] };
+  const f = CL.fitMixture(mmd, 3, { model: 'mixed', init, maxIter: tag === 'conv' ? 5000 : 5, tol: tag === 'conv' ? 1e-12 : 0, alpha: 0, keepOrder: true });
+  const what = `Mixed model (2 continuous + 3 categorical), ${tag === 'conv' ? 'converged' : '5 EM steps'}`;
+  near(`${what}: means and variances, largest difference from StepMix`, Math.max(gap(f.P.mu, ref.means), gap(f.P.cov, ref.cov)), 0, 1e-8);
+  near(`${what}: item-response probabilities, largest difference from StepMix`, gap(f.P.theta, ref.theta), 0, 1e-8);
+  near(`${what}: log-likelihood (StepMix ${ref.ll.toFixed(4)})`, f.ll, ref.ll, 1e-8);
+  near(`${what}: BIC (StepMix)`, f.bic, ref.bic, 1e-8);
+  same(`${what}: parameter count (StepMix ${ref.nparams})`, f.nParams, ref.nparams);
+}
+// The mixed model reduces to the diagonal Gaussian mixture with no categorical columns, and to LCA with no continuous ones.
+const mxSpec = (types) => exc.filter((c) => c.type !== 'ignore').map((c) => ({ name: c.name, index: c.index, type: types[c.type] ?? c.type, levels: c.levels })).filter((s) => s.type !== 'ignore');
+const contOnly = CL.prepare(ex, mxSpec({ ordinal: 'ignore', nominal: 'ignore' }), 'skip');
+const sw = (algo, prep, cov) => CL.runMixture(prep, { algo, cov, k: 'auto', seed: 3, nStarts: 4 }).mix.sweep;
+const swM = sw('mixed', contOnly), swG = sw('gmm', contOnly, 'diag');
+near('Mixed model with only continuous columns = GMM diag: log-likelihood for k = 1..8, largest difference', gap(swM.map((s) => s.ll), swG.map((s) => s.ll)), 0, 1e-9);
+same('Mixed model with only continuous columns = GMM diag: parameter counts and BIC choice', [swM.map((s) => s.nParams), swM.reduce((a, b) => (b.bic < a.bic ? b : a)).k], [swG.map((s) => s.nParams), swG.reduce((a, b) => (b.bic < a.bic ? b : a)).k]);
+const catOnly = CL.prepare(ex, mxSpec({ continuous: 'ignore' }), 'skip');
+const swM2 = sw('mixed', catOnly), swL = sw('lca', catOnly);
+near('Mixed model with no continuous columns = LCA: log-likelihood for k = 1..8, largest difference', gap(swM2.map((s) => s.ll), swL.map((s) => s.ll)), 0, 1e-9);
+same('Mixed model with no continuous columns = LCA: parameter counts', swM2.map((s) => s.nParams), swL.map((s) => s.nParams));
+// Entropy R², AIC, BIC, ICL and the average-posterior table by hand: n = 2, k = 2, one numeric column, LL = −10,
+// posteriors (0.9, 0.1) and (0.2, 0.8). P = 1 + 2 + 2 = 5; E = −Σ p ln p = 0.825299…; R² = 1 − E/(2 ln 2).
+const hs = CL.mixtureStats(CL.rawMixtureData([[0], [1]]), 2, { R: Float64Array.from([0.9, 0.1, 0.2, 0.8]), ll: -10 });
+const Eh = -(0.9 * Math.log(0.9) + 0.1 * Math.log(0.1) + 0.2 * Math.log(0.2) + 0.8 * Math.log(0.8));
+near('Entropy R² by hand, 1 − E/(n ln k)', hs.entropyR2, 1 - Eh / (2 * Math.log(2)), 1e-12);
+near('AIC by hand, −2 LL + 2P = 20 + 10', hs.aic, 30, 1e-12);
+near('BIC by hand, −2 LL + P ln n = 20 + 5 ln 2', hs.bic, 20 + 5 * Math.log(2), 1e-12);
+near('ICL-BIC by hand, BIC + 2E', hs.icl, 20 + 5 * Math.log(2) + 2 * Eh, 1e-12);
+same('Average posterior table by hand, diagonal [0.9, 0.8]', hs.avepp.map((r, i) => r[i]), [0.9, 0.8]);
+near('Entropy R² of a converged fit matches 1 − Σ −p ln p/(n ln k) recomputed from its posteriors', gRun.entropyR2, 1 - flat(gRun.R).reduce((s, p) => s - (p > 0 ? p * Math.log(p) : 0), 0) / (gmd.n * Math.log(3)), 1e-12);
+// The example survey: BIC picks the four built-in respondent types with LCA and with the mixed model.
+const exs = CL.prepare(ex, exc.filter((c) => c.type !== 'ignore').map((c) => ({ name: c.name, index: c.index, type: c.type, levels: c.levels })), 'skip');
+const exLca = CL.runMixture(exs, { algo: 'lca', k: 'auto', seed: 1 }), exMix = CL.runMixture(exs, { algo: 'mixed', k: 'auto', seed: 1 });
+same('Example survey: k by BIC, LCA and mixed model', [exLca.bestK, exMix.bestK], [4, 4]);
+same('Example survey, mixed model: average posterior probability above 0.8 in every class', exMix.mix.avepp.every((r, i) => r[i] > 0.8), true);
+const csvHead = CL.toCSV(ex, exs.used, exMix.labels, [], { k: exMix.k, R: exMix.mix.R }).split('\n');
+same('Mixture CSV export adds p_cluster_1..4 and certainty', csvHead[0].split(',').slice(-5), ['p_cluster_1', 'p_cluster_2', 'p_cluster_3', 'p_cluster_4', 'certainty']);
+near('Mixture CSV: posterior probabilities in a row sum to 1', csvHead[1].split(',').slice(-5, -1).reduce((s, v) => s + Number(v), 0), 1, 1e-5);
+const exProf = CL.mixtureProfiles(exs, exMix.labels, exMix.mix);
+same('LCA-style persona text uses class-conditional probabilities', /^\d+% likely to answer .+ vs \d+% overall$/.test(exProf[0].apart.find((a) => a.model === 'cat').text), true);
+
 // ── The shared catalog matches the calculators page: every calculator has a component, and the methods each one
 // lists in calc/catalog.js are exactly the methods its "How this is calculated" section links to.
 // ── Every atlas method a calculator links to exists.

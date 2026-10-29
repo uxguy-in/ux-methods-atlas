@@ -715,10 +715,23 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .persona-attrs dd { margin: 2px 0 0; overflow-wrap: anywhere; }
 .clu-levels { display: flex; height: 8px; margin-top: 5px; background: var(--bg-sunk); max-width: 220px; }
 .clu-levels i { display: block; background: var(--pc, var(--accent)); }
+.clu-multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px 22px; align-items: start; }
+.clu-panel { margin: 0; min-width: 0; }
+.clu-panel figcaption { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; overflow-wrap: anywhere; }
+.clu-num td, .clu-num th { white-space: nowrap; }
+.clu-table.clu-num td:first-child { min-width: 0; max-width: none; }
+.clu-table.clu-num td:last-child { min-width: 0; }
+.clu-table td.clu-tags { min-width: 180px; }
+.clu-tags .qtag { display: inline-block; white-space: nowrap; margin: 0 6px 4px 0; }
+.clu-table tr.on td { background: var(--bg-soft); }
+.clu-table td.diag { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.clu-progress { vertical-align: middle; width: 120px; margin-left: 8px; accent-color: var(--accent); }
+.clu-explain { display: grid; gap: 8px; }
+.clu-explain p { margin: 0; }
 @media (max-width: 860px) { .exp-wrap.clu-map { grid-template-columns: 1fr; } .persona-name input { font-size: 16px; } }
 @media print {
   body:has(.clu-root) .hero, body:has(.clu-root) .calc-pick, body:has(.clu-root) .calc-nav,
-  .clu-root .calc-about, .clu-root .calc-inputs, .clu-root .clu-scroll, .clu-root .clu-actions, .clu-root .clu-charts, .clu-root .calc-stats, .clu-root .clu-h, .clu-root .clu-note { display: none !important; }
+  .clu-root .calc-about, .clu-root .calc-inputs, .clu-root .clu-scroll, .clu-root .clu-actions, .clu-root .clu-charts, .clu-root .clu-multiples, .clu-root > .clu-h3, .clu-root .calc-stats, .clu-root .clu-h, .clu-root .clu-note { display: none !important; }
   body:has(.clu-root) .calc-layout { grid-template-columns: 1fr; }
   .persona details { display: block; }
   .persona-grid { grid-template-columns: 1fr 1fr; }
