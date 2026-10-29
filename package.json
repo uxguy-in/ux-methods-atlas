@@ -19,6 +19,7 @@
     "check:tools": "node server/scripts/check-tools.js",
     "check:studytools": "node server/scripts/check-studytools.js",
     "check:surveystats": "node server/scripts/check-surveystats.js",
+    "check:conjoint": "node server/scripts/check-conjoint.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

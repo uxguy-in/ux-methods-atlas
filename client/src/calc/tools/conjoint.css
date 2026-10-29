@@ -1,0 +1,75 @@
+/* Conjoint studio (client/src/calc/tools/Conjoint.jsx). Theme tokens only, light and dark. */
+.cj-app { display: grid; gap: 22px; min-width: 0; }
+.cj-app .seg { flex-wrap: wrap; }
+.cj-app .btn { white-space: normal; text-align: center; }
+.cj-app .calc-field { max-width: 100%; }
+.cj-app select.select { max-width: 100%; }
+.cj-grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 24px; align-items: start; }
+@media (max-width: 860px) { .cj-grid2 { grid-template-columns: minmax(0, 1fr); } }
+.cj-row { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; }
+.cj-row .calc-field input { width: 96px; }
+.cj-name input { width: 100% !important; max-width: 480px; }
+
+/* Part-worth bars: a zero line in the middle, bars left (negative) or right (positive), 95% interval whiskers. */
+.cj-pw { display: grid; gap: 14px; }
+.cj-pw-attr h4 { margin: 0 0 6px; font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.cj-pw-attr h4 i { width: 12px; height: 12px; display: inline-block; }
+.cj-pw-row { display: grid; grid-template-columns: minmax(0, 170px) minmax(80px, 1fr) minmax(56px, auto); gap: 10px; align-items: center; font-size: 14px; font-variant-numeric: tabular-nums; min-height: 22px; }
+.cj-pw-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cj-pw-row b { text-align: right; font-weight: 700; white-space: nowrap; }
+.cj-track { position: relative; height: 100%; min-height: 18px; background: linear-gradient(var(--line), var(--line)) 50% 0 / 1px 100% no-repeat; }
+.cj-bar { position: absolute; height: 10px; opacity: .9; }
+.cj-ci { position: absolute; height: 2px; background: var(--ink); opacity: .55; }
+@media (max-width: 640px) { .cj-pw-row { grid-template-columns: minmax(0, 1fr) minmax(70px, 1.3fr) 52px; gap: 6px; font-size: 13px; } }
+
+.cj-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin: 0; padding: 0; list-style: none; }
+.cj-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; }
+
+.cj-progress { height: 12px; background: var(--bg-sunk); border-radius: var(--radius-sm); overflow: hidden; max-width: 520px; }
+.cj-progress i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+
+.cj-traces { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.cj-trace { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; background: var(--bg); min-width: 0; }
+.cj-trace .t { font-size: 12.5px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.cj-trace .t span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cj-trace .t em { font-style: normal; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
+.cj-trace svg { display: block; width: 100%; height: 64px; }
+.cj-trace .burn { fill: var(--bg-sunk); }
+.cj-trace .ln { fill: none; stroke: var(--c1); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.cj-trace .mid { stroke: var(--ink-3); stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+
+.cj-plot { width: 100%; height: auto; display: block; }
+.cj-plot text { font-family: var(--font); }
+.cj-plot .ax { font-size: 13px; fill: var(--ink-3); }
+.cj-plot .grid { stroke: var(--line); }
+.cj-plot .ln { fill: none; stroke-width: 2.5; }
+.cj-plot .lb { font-size: 13px; font-weight: 700; }
+
+/* Design preview: CBC tasks and rating cards */
+.cj-tasks { display: grid; gap: 12px; }
+.cj-task { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--bg); }
+.cj-task > b { font-size: 13px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; }
+.cj-alts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+.cj-alt { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13.5px; background: var(--bg-soft); }
+.cj-alt dl { margin: 0; display: grid; gap: 2px; }
+.cj-alt dt { font-size: 12px; color: var(--ink-3); }
+.cj-alt dd { margin: 0 0 4px; font-weight: 700; overflow-wrap: anywhere; }
+
+/* Respondent screen (portal over the page, like the tree test) */
+.cj-choice { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .cj-choice { grid-template-columns: 1fr; } }
+.cj-opt { border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; background: var(--bg); display: grid; gap: 10px; align-content: start; }
+.cj-opt h2 { margin: 0; font-size: 17px; }
+.cj-opt dl { margin: 0; display: grid; gap: 4px; }
+.cj-opt dt { font-size: 13px; color: var(--ink-3); }
+.cj-opt dd { margin: 0 0 6px; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.cj-opt.ranked { border-color: var(--accent); }
+.cj-opt .rk { font-size: 13px; font-weight: 800; color: var(--accent); }
+.cj-scale { display: flex; flex-wrap: wrap; gap: 6px; }
+.cj-scale button { min-width: 44px; height: 44px; font: inherit; font-weight: 700; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); cursor: pointer; }
+.cj-scale button:hover, .cj-scale button:focus-visible { border-color: var(--ink); }
+.cj-scale-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); max-width: 560px; }
+.cj-none { justify-self: start; }
+
+.cj-cell-best { font-weight: 700; color: var(--ok); }
+.cj-muted { color: var(--ink-3); }

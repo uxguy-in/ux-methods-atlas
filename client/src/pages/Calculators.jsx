@@ -19,6 +19,7 @@ import SurveystatsFactor from '../calc/tools/SurveystatsFactor.jsx';
 import SurveystatsValidity from '../calc/tools/SurveystatsValidity.jsx';
 import SurveystatsDrivers from '../calc/tools/SurveystatsDrivers.jsx';
 import SurveystatsCrosstab from '../calc/tools/SurveystatsCrosstab.jsx';
+import ConjointStudio from '../calc/tools/Conjoint.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2679,6 +2680,7 @@ const COMPONENTS = {
   'loss-aversion': LossAversion, 'weber-jnd': WeberJND, 'tree-test': TreeTest, hta: HTA,
   'card-sort': CardSort, 'first-click': FirstClick,
   'factor-analysis': SurveystatsFactor, 'scale-validity': SurveystatsValidity, 'key-drivers': SurveystatsDrivers, crosstab: SurveystatsCrosstab,
+  conjoint: ConjointStudio,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
