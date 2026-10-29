@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as S from '../../client/src/calc/stats.js';
+import * as CL from '../../client/src/calc/cluster.js';
 import { CATALOG, CALCS_BY_METHOD } from '../../client/src/calc/catalog.js';
 import { kinds } from '../lib/data.js';
 
@@ -253,6 +254,59 @@ const sylWords = { usability: 5, research: 2, participant: 4, questionnaire: 3, 
 const sylOk = Object.entries(sylWords).filter(([w, n]) => S.syllables(w) === n).length;
 near('Syllable heuristic: share of 20 common UX words counted exactly (at least 90%)', sylOk / 20, 1, 0.1);
 same('Sentence splitting with paragraphs and list items', S.readability('One two. Three four!\n\nFive six?\n- seven eight\n- nine').sentences, 5);
+
+// ── Clustering (calc/cluster.js), against scikit-learn 1.9, scipy 1.18 and numpy 2.5 on the same data. The reference
+// script computed: KMeans(init=fixed centres, n_init=1, algorithm='lloyd'), silhouette_score (Euclidean and precomputed),
+// DBSCAN, a numpy Gower matrix, a brute-force k-medoids optimum over all 120 sets of 3 medoids, scipy linkage (ward and
+// average), numpy SVD for PCA, numpy eigh for classical MDS and adjusted_rand_score.
+const samePartition = (a, b) => { const f = new Map(), g = new Map(); for (let i = 0; i < a.length; i++) { if (f.has(a[i]) && f.get(a[i]) !== b[i]) return false; if (g.has(b[i]) && g.get(b[i]) !== a[i]) return false; f.set(a[i], b[i]); g.set(b[i], a[i]); } return true; };
+const maxDiff = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+const KX = [[1.0,2.0,0.5],[1.5,1.8,0.7],[5.0,8.0,3.1],[8.0,8.0,2.9],[1.0,0.6,0.4],[9.0,11.0,3.5],[8.0,2.0,6.0],[10.0,2.0,6.2],[9.0,3.0,5.5],[2.0,1.0,0.9],[7.5,9.0,3.0],[9.5,2.5,5.9]].map((r) => Float64Array.from(r));
+const kmL = CL.kmeansLloyd(KX, [KX[0], KX[2], KX[6]]);
+same('k-means labels from fixed centres (sklearn [0, 0, 1, 1, 0, 1, 2, 2, 2, 0, 1, 2])', samePartition(kmL.labels, [0, 0, 1, 1, 0, 1, 2, 2, 2, 0, 1, 2]), true);
+near('k-means inertia (sklearn)', kmL.inertia, 20.174999999999997, 1e-9);
+near('k-means++ with 10 restarts finds the same inertia', CL.kmeans(KX, 3, { seed: 3 }).inertia, 20.174999999999997, 1e-9);
+near('k-prototypes with no nominal columns reduces to k-means (same inertia)', CL.kprototypes(KX, KX.map(() => []), 3, 1, { seed: 3 }).cost, 20.174999999999997, 1e-9);
+near('Silhouette, Euclidean (sklearn silhouette_score)', CL.silhouette(CL.euclidMatrix(KX), 12, [0,0,1,1,0,1,2,2,2,0,1,1]).mean, 0.5581382251094512, 1e-12);
+const DP = [[1,1],[1.2,1.1],[0.9,1.3],[1.1,0.8],[5,5],[5.2,5.1],[4.9,5.3],[5.1,4.8],[5.3,5.2],[9,1],[3,3],[1.05,1.0],[8.8,1.2],[9.1,0.9],[2.0,2.0]].map((r) => Float64Array.from(r));
+const dbl = CL.dbscan(CL.euclidMatrix(DP), DP.length, 0.5, 3).labels;
+same('DBSCAN eps 0.5, minPts 3: same clusters as sklearn', samePartition(dbl, [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, -1, 0, 2, 2, -1]), true);
+same('DBSCAN noise points (sklearn: rows 10 and 14)', dbl.map((l, i) => (l < 0 ? i : -1)).filter((i) => i >= 0), [10, 14]);
+// Gower on a mixed table: two continuous columns, an ordinal answer scale (detected from its labels) and a nominal one.
+const gt = CL.parseTable('age,freq,team,score\n23,Never,a,1.5\n35,Sometimes,b,1.5\n47,Always,a,3.0\n52,Often,c,0\n29,Rarely,b,2.0\n61,Always,a,2.5\n38,Sometimes,c,1.0');
+const gc = CL.guessColumns(gt);
+same('Column types guessed', gc.map((c) => c.type), ['continuous', 'ordinal', 'nominal', 'continuous']);
+same('Ordinal order from the answer scale', gc[1].levels, ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']);
+const gp = CL.prepare(gt, gc.map((c) => ({ name: c.name, index: c.index, type: c.type, levels: c.levels })));
+const GM = CL.gowerMatrix(gp.feats), GREF = [[0.0, 0.45394736842105265, 0.5328947368421053, 0.7532894736842105, 0.393640350877193, 0.5833333333333334, 0.5153508771929824], [0.45394736842105265, 0.0, 0.5789473684210527, 0.549342105263158, 0.14364035087719298, 0.6293859649122807, 0.31140350877192985], [0.5328947368421053, 0.5789473684210527, 0.0, 0.5953947368421053, 0.6392543859649124, 0.1337719298245614, 0.6008771929824561], [0.7532894736842105, 0.549342105263158, 0.5953947368421053, 0.0, 0.6929824561403508, 0.5800438596491229, 0.23793859649122806], [0.393640350877193, 0.14364035087719298, 0.6392543859649124, 0.6929824561403508, 0.0, 0.6896929824561403, 0.4550438596491228], [0.5833333333333334, 0.6293859649122807, 0.1337719298245614, 0.5800438596491229, 0.6896929824561403, 0.0, 0.6513157894736842], [0.5153508771929824, 0.31140350877192985, 0.6008771929824561, 0.23793859649122806, 0.4550438596491228, 0.6513157894736842, 0.0]];
+near('Gower distance matrix, largest difference from numpy', maxDiff(Array.from(GM), GREF.flat()), 0, 1e-12);
+near('Gower distance rows 1 and 4 (numpy 0.753289)', CL.gowerPair(gp.feats, 0, 3), 0.7532894736842105, 1e-12);
+near('Silhouette on precomputed Gower distances (sklearn)', CL.silhouette(GM, 7, [0,1,0,1,0,2,1]).mean, -0.005240518380507565, 1e-12);
+const PQ = [[0,0],[0.5,0.2],[0.1,0.9],[4,4],[4.3,3.8],[3.9,4.4],[8,0],[8.2,0.5],[7.7,0.3],[2,2.2]].map((r) => Float64Array.from(r));
+const pm = CL.pam(CL.euclidMatrix(PQ), 10, 3);
+same('PAM medoids (brute-force optimum [1, 3, 6])', [...pm.medoids].sort((a, b) => a - b), [1, 3, 6]);
+near('PAM total distance (brute-force optimum)', pm.cost, 5.58038849507685, 1e-12);
+const wz = CL.hclust(CL.euclidMatrix(PQ), 10, 'ward');
+near('Ward merge heights, largest difference from scipy linkage', maxDiff(wz.map((z) => z[2]), [0.3605551275463989, 0.4242640687119284, 0.5385164807134505, 0.5715476066494076, 0.6454972243679032, 0.939858145324779, 3.1466913840837116, 8.720815274251546, 12.640531935763132]), 0, 1e-12);
+same('Ward merge order and sizes (scipy)', wz.map((z) => [z[0], z[1], z[3]]), [[3, 4, 2], [6, 8, 2], [0, 1, 2], [7, 11, 3], [5, 10, 3], [2, 12, 3], [9, 15, 4], [14, 16, 7], [13, 17, 10]]);
+near('Average-linkage heights on Gower, largest difference from scipy', maxDiff(CL.hclust(GM, 7, 'average').map((z) => z[2]), [0.1337719298245614, 0.14364035087719298, 0.23793859649122806, 0.42379385964912286, 0.5462353801169592, 0.6081140350877192]), 0, 1e-12);
+same('Cutting the Ward tree at 3 clusters', samePartition(CL.cutTree(wz, 10, 3), [0,0,0,1,1,1,2,2,2,0]), true);
+const pc = CL.pca(KX);
+near('PCA explained variance, largest difference from numpy SVD', maxDiff(pc.variance, [21.088704376665678, 10.133886475225863, 0.23150005719935765]), 0, 1e-9);
+near('PCA share of variance, first component (numpy)', pc.ratio[0], 0.670459827868387, 1e-12);
+const mdsR = CL.classicalMDS(GM, 7);
+near('Classical MDS eigenvalues, largest difference from numpy eigh', maxDiff(mdsR.eigenvalues, [0.44265934516671557, 0.3588497389671265]), 0, 1e-10);
+near('Classical MDS coordinates up to sign, largest difference from numpy', maxDiff(mdsR.coords.flat(), [-0.12029530293672608, -0.2831320473034757, -0.23330601552955121, 0.00046265341261231285, 0.32180468681090724, -0.13052026885694162, 0.09982635466800166, 0.4146214650482723, -0.3050345047312535, -0.13905435711631486, 0.38222710384678127, -0.10573552264491672, -0.14522232212815944, 0.24335807746076418]), 0, 1e-8);
+near('Adjusted Rand index (sklearn)', CL.ari([0,0,0,1,1,1,2,2,2,2,0,1], [1,1,0,0,2,2,2,2,0,0,1,2]), 0.21160409556313994, 1e-12);
+near('Adjusted Rand index, same partition with other labels (sklearn 1)', CL.ari([0,0,1,1,-1,2,2], [5,5,3,3,7,1,1]), 1, 1e-12);
+// The example survey: the four built-in respondent types come back as four clusters on Gower distance.
+const ex = CL.parseTable(CL.exampleSurvey());
+const exc = CL.guessColumns(ex);
+same('Example survey column types', exc.map((c) => c.type), ['ignore', 'ordinal', 'nominal', 'continuous', 'ordinal', 'ordinal', 'ordinal', 'ordinal', 'ordinal', 'nominal', 'continuous']);
+const exp = CL.prepare(ex, exc.filter((c) => c.type !== 'ignore').map((c) => ({ name: c.name, index: c.index, type: c.type, levels: c.levels })), 'impute');
+const exr = CL.run(exp, { algo: 'pam', distance: 'gower', scaling: 'z', k: 'auto', seed: 1 });
+same('Example survey: best k by silhouette (k-medoids on Gower)', exr.bestK, 4);
+same('Example survey: CSV export adds cluster and persona columns', CL.toCSV(ex, exp.used, exr.labels, []).split('\n')[0].endsWith(',cluster,persona'), true);
 
 // ── The shared catalog matches the calculators page: every calculator has a component, and the methods each one
 // lists in calc/catalog.js are exactly the methods its "How this is calculated" section links to.

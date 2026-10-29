@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import * as S from '../calc/stats.js';
+import * as CL from '../calc/cluster.js';
 import { CATALOG } from '../calc/catalog.js';
 
 // ── Formatting ──
@@ -1990,6 +1991,386 @@ function Readability() {
   );
 }
 
+// ── 40. Cluster to personas ──
+// Categorical palette (CSS tokens --c1 to --c8, stepped separately for dark mode) plus a marker shape per cluster,
+// so clusters never depend on colour alone. Noise points are grey.
+const CL_SHAPES = ['circle', 'square', 'triangle', 'diamond', 'down', 'plus', 'hex', 'star'];
+const clColor = (c) => (c < 0 ? 'var(--ink-3)' : `var(--c${(c % 8) + 1})`);
+function Marker({ x, y, c, r = 4.5, strong, title }) {
+  const shape = c < 0 ? 'circle' : CL_SHAPES[c % 8];
+  const st = { fill: clColor(c), stroke: strong ? 'var(--ink)' : 'var(--bg)', strokeWidth: strong ? 2 : 0.75, opacity: c < 0 ? 0.6 : 0.9 };
+  const R = strong ? r * 1.9 : c < 0 ? r * 0.75 : r;
+  const poly = (pts) => <polygon points={pts.map(([a, b]) => `${x + a * R},${y + b * R}`).join(' ')} style={st}>{title && <title>{title}</title>}</polygon>;
+  if (shape === 'circle') return <circle cx={x} cy={y} r={R} style={st}>{title && <title>{title}</title>}</circle>;
+  if (shape === 'square') return <rect x={x - R * 0.85} y={y - R * 0.85} width={R * 1.7} height={R * 1.7} style={st}>{title && <title>{title}</title>}</rect>;
+  if (shape === 'triangle') return poly([[0, -1.15], [1.05, 0.75], [-1.05, 0.75]]);
+  if (shape === 'down') return poly([[0, 1.15], [1.05, -0.75], [-1.05, -0.75]]);
+  if (shape === 'diamond') return poly([[0, -1.2], [1.05, 0], [0, 1.2], [-1.05, 0]]);
+  if (shape === 'plus') return poly([[-0.35, -1.1], [0.35, -1.1], [0.35, -0.35], [1.1, -0.35], [1.1, 0.35], [0.35, 0.35], [0.35, 1.1], [-0.35, 1.1], [-0.35, 0.35], [-1.1, 0.35], [-1.1, -0.35], [-0.35, -0.35]]);
+  if (shape === 'hex') return poly(Array.from({ length: 6 }, (_, i) => [Math.cos((i * Math.PI) / 3), Math.sin((i * Math.PI) / 3)]));
+  return poly(Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? 0.5 : 1.2; return [rr * Math.cos(a), rr * Math.sin(a)]; }));
+}
+function Swatch({ c }) { return <svg width="16" height="16" aria-hidden="true" style={{ verticalAlign: '-3px' }}><Marker x={8} y={8} c={c} r={5} /></svg>; }
+
+// Small line chart on the expectation-plot frame, with an optional highlighted x and a horizontal reference line.
+function MiniLine({ xs, ys, label, xLabel, yLabel, mark, hline, hlineLabel, fmtY = (v) => num(v, 2), fmtX = (v) => String(v), dots = true }) {
+  const W = 360, H = 230, L = 50, R = 12, T = 14, B = 38;
+  const ok = ys.map((y, i) => [xs[i], y]).filter(([, y]) => Number.isFinite(y));
+  if (ok.length < 2) return null;
+  let y0 = Math.min(...ok.map((p) => p[1]), Number.isFinite(hline) ? hline : Infinity), y1 = Math.max(...ok.map((p) => p[1]), Number.isFinite(hline) ? hline : -Infinity);
+  if (y1 - y0 < 1e-9) { y0 -= 0.5; y1 += 0.5; }
+  const pad = (y1 - y0) * 0.08; y0 -= pad; y1 += pad;
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const sx = (v) => L + ((v - x0) / (x1 - x0 || 1)) * (W - L - R), sy = (v) => T + (1 - (v - y0) / (y1 - y0)) * (H - T - B);
+  const yt = [0, 0.5, 1].map((t) => y0 + pad + t * (y1 - y0 - 2 * pad));
+  const xt = dots ? xs : [x0, Math.round((x0 + x1) / 2), x1];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={label}>
+      <rect x={L} y={T} width={W - L - R} height={H - T - B} className="q ok" />
+      {yt.map((t, i) => <g key={i}><line x1={L} x2={W - R} y1={sy(t)} y2={sy(t)} style={{ stroke: 'var(--line)' }} /><text x={L - 6} y={sy(t) + 4} className="ax" textAnchor="end">{fmtY(t)}</text></g>)}
+      {xt.map((t) => <text key={t} x={sx(t)} y={H - B + 15} className="ax" textAnchor="middle">{fmtX(t)}</text>)}
+      {Number.isFinite(hline) && <g><line x1={L} x2={W - R} y1={sy(hline)} y2={sy(hline)} style={{ stroke: 'var(--accent)', strokeWidth: 1.5, strokeDasharray: '5 4' }} /><text x={W - R - 4} y={sy(hline) - 5} className="dl" textAnchor="end">{hlineLabel}</text></g>}
+      <polyline points={ok.map(([x, y]) => `${sx(x)},${sy(y)}`).join(' ')} style={{ fill: 'none', stroke: 'var(--ink-2)', strokeWidth: 2 }} />
+      {dots && ok.map(([x, y]) => <circle key={x} cx={sx(x)} cy={sy(y)} r={x === mark ? 6 : 3.5} className={x === mark ? 'dot' : ''} style={x === mark ? undefined : { fill: 'var(--ink-2)' }}><title>{`k = ${x}: ${fmtY(y)}`}</title></circle>)}
+      <text x={(L + W - R) / 2} y={H - 6} className="ax" textAnchor="middle">{xLabel}</text>
+      <text x={12} y={(T + H - B) / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>{yLabel}</text>
+    </svg>
+  );
+}
+
+// 2D map of respondents: PCA scores or classical MDS coordinates, equal scale on both axes.
+function ClusterMap({ r, names }) {
+  const W = 560, H = 440, P = 34;
+  const pts = r.embed.points.map((a, t) => ({ a, x: r.embed.coords[t][0], y: r.embed.coords[t][1], c: r.sampleLabels[a] }));
+  const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const span = Math.max(Math.max(...xs) - Math.min(...xs), (Math.max(...ys) - Math.min(...ys)) * ((W - 2 * P) / (H - 2 * P)), 1e-9);
+  const k = (W - 2 * P) / span;
+  const sx = (v) => W / 2 + (v - cx) * k, sy = (v) => H / 2 - (v - cy) * k;
+  const pos = new Map(pts.map((p) => [p.a, p]));
+  const centre = (c) => { const m = pts.filter((p) => p.c === c); return r.centroidMode ? { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) } : pos.get(r.reps[c]) || { x: S.mean(m.map((p) => p.x)), y: S.mean(m.map((p) => p.y)) }; };
+  const ax = r.embed.kind === 'pca'
+    ? [`Component 1 (${pct(r.embed.ratio[0], 0)} of variance) →`, `Component 2 (${pct(r.embed.ratio[1], 0)}) →`]
+    : ['MDS dimension 1 (no units) →', 'MDS dimension 2 (no units) →'];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={`Respondents on a ${r.embed.kind === 'pca' ? 'principal component' : 'multidimensional scaling'} map, marked by cluster`}>
+      <rect x={P} y={P / 2} width={W - 2 * P} height={H - P * 1.5} className="q ok" />
+      {pts.filter((p) => p.c < 0).map((p) => <Marker key={p.a} x={sx(p.x)} y={sy(p.y)} c={-1} title={`Row ${r.rowOf(p.a)}: noise`} />)}
+      {pts.filter((p) => p.c >= 0).map((p) => <Marker key={p.a} x={sx(p.x)} y={sy(p.y)} c={p.c} title={`Row ${r.rowOf(p.a)}: ${names[p.c]}`} />)}
+      {r.clusters.map((c) => { const m = centre(c); return <g key={c}><Marker x={sx(m.x)} y={sy(m.y)} c={c} r={5} strong title={`${r.centroidMode ? 'Centre' : 'Most typical member'} of ${names[c]}`} /><text x={sx(m.x) + 12} y={sy(m.y) - 9} className="dl">{c + 1}</text></g>; })}
+      <text x={W / 2} y={H - 6} className="ax" textAnchor="middle">{ax[0]}</text>
+      <text x={12} y={H / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${H / 2})`}>{ax[1]}</text>
+    </svg>
+  );
+}
+
+// Silhouette plot: one thin bar per respondent, grouped by cluster and sorted, with the overall mean dashed.
+function SilhouettePlot({ r }) {
+  const W = 560, L = 40, R = 14, T = 10, B = 34;
+  const groups = r.clusters.map((c) => r.sil.s.map((v, a) => [v, a]).filter(([, a]) => r.sampleLabels[a] === c).map(([v]) => v).sort((a, b) => b - a));
+  const n = groups.reduce((s, g) => s + g.length, 0), gap = 8;
+  const H = Math.max(220, Math.min(460, n * 2 + gap * groups.length + T + B));
+  const bh = (H - T - B - gap * (groups.length - 1)) / Math.max(1, n);
+  const lo = Math.min(0, ...groups.flat()), x0 = Math.min(-0.2, Math.floor(lo * 10) / 10);
+  const sx = (v) => L + ((v - x0) / (1 - x0)) * (W - L - R);
+  let y = T;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label="Silhouette width of each respondent, grouped by cluster">
+      {[x0, 0, 0.25, 0.5, 0.75, 1].filter((v, i, a) => a.indexOf(v) === i).map((v) => <g key={v}><line x1={sx(v)} x2={sx(v)} y1={T} y2={H - B} style={{ stroke: 'var(--line)' }} /><text x={sx(v)} y={H - B + 15} className="ax" textAnchor="middle">{num(v, 2)}</text></g>)}
+      {groups.map((g, gi) => {
+        const top = y; y += g.length * bh + gap;
+        return <g key={gi}>
+          {g.map((v, i) => <rect key={i} x={Math.min(sx(0), sx(v))} y={top + i * bh} width={Math.abs(sx(v) - sx(0))} height={Math.max(bh, 0.6)} style={{ fill: clColor(r.clusters[gi]) }} />)}
+          <text x={L - 8} y={top + (g.length * bh) / 2 + 4} className="dl" textAnchor="end">{r.clusters[gi] + 1}</text>
+        </g>;
+      })}
+      <line x1={sx(r.sil.mean)} x2={sx(r.sil.mean)} y1={T} y2={H - B} style={{ stroke: 'var(--ink)', strokeWidth: 1.5, strokeDasharray: '5 4' }} />
+      <text x={W / 2} y={H - 4} className="ax" textAnchor="middle">Silhouette width (dashed: average {num(r.sil.mean, 2)}) →</text>
+    </svg>
+  );
+}
+
+// Dendrogram of the last merges (at most 30 branches, like scipy's truncate_mode='lastp'), cut at k.
+function Dendrogram({ r }) {
+  const Z = r.Z, n = r.n, P = Math.min(n, 30), thresh = 2 * n - P;
+  const W = 560, H = 300, L = 46, R = 12, T = 12, B = 34;
+  const leaves = [], segs = [];
+  const rep = (id) => { while (id >= n) id = Z[id - n][0]; return id; };
+  const top = Z[n - 2][2] || 1;
+  const sy = (h) => T + (1 - h / top) * (H - T - B);
+  const walk = (id) => {
+    if (id < thresh || id < n) { leaves.push(id); return { x: leaves.length - 1, h: 0 }; }
+    const [a, b, h] = Z[id - n];
+    const A = walk(a), Bn = walk(b);
+    segs.push([A.x, A.h, h], [Bn.x, Bn.h, h], [A.x, h, h, Bn.x]);
+    return { x: (A.x + Bn.x) / 2, h };
+  };
+  walk(2 * n - 2);
+  const sx = (x) => L + ((x + 0.5) / leaves.length) * (W - L - R);
+  const k = r.k, cut = k >= 2 && k <= n - 1 ? (Z[n - k - 1][2] + Z[n - k][2]) / 2 : null;
+  const size = (id) => (id < n ? 1 : Z[id - n][3]);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="exp-plot" role="img" aria-label={`Dendrogram of the last ${P} merges, cut into ${k} clusters`}>
+      {[0, 0.5, 1].map((t) => <g key={t}><line x1={L} x2={W - R} y1={sy(t * top)} y2={sy(t * top)} style={{ stroke: 'var(--line)' }} /><text x={L - 6} y={sy(t * top) + 4} className="ax" textAnchor="end">{num(t * top, 2)}</text></g>)}
+      {segs.map((s, i) => (s.length === 3
+        ? <line key={i} x1={sx(s[0])} x2={sx(s[0])} y1={sy(s[1])} y2={sy(s[2])} style={{ stroke: 'var(--ink-2)', strokeWidth: 1.5 }} />
+        : <line key={i} x1={sx(s[0])} x2={sx(s[3])} y1={sy(s[1])} y2={sy(s[1])} style={{ stroke: 'var(--ink-2)', strokeWidth: 1.5 }} />))}
+      {leaves.map((id, i) => <g key={id}><Marker x={sx(i)} y={sy(0) + 8} c={r.sampleLabels[rep(id)]} r={3.5} title={`${size(id)} respondent${size(id) > 1 ? 's' : ''}`} /></g>)}
+      {cut !== null && <g><line x1={L} x2={W - R} y1={sy(cut)} y2={sy(cut)} style={{ stroke: 'var(--accent)', strokeWidth: 1.5, strokeDasharray: '6 4' }} /><text x={W - R - 4} y={sy(cut) - 5} className="dl" textAnchor="end">cut: {k} clusters</text></g>}
+      <text x={W / 2} y={H - 4} className="ax" textAnchor="middle">{P < n ? `Last ${P} branches; markers show each branch's cluster` : 'Respondents; markers show their cluster'}</text>
+      <text x={12} y={(T + H - B) / 2} className="ax" textAnchor="middle" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>Merge height</text>
+    </svg>
+  );
+}
+
+// Stacked share bar for an ordinal column inside a persona card.
+function LevelBar({ dist, levels }) {
+  return <span className="clu-levels" aria-label={levels.map((l, i) => `${l}: ${pct(dist[i], 0)}`).join(', ')}>{dist.map((d, i) => d > 0 && <i key={i} title={`${levels[i]}: ${pct(d, 0)}`} style={{ flex: d, opacity: 0.25 + (0.75 * i) / Math.max(1, levels.length - 1) }} />)}</span>;
+}
+
+const CL_ALGOS = [['pam', 'k-medoids (PAM)'], ['kproto', 'k-prototypes'], ['kmeans', 'k-means'], ['dbscan', 'DBSCAN'], ['hier', 'Hierarchical']];
+const CL_TYPES = [['continuous', 'Continuous'], ['ordinal', 'Ordinal'], ['nominal', 'Nominal'], ['ignore', 'Ignore (ID or free text)']];
+const textHash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return `${s.length}:${h}`; };
+const download = (name, text, type) => {
+  const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+const silWords = (s) => (s > 0.7 ? 'strong structure' : s > 0.5 ? 'reasonable structure' : s > 0.25 ? 'weak structure that could be partly artificial' : 'no substantial structure');
+
+function ClusterPersonas() {
+  const [text, setText] = useState(() => CL.exampleSurvey());
+  const table = useMemo(() => CL.parseTable(text), [text]);
+  const guessed = useMemo(() => CL.guessColumns(table), [table]);
+  const headKey = table.headers.join('\u0001');
+  const [over, setOver] = useState({ key: headKey, map: {} });
+  const ovr = over.key === headKey ? over.map : {};
+  const setCol = (name, patch) => setOver({ key: headKey, map: { ...ovr, [name]: { ...ovr[name], ...patch } } });
+  const cols = guessed.map((g) => ({ ...g, type: ovr[g.name]?.type ?? g.type, levels: ovr[g.name]?.levels ?? g.levels }));
+  const [editing, setEditing] = useState(null);
+  const [missing, setMissing] = useState('impute');
+  const [algo, setAlgo] = useState('pam'); const [distance, setDistance] = useState('gower'); const [scaling, setScaling] = useState('z');
+  const [oneHot, setOneHot] = useState('onehot'); const [linkage, setLinkage] = useState('average');
+  const [kMode, setKMode] = useState('auto'); const [kNum, setKNum] = useState('4');
+  const [eps, setEps] = useState(''); const [minPts, setMinPts] = useState('5'); const [seed, setSeed] = useState('1'); const [gammaScale, setGammaScale] = useState('1');
+  const [res, setRes] = useState(null); const [busy, setBusy] = useState(false); const [err, setErr] = useState('');
+  const [stab, setStab] = useState(null); const [names, setNames] = useState({});
+
+  const spec = cols.filter((c) => c.type !== 'ignore').map((c) => ({ name: c.name, index: c.index, type: c.type, levels: c.levels }));
+  const specKey = JSON.stringify(spec.map((s) => [s.index, s.type, s.type === 'ordinal' ? s.levels : 0]));
+  const prep = useMemo(() => (spec.length && table.rows.length ? CL.prepare(table, spec, missing) : null), [table, specKey, missing]);
+  const hasNom = spec.some((s) => s.type === 'nominal'), hasNum = spec.some((s) => s.type !== 'nominal');
+  const opts = { algo, distance, scaling, oneHot: oneHot === 'onehot', linkage, k: kMode === 'auto' ? 'auto' : int(kNum), eps: eps === '' ? NaN : n_(eps), minPts: Math.max(2, int(minPts) || 5), seed: Math.max(1, int(seed) || 1), gammaScale: n_(gammaScale) >= 0 ? n_(gammaScale) : 1 };
+  const runKey = `${textHash(text)}|${specKey}|${missing}|${JSON.stringify(opts)}`;
+  const tooFew = !prep || prep.n < 4;
+
+  const run = () => {
+    if (tooFew) return;
+    setBusy(true); setErr(''); setStab(null);
+    setTimeout(() => {
+      try {
+        const r = CL.run(prep, opts);
+        r.rowOf = (a) => prep.used[r.idx[a]] + 1;
+        r.centroidMode = algo === 'kmeans' || algo === 'kproto';
+        setRes({ r, profs: CL.profiles(prep, r.labels), prep, table, key: runKey, opts });
+        setNames({});
+      } catch (e) { setErr(e.message || String(e)); setRes(null); }
+      setBusy(false);
+    }, 30);
+  };
+  useEffect(() => { run(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const checkStability = () => {
+    setBusy(true);
+    setTimeout(() => { try { setStab(CL.stability(res.prep, res.opts, res.r, 10)); } catch (e) { setErr(e.message || String(e)); } setBusy(false); }, 30);
+  };
+
+  const r = res?.r, profs = res?.profs || [];
+  const nameOf = (c) => names[c] ?? profs.find((p) => p.cluster === c)?.suggestedName ?? `Cluster ${c + 1}`;
+  const nameList = profs.map((p) => nameOf(p.cluster));
+  const stale = res && res.key !== runKey;
+  const algoName = (a) => CL_ALGOS.find(([v]) => v === a)[1];
+  const moveLevel = (c, i, d) => { const lv = [...c.levels]; const j = i + d; if (j < 0 || j >= lv.length) return; [lv[i], lv[j]] = [lv[j], lv[i]]; setCol(c.name, { levels: lv }); };
+  const meta = r ? `${algoName(res.opts.algo)}, ${r.k} clusters, ${r.N} respondents, average silhouette ${num(r.sil.mean, 2)}. Made with the UX Methods Atlas cluster-to-personas calculator.` : '';
+
+  return (
+    <div className="clu-root">
+      <p className="calc-warn">Your data never leaves this device: parsing, clustering and the charts all run in your browser, and nothing you paste is uploaded or stored.</p>
+      <h2 className="clu-h">1. Your data</h2>
+      <div className="calc-inputs">
+        <Area label="Paste survey data with a header row" value={text} onChange={setText} rows={8}
+          hint="Copy the cells straight from Excel or Google Sheets (tab-separated), or paste CSV. One respondent per row, one question per column." />
+        <div className="clu-actions">
+          <button type="button" className="btn ghost small" onClick={() => setText(CL.exampleSurvey())}>Load example</button>
+          <button type="button" className="btn ghost small" onClick={() => setText('')}>Clear</button>
+        </div>
+      </div>
+      {table.headers.length > 0 && (
+        <>
+          <div className="clu-scroll">
+            <table className="clu-table">
+              <thead><tr><th>Column</th><th>Type</th><th>Missing</th><th>Distinct</th><th>Summary</th></tr></thead>
+              <tbody>
+                {cols.map((c) => {
+                  const sm = c.type === 'ignore' ? { text: c.why ? `Guessed: ${c.why}` : '', bad: 0 } : CL.summarise(table, c, c.type, c.levels);
+                  const canOrder = c.type === 'ordinal' && !c.numeric;
+                  return (
+                    <tr key={c.name} className={c.type === 'ignore' ? 'off' : ''}>
+                      <td><b>{c.name}</b></td>
+                      <td>
+                        <select className="select" value={c.type} aria-label={`Type of ${c.name}`} onChange={(e) => setCol(c.name, { type: e.target.value })}>
+                          {CL_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                        </select>
+                        {c.type !== c.guessed && <small className="muted"> (guessed {c.guessed})</small>}
+                      </td>
+                      <td>{c.missing}</td>
+                      <td>{c.distinct}</td>
+                      <td>
+                        {sm.text}
+                        {sm.bad > 0 && <> <span className="qtag opp">{sm.bad} not {c.type === 'continuous' ? 'numbers' : 'in the order'}, treated as missing</span></>}
+                        {canOrder && <> <button type="button" className="clu-link" onClick={() => setEditing(editing === c.name ? null : c.name)}>{editing === c.name ? 'Done' : 'Edit order'}</button></>}
+                        {canOrder && editing === c.name && (
+                          <ol className="clu-order">
+                            {c.levels.map((l, i) => (
+                              <li key={l}><span>{l}</span>
+                                <button type="button" aria-label={`Move ${l} up`} disabled={i === 0} onClick={() => moveLevel(c, i, -1)}>↑</button>
+                                <button type="button" aria-label={`Move ${l} down`} disabled={i === c.levels.length - 1} onClick={() => moveLevel(c, i, 1)}>↓</button>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="calc-inputs">
+            <Choice label="Missing values" value={missing} onChange={setMissing} options={[['drop', 'Drop the row'], ['impute', 'Fill in (median or mode)']]} />
+          </div>
+          {prep && <p className="muted clu-note">Using {prep.n} of {table.rows.length} rows{prep.dropped ? `; ${prep.dropped} dropped for missing values` : ''}{prep.imputed ? `; ${prep.imputed} missing value${prep.imputed > 1 ? 's' : ''} filled in` : ''}. Clustering on {spec.length} column{spec.length === 1 ? '' : 's'}: {spec.filter((s) => s.type === 'continuous').length} continuous, {spec.filter((s) => s.type === 'ordinal').length} ordinal, {spec.filter((s) => s.type === 'nominal').length} nominal.</p>}
+          {prep && prep.n > CL.MAX_ROWS && <Problem>There are {prep.n.toLocaleString()} rows. Distances between every pair of respondents grow with the square of the rows, so the clusters are found on a random {CL.MAX_ROWS.toLocaleString()} (CLARA-style) and every other row joins the cluster of its nearest sampled respondent.</Problem>}
+        </>
+      )}
+      {tooFew && <Problem>{!table.headers.length ? 'Paste data with a header row, or load the example.' : !spec.length ? 'Set at least one column to continuous, ordinal or nominal.' : 'At least four usable rows are needed.'}</Problem>}
+
+      <h2 className="clu-h">2. Method</h2>
+      <div className="calc-inputs">
+        <Choice label="Algorithm" value={algo} onChange={setAlgo} options={CL_ALGOS} />
+        {(algo === 'pam' || algo === 'dbscan' || (algo === 'hier' && linkage === 'average')) && <Choice label="Distance" value={distance} onChange={setDistance} options={[['gower', 'Gower (mixed data)'], ['euclid', 'Euclidean (scaled)']]} />}
+        {algo === 'hier' && <Choice label="Linkage" value={linkage} onChange={setLinkage} options={[['average', 'Average'], ['ward', 'Ward (Euclidean)']]} />}
+        {(algo === 'kmeans' || algo === 'kproto' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && distance === 'euclid')) && hasNum && <Choice label="Scale numeric columns" value={scaling} onChange={setScaling} options={[['z', 'z-score'], ['minmax', 'Min-max (0 to 1)']]} />}
+        {hasNom && (algo === 'kmeans' || (algo === 'hier' && linkage === 'ward') || (algo !== 'kproto' && algo !== 'kmeans' && distance === 'euclid')) && <Choice label="Nominal columns" value={oneHot} onChange={setOneHot} options={[['onehot', 'One-hot encode'], ['drop', 'Leave out']]} />}
+        {algo === 'kproto' && <Num label="Weight on nominal mismatches" value={gammaScale} onChange={setGammaScale} min={0} step="any" suffix="× mean SD" hint="γ: 1 means a mismatch counts as much as the average spread of a scaled numeric column." />}
+        {algo !== 'dbscan' && <Choice label="Number of clusters" value={kMode} onChange={setKMode} options={[['auto', 'Best by silhouette'], ['manual', 'Choose k']]} />}
+        {algo !== 'dbscan' && kMode === 'manual' && <Num label="k" value={kNum} onChange={setKNum} min={2} max={12} />}
+        {algo === 'dbscan' && <Num label="eps (neighbourhood radius)" value={eps} onChange={setEps} min={0} step="any" hint="Leave blank to use the knee of the k-distance plot." />}
+        {algo === 'dbscan' && <Num label="minPts" value={minPts} onChange={setMinPts} min={2} hint="Respondents (including itself) a core point needs within eps." />}
+        {algo !== 'dbscan' && algo !== 'hier' && <Num label="Random seed" value={seed} onChange={setSeed} min={1} />}
+      </div>
+      {algo === 'kmeans' && hasNom && <Problem>k-means only understands numbers, so nominal columns are {oneHot === 'onehot' ? 'turned into 0/1 columns, which distorts distances' : 'left out'}. For survey data with categories, k-medoids on Gower distance or k-prototypes is usually a better choice.</Problem>}
+      {algo === 'pam' && <p className="muted clu-note">Recommended for mixed survey data: every cluster is centred on a real respondent, and Gower distance handles continuous, ordinal and nominal answers together.</p>}
+      <div className="clu-actions">
+        <button type="button" className="btn small" onClick={run} disabled={busy || tooFew}>{busy ? 'Working…' : 'Run clustering'}</button>
+        {busy && <span className="muted" role="status">Clustering in your browser…</span>}
+        {stale && !busy && <span className="qtag opp">Settings changed: run again to update</span>}
+      </div>
+      {err && <Problem>{err}</Problem>}
+
+      {r && (
+        <>
+          <h2 className="clu-h">3. Clusters</h2>
+          {r.notes.map((t) => <Problem key={t}>{t}</Problem>)}
+          <Result big={`${r.k} cluster${r.k === 1 ? '' : 's'}`} label={`${algoName(res.opts.algo)}${res.opts.algo === 'hier' ? ` (${res.opts.linkage === 'ward' ? 'Ward' : 'average'} linkage)` : ''} on ${r.wd === 'gower' ? 'Gower distance' : 'scaled Euclidean distance'}, ${r.N} respondents`} tone={r.sil.mean > 0.5 ? 'good' : r.sil.mean <= 0.25 ? 'bad' : ''}>
+            <p>The average silhouette is {num(r.sil.mean, 2)}, which by Kaufman and Rousseeuw's rule of thumb means {silWords(r.sil.mean)}. {r.bestK && (res.opts.k === 'auto' ? `k = ${r.bestK} gave the highest silhouette of the k values tried.` : r.bestK !== r.k ? `You chose k = ${r.k}; k = ${r.bestK} gave the highest silhouette.` : `k = ${r.k} also gave the highest silhouette.`)} {r.noise > 0 && `${r.noise} respondent${r.noise > 1 ? 's' : ''} (${pct(r.noise / r.n, 0)}) did not fit any dense group and ${r.noise > 1 ? 'are' : 'is'} marked as noise.`} {r.sampled && `Found on a random ${r.n} of the ${r.N} rows.`}</p>
+          </Result>
+          {r.sweep.length > 0 && (
+            <div className="clu-charts">
+              <div><h3 className="clu-h3">Elbow: {res.opts.algo === 'kmeans' ? 'within-cluster sum of squares' : res.opts.algo === 'kproto' ? 'k-prototypes cost' : res.opts.algo === 'hier' && res.opts.linkage === 'ward' ? 'within-cluster sum of squares' : 'total distance to the medoids'}</h3>
+                <MiniLine xs={r.sweep.map((s) => s.k)} ys={r.sweep.map((s) => s.cost)} mark={r.k} label="Elbow plot: cost by number of clusters" xLabel="Number of clusters, k" yLabel="Cost" fmtY={(v) => (Math.abs(v) >= 100 ? num(v, 0) : num(v, 1))} /></div>
+              <div><h3 className="clu-h3">Average silhouette (higher is better)</h3>
+                <MiniLine xs={r.sweep.map((s) => s.k)} ys={r.sweep.map((s) => s.sil)} mark={r.k} label="Average silhouette by number of clusters" xLabel="Number of clusters, k" yLabel="Silhouette" /></div>
+            </div>
+          )}
+          {r.kd && (
+            <div className="clu-charts">
+              <div><h3 className="clu-h3">k-distance plot: pick eps at the bend</h3>
+                <MiniLine xs={r.kd.map((_, i) => i + 1)} ys={r.kd} dots={false} hline={r.eps} hlineLabel={`eps ${num(r.eps, 3)}`} label="Sorted distance to each respondent's (minPts − 1)th nearest neighbour" xLabel="Respondents, sorted" yLabel={`Distance to neighbour ${r.minPts - 1}`} fmtY={(v) => num(v, 2)} fmtX={(v) => String(v)} /></div>
+              <div><p className="muted clu-note">Each point's distance to its {r.minPts - 1}th nearest neighbour, sorted. Points left of the bend sit in dense regions; the bend is a good eps. {Number.isFinite(res.opts.eps) ? `You set eps = ${num(r.eps, 3)}.` : `eps = ${num(r.eps, 3)} was taken from the bend.`} Raise eps to merge clusters and absorb noise; lower it to split them.</p></div>
+            </div>
+          )}
+          <div className="exp-wrap clu-map">
+            <ClusterMap r={r} names={nameList} />
+            <ol className="exp-list clu-legend">
+              {r.clusters.map((c) => <li key={c}><Swatch c={c} /> <b>{c + 1}. {nameList[c]}</b><br /><span className="muted">{r.labels.filter((l) => l === c).length} respondents ({pct(r.labels.filter((l) => l === c).length / r.N, 0)}) · silhouette {num(r.sil.byCluster.find((b) => b.cluster === c)?.mean, 2)}</span></li>)}
+              {r.noise > 0 && <li><Swatch c={-1} /> <b>Noise</b><br /><span className="muted">{r.labels.filter((l) => l < 0).length} respondents in no cluster</span></li>}
+              <li className="muted">{r.embed.kind === 'pca' ? `Principal components of the scaled numeric columns; together the two axes show ${pct(r.embed.ratio[0] + r.embed.ratio[1], 0)} of the variance.` : 'Classical multidimensional scaling of the Gower distances: nearby points answered alike. The axes have no units.'} Large outlined markers are each cluster's {r.centroidMode ? 'centre' : 'most typical member (medoid)'}.{r.embed.points.length < r.n ? ` Showing a random ${r.embed.points.length} of ${r.n}.` : ''}</li>
+            </ol>
+          </div>
+          <div className="clu-charts">
+            <div><h3 className="clu-h3">Silhouette by respondent</h3><SilhouettePlot r={r} />
+              <p className="muted clu-note">Bars near 1 sit well inside their cluster; bars below 0 are closer to another cluster than their own.</p></div>
+            {r.Z && <div><h3 className="clu-h3">Dendrogram</h3><Dendrogram r={r} /></div>}
+          </div>
+          <div className="clu-actions">
+            <button type="button" className="btn ghost small" onClick={checkStability} disabled={busy || stale}>Check stability</button>
+            {stab && <span><b>Adjusted Rand index {num(stab.mean, 2)}</b> on average across 10 reruns on random 80% subsamples (lowest {num(stab.min, 2)}). {stab.mean >= 0.8 ? 'The clusters come back almost the same: they look real.' : stab.mean >= 0.6 ? 'The clusters mostly come back, but some respondents move: treat the boundaries as soft.' : 'The clusters change a lot between reruns: they may be an artefact of this sample. Try another k or method.'}</span>}
+          </div>
+          <Stats rows={[
+            ['Respondents clustered', `${r.N}${r.sampled ? ` (found on ${r.n})` : ''}`],
+            ['Average silhouette', num(r.sil.mean, 3)],
+            Number.isFinite(r.cost) && ['Total cost', num(r.cost, 2)],
+            r.gamma !== undefined && ['γ (nominal weight)', num(r.gamma, 3)],
+            r.eps !== null && ['eps · minPts', `${num(r.eps, 4)} · ${r.minPts}`],
+            r.oneHot && ['Nominal columns', 'One-hot encoded'],
+            ['Time', `${r.ms} ms`],
+          ]} />
+
+          <h2 className="clu-h">4. Personas</h2>
+          <p className="calc-warn">Clusters are a starting point, not personas. Interview a few people from each cluster to learn the goals, contexts and stories behind the numbers before you write the persona (see <Link to="/methods/personas">Personas</Link> and <Link to="/methods/cluster-validation-with-qualitative-investigation">validating clusters with qualitative research</Link>).</p>
+          <div className="clu-actions no-print">
+            <button type="button" className="btn small" onClick={() => download('personas.md', CL.toMarkdown(profs, Object.fromEntries(profs.map((p) => [p.cluster, nameOf(p.cluster)])), meta), 'text/markdown')}>Download personas (Markdown)</button>
+            <button type="button" className="btn ghost small" onClick={() => download('data-with-clusters.csv', CL.toCSV(res.table, res.prep.used, r.labels, nameList), 'text/csv')}>Download data with clusters (CSV)</button>
+            <button type="button" className="btn ghost small" onClick={() => window.print()}>Print personas</button>
+          </div>
+          <div className="persona-grid">
+            {profs.map((p) => (
+              <article key={p.cluster} className="persona" style={{ '--pc': clColor(p.cluster) }}>
+                <div className="persona-head"><Swatch c={p.cluster} /><span className="muted">Cluster {p.cluster + 1} · {p.size} respondents ({pct(p.share, 0)})</span></div>
+                <label className="persona-name"><span className="sr-only">Persona name</span><input value={nameOf(p.cluster)} onChange={(e) => setNames({ ...names, [p.cluster]: e.target.value })} aria-label={`Name for cluster ${p.cluster + 1}`} /></label>
+                <p>{p.summary}</p>
+                <h3 className="clu-h3">What sets them apart</h3>
+                {p.apart.length ? <ul className="plain-list">{p.apart.map((a) => <li key={a.name}>{a.text}</li>)}</ul> : <p className="muted">Nothing stands out strongly from the sample as a whole.</p>}
+                <details>
+                  <summary>Full profile</summary>
+                  <dl className="persona-attrs">
+                    {p.attrs.map((a) => (
+                      <div key={a.name}>
+                        <dt>{a.name}</dt>
+                        <dd>{a.type === 'continuous' ? <>mean {num(a.mean, 1)} vs {num(a.overall, 1)} overall · median {num(a.median, 1)}</>
+                          : a.type === 'ordinal' ? <>median {a.median} vs {a.overallMedian} overall<LevelBar dist={a.dist} levels={a.levels} /></>
+                          : a.cats.slice(0, 3).map((c) => `${c.cat} ${pct(c.share, 0)} (vs ${pct(c.overall, 0)}${Number.isFinite(c.lift) ? `, lift ${num(c.lift, 1)}×` : ''})`).join(' · ')}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
+              </article>
+            ))}
+            {r.noise > 0 && <article className="persona" style={{ '--pc': 'var(--ink-3)' }}><div className="persona-head"><Swatch c={-1} /><span className="muted">Noise · {r.labels.filter((l) => l < 0).length} respondents</span></div><p>Respondents DBSCAN could not place in any dense group. They may be unusual cases worth a look, or a sign that eps is too small.</p></article>}
+          </div>
+        </>
+      )}
+      <About method="cluster-analysis" links={[['personas', 'Personas'], ['gowers-distance-for-mixed-data-clustering', "Gower's distance"], ['dbscan-density-based-clustering', 'DBSCAN'], ['silhouette-scores-and-gap-statistic-validation', 'Silhouette validation'], ['cophenetic-and-matrix-correlation-checks-for-hierarchical-clustering', 'Checks for hierarchical clustering'], ['choosing-a-resemblance-coefficient-for-clustering', 'Choosing a resemblance coefficient'], ['k-means-vs-gmm-comparison', 'k-means vs GMM'], ['gaussian-mixture-models-for-user-segmentation', 'Gaussian mixture models'], ['gmm-behavioural-clustering', 'GMM behavioural clustering'], ['latent-class-analysis-for-personas', 'Latent class analysis for personas'], ['factor-analytic-and-correspondence-analytic-persona-development', 'Factor-analytic personas'], ['cluster-validation-with-qualitative-investigation', 'Validating clusters qualitatively'], ['persona-validation-against-behavioural-data', 'Persona validation'], ['pca', 'PCA'], ['multidimensional-scaling-and-perceptual-mapping', 'Multidimensional scaling'], ['hypersona-semi-automated-clustering-algorithm-selection', 'HyPersona']]}>
+        <p><b>Data.</b> Continuous columns are used as numbers. Ordinal columns are ranked in the order shown (numbers in numeric order, recognised answer scales such as "Strongly disagree … Strongly agree" in scale order, bands such as "25–34" by their first number). Nominal columns are unordered categories. Missing values either drop the row or are filled with the column's median (continuous, ordinal) or most common answer (nominal).</p>
+        <p><b>Gower distance</b> (Gower 1971) averages one dissimilarity per column, each between 0 and 1: |x − y| ÷ range for continuous columns, |rank − rank| ÷ (levels − 1) for ordinal columns, and 0 for the same answer or 1 for a different one on nominal columns. <b>Scaling</b> for Euclidean methods is the z-score (x − mean) ÷ SD or min-max (x − min) ÷ (max − min); one-hot encoding turns each category into a 0/1 column.</p>
+        <p><b>k-means</b> minimises the within-cluster sum of squares Σ‖x − centre‖² with Lloyd's algorithm from k-means++ starts (the greedy version used by scikit-learn), keeping the best of 10 seeded restarts. <b>k-prototypes</b> (Huang 1997) minimises Σ‖x<sub>num</sub> − mean‖² + γ × (nominal mismatches with the cluster's modes), with γ = mean SD of the scaled numeric columns × your weight. <b>k-medoids</b> uses PAM (Kaufman and Rousseeuw): a greedy BUILD, then the swap of a medoid for a non-medoid that most lowers the total distance, repeated until no swap helps, using Schubert and Rousseeuw's FastPAM1 speed-up, which finds the same swaps. <b>DBSCAN</b> (Ester et al. 1996) grows clusters from core points with at least minPts respondents within eps; the rest are noise. <b>Hierarchical</b> clustering merges the closest pair of clusters step by step (nearest-neighbour chain with Lance-Williams updates); Ward's linkage merges the pair that least increases the within-cluster sum of squares, average linkage uses the mean distance between members. The tree is cut at k.</p>
+        <p><b>Choosing k.</b> For k = 2 to 8 the calculator plots the method's cost (the elbow) and the average silhouette s = (b − a) ÷ max(a, b), where a is a respondent's mean distance to its own cluster and b to the nearest other cluster (Rousseeuw 1987). It suggests the k with the highest silhouette. Above 0.7 is strong structure, 0.5 to 0.7 reasonable, 0.25 to 0.5 weak, below that none (Kaufman and Rousseeuw 1990). <b>Stability</b> reclusters ten random 80% subsamples with new seeds and compares each with the full solution using the adjusted Rand index (1 is identical, 0 is chance agreement).</p>
+        <p><b>The map</b> uses principal component analysis of the scaled columns when all columns are numeric, and classical (Torgerson) multidimensional scaling of the Gower distances otherwise: the top eigenvectors of −½ J D² J, scaled by the square root of their eigenvalues. <b>Personas</b> rank attributes by standardised difference, (cluster mean − overall mean) ÷ overall SD for continuous and ordinal columns, and (p<sub>cluster</sub> − p) ÷ √(p(1 − p)) for the most over-represented category of a nominal column, whose lift is p<sub>cluster</sub> ÷ p. Results match scikit-learn, scipy and numpy on test data (<code>npm run check:calc</code>).</p>
+        <p><b>When not to use it.</b> Clustering always returns clusters, even from data with no groups in it, so check the silhouette and the stability before believing them. With fewer than about 50 respondents, or many more columns than respondents, clusters are fragile. Clusters reflect the questions you asked: if the survey only asks about attitudes, the segments will be attitudinal. Use latent class analysis or Gaussian mixtures when you want probabilities of membership and a statistical test for the number of groups, and always ground the personas in qualitative research.</p>
+      </About>
+    </div>
+  );
+}
+
 const COMPONENTS = {
   'sample-size': SampleSize, 'completion-rate': CompletionRate, 'task-time': TaskTime, rating: Rating, sus: SUS, 'umux-lite': UMUXLite,
   sum: SUM, 'top-box': TopBox, nps: NPS, seq: SEQ, 'nasa-tlx': NasaTLX, ueq: UEQ, attrakdiff: AttrakDiff,
@@ -1997,7 +2378,7 @@ const COMPONENTS = {
   'effect-size': EffectSize, nonparametric: Nonparametric, 'bayes-ab': BayesAB, sprt: SPRT, reliability: Reliability,
   'margin-of-error': MarginOfError, intercoder: InterCoder, saturation: Saturation, expectation: Expectation, discovery: Discovery,
   'capture-recapture': CaptureRecapture, klm: KLM, fitts: Fitts, hick: Hick, 'van-westendorp': VanWestendorp, 'gabor-granger': GaborGranger,
-  kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability,
+  kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability, 'cluster-personas': ClusterPersonas,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
@@ -2015,7 +2396,7 @@ export default function Calculators() {
           <p className="eyebrow">UX calculators</p>
           <h1 className="h1">{current ? current.name : 'Do the maths properly.'}</h1>
           <p className="lede">
-            {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis, plus predictive models, pricing and business-case tools. Everything runs in your browser; nothing you enter is sent anywhere.'}
+            {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis, plus predictive models, pricing, business-case tools and survey segmentation. Everything runs in your browser; nothing you enter is sent anywhere.'}
           </p>
         </div>
       </section>
