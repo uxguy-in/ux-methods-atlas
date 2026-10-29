@@ -13,6 +13,11 @@ import LossAversion from '../calc/tools/LossAversion.jsx';
 import WeberJND from '../calc/tools/WeberJND.jsx';
 import TreeTest from '../calc/tools/TreeTest.jsx';
 import HTA from '../calc/tools/HTA.jsx';
+import ExpAbHealth from '../calc/tools/expanalytics-AbHealth.jsx';
+import ExpMultiCompare from '../calc/tools/expanalytics-MultiCompare.jsx';
+import ExpDecisionMatrix from '../calc/tools/expanalytics-DecisionMatrix.jsx';
+import ExpRetentionFunnel from '../calc/tools/expanalytics-RetentionFunnel.jsx';
+import ExpMetaAnalysis from '../calc/tools/expanalytics-MetaAnalysis.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2671,6 +2676,7 @@ const COMPONENTS = {
   kano: Kano, maxdiff: MaxDiff, turf: TURF, 'ux-roi': UXROI, lostness: Lostness, readability: Readability, 'cluster-personas': ClusterPersonas,
   'shannon-information': ShannonInfo, 'information-foraging': InfoForaging, 'signal-detection': SignalDetection, discounting: Discounting,
   'loss-aversion': LossAversion, 'weber-jnd': WeberJND, 'tree-test': TreeTest, hta: HTA,
+  'ab-health': ExpAbHealth, 'multi-compare': ExpMultiCompare, 'decision-matrix': ExpDecisionMatrix, 'retention-funnel': ExpRetentionFunnel, 'meta-analysis': ExpMetaAnalysis,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
