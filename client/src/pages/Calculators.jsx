@@ -25,6 +25,14 @@ import ExpMultiCompare from '../calc/tools/expanalytics-MultiCompare.jsx';
 import ExpDecisionMatrix from '../calc/tools/expanalytics-DecisionMatrix.jsx';
 import ExpRetentionFunnel from '../calc/tools/expanalytics-RetentionFunnel.jsx';
 import ExpMetaAnalysis from '../calc/tools/expanalytics-MetaAnalysis.jsx';
+import DecCounterbalance from '../calc/tools/decisions-Counterbalance.jsx';
+import DecValueOfInfo from '../calc/tools/decisions-Voi.jsx';
+import DecDecisionTree from '../calc/tools/decisions-Tree.jsx';
+import DecForecastCalibration from '../calc/tools/decisions-Forecast.jsx';
+import DecUseFmea from '../calc/tools/decisions-Fmea.jsx';
+import DecSeverityRatings from '../calc/tools/decisions-Severity.jsx';
+import DecHumanError from '../calc/tools/decisions-Hra.jsx';
+import DecColourContrast from '../calc/tools/decisions-Colour.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2687,6 +2695,8 @@ const COMPONENTS = {
   'factor-analysis': SurveystatsFactor, 'scale-validity': SurveystatsValidity, 'key-drivers': SurveystatsDrivers, crosstab: SurveystatsCrosstab,
   conjoint: ConjointStudio,
   'ab-health': ExpAbHealth, 'multi-compare': ExpMultiCompare, 'decision-matrix': ExpDecisionMatrix, 'retention-funnel': ExpRetentionFunnel, 'meta-analysis': ExpMetaAnalysis,
+  counterbalancing: DecCounterbalance, 'value-of-information': DecValueOfInfo, 'decision-tree': DecDecisionTree, 'forecast-calibration': DecForecastCalibration,
+  'use-fmea': DecUseFmea, 'severity-ratings': DecSeverityRatings, 'human-error': DecHumanError, 'colour-contrast': DecColourContrast,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
