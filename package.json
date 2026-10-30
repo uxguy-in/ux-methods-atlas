@@ -26,6 +26,7 @@
     "check:signals": "node server/scripts/check-signals.js",
     "check:statsbench": "node server/scripts/check-statsbench.js",
     "check:decisions": "node server/scripts/check-decisions.js",
+    "check:sensors": "node server/scripts/check-sensors.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {
