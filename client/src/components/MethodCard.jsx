@@ -19,9 +19,11 @@ export function Validation({ value }) {
 
 const sentence = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export default function MethodCard({ m, why }) {
+// `calcs` (optional): calculators for this method ({ id, name }); the first is linked under the card as
+// "Calculator: name". The link sits outside the card's own link, since links cannot nest.
+export default function MethodCard({ m, why, calcs }) {
   const reason = why?.find((w) => !w.startsWith('needs'));
-  return (
+  const card = (
     <Link to={`/methods/${m.id}`} className="card">
       <span className="fam">{m.family}</span>
       <h3>{m.name}</h3>
@@ -33,5 +35,16 @@ export default function MethodCard({ m, why }) {
       </div>
       {reason && <span className="why-tag">{sentence(reason)}</span>}
     </Link>
+  );
+  if (!calcs?.length) return card;
+  const [first, ...rest] = calcs;
+  return (
+    <div className="card-stack">
+      {card}
+      <p className="card-calc">
+        <span className="lbl">Calculator</span><Link to={`/calculators/${first.id}`}>{first.name}</Link>
+        {rest.length > 0 && <> <Link to={`/methods/${m.id}`} className="card-calc-more" aria-label={`${rest.length} more calculator${rest.length > 1 ? 's' : ''} on the ${m.name} page`}>+{rest.length} more</Link></>}
+      </p>
+    </div>
   );
 }

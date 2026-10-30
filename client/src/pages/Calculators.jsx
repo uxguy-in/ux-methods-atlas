@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import * as S from '../calc/stats.js';
 import * as SM from '../calc/summaries.js';
 import StudySummary from '../components/StudySummary.jsx';
 import * as CL from '../calc/cluster.js';
 import { CATALOG } from '../calc/catalog.js';
+import { STAGES, calcInfo } from '../calc/learn.js';
+import { CalcSwitcher, LearnPanel, NextSteps, useMethodNames } from '../components/CalcLearn.jsx';
+import CalculatorIndex from './CalculatorIndex.jsx';
 import ShannonInfo from '../calc/tools/ShannonInfo.jsx';
 import InfoForaging from '../calc/tools/InfoForaging.jsx';
 import SignalDetection from '../calc/tools/SignalDetection.jsx';
@@ -2767,51 +2770,55 @@ const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
 
 export default function Calculators() {
   const { calc } = useParams();
+  if (!calc) return <CalculatorIndex />;
   const current = CALCS.find((c) => c.id === calc);
-  const groups = [...new Set(CALCS.map((c) => c.group))];
-  const go = useNavigate();
+  if (!current) return <CalcNotFound id={calc} />;
+  return <CalculatorPage key={current.id} current={current} />;
+}
 
+// One calculator: a compact top bar (breadcrumb, switcher), the "Before you start" guide, the calculator, then
+// "What to do next". Without a guide the page shows the catalog blurb, the group and the linked methods.
+function CalculatorPage({ current }) {
+  const info = calcInfo(current.id);
+  const methodName = useMethodNames();
+  const stage = info.stages[0];
   return (
     <>
-      <section className="hero compact">
+      <section className="hero compact calc-hero">
         <div className="wrap">
-          <p className="eyebrow">UX calculators</p>
-          <h1 className="h1">{current ? current.name : 'Do the maths properly.'}</h1>
-          <p className="lede">
-            {current ? current.blurb : 'Sample sizes, confidence intervals, questionnaire scoring and significance tests for UX research, using the small-sample methods from Sauro and Lewis, plus predictive models, pricing, business-case tools and survey segmentation. Everything runs in your browser; nothing you enter is sent anywhere.'}
-          </p>
+          <div className="calc-topbar">
+            <nav className="crumbs calc-crumbs" aria-label="Breadcrumb">
+              <Link to="/calculators">Calculators</Link><span aria-hidden="true">›</span>
+              <Link to={`/calculators?stage=${stage}`}>{STAGES[stage].label}</Link>
+            </nav>
+            <div className="calc-topbar-tools">
+              <CalcSwitcher currentId={current.id} methodName={methodName} />
+              <Link to="/calculators" className="btn ghost small">All calculators</Link>
+            </div>
+          </div>
+          <p className="eyebrow">{current.group}</p>
+          <h1 className="h1">{current.name}</h1>
+          <p className="lede">{current.blurb}</p>
         </div>
       </section>
-      <section className="section tight"><div className="wrap calc-layout">
-        <label className="calc-pick">
-          <span>Calculator</span>
-          <select className="select" value={current?.id || ''} onChange={(e) => go(e.target.value ? `/calculators/${e.target.value}` : '/calculators')}>
-            <option value="">All calculators</option>
-            {groups.map((g) => <optgroup key={g} label={g}>{CALCS.filter((c) => c.group === g).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup>)}
-          </select>
-        </label>
-        <nav className="calc-nav" aria-label="Calculators">
-          {groups.map((g) => (
-            <div key={g}>
-              <h3>{g}</h3>
-              {CALCS.filter((c) => c.group === g).map((c) => <NavLink key={c.id} to={`/calculators/${c.id}`}>{c.name}</NavLink>)}
-            </div>
-          ))}
-        </nav>
-        <div className="calc-main">
-          {current ? <current.C key={current.id} /> : (
-            <div className="calc-grid">
-              {CALCS.map((c) => (
-                <Link key={c.id} to={`/calculators/${c.id}`} className="card">
-                  <span className="fam">{c.group}</span>
-                  <h3>{c.name}</h3>
-                  <p>{c.blurb}</p>
-                </Link>
-              ))}
-            </div>
-          )}
+      <section className="section tight calc-page">
+        <div className="wrap calc-page-wrap">
+          <LearnPanel c={info} methodName={methodName} />
+          <div className="calc-main">
+            <current.C />
+          </div>
+          <NextSteps c={info} />
         </div>
-      </div></section>
+      </section>
     </>
+  );
+}
+
+function CalcNotFound({ id }) {
+  return (
+    <section className="section tight"><div className="wrap">
+      <h1 className="h1">No calculator called “{id}”</h1>
+      <p className="lede"><Link to={`/calculators?q=${encodeURIComponent(id.replace(/-/g, ' '))}`}>Search the calculators</Link> or <Link to="/calculators">see them all</Link>.</p>
+    </div></section>
   );
 }

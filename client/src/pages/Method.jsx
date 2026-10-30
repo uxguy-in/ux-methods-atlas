@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { cameFrom } from '../nav-trail.js';
-import { calculatorsFor } from '../calc/catalog.js';
+import { calcsForMethod, firstWhen, plainText } from '../calc/learn.js';
+import { StageBadges } from '../components/CalcLearn.jsx';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
@@ -24,9 +25,16 @@ export default function Method() {
   const f = m.facets || {};
   // Design & product practices sit outside the research atlas, so they skip its filters and the finder.
   const design = m.kind === 'design';
-  // Calculators whose "How this is calculated" section links to this method (reverse map from calc/catalog.js).
-  const calcs = calculatorsFor(m.id || id);
+  // Calculators whose "How this is calculated" section links to this method (calc/catalog.js), with their guides.
+  const calcs = calcsForMethod(m.id || id);
   const sources = mergeSources(m.sourceBooks, m.sources);
+  // A plain anchor (#put-numbers) would be read as a route under the static build's hash router, so scroll instead.
+  const jumpToCalcs = () => {
+    const el = document.getElementById('put-numbers');
+    if (!el) return;
+    el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    el.focus({ preventScroll: true });
+  };
   const lostLabel = m.status === 'active' ? 'Why it survived' : m.status === 'community' ? 'Why it was proposed' : `Why it was lost (${STATUS[m.status]?.label.toLowerCase()})`;
 
   return (
@@ -67,10 +75,9 @@ export default function Method() {
               ? <Link to="/design" className="btn ghost">More design & product methods</Link>
               : <Link to="/find" className="btn accent">Is this right for my problem?</Link>}
             {calcs.length > 0 && (
-              <div className="method-calcs">
-                <span className="label">Calculate it</span>
-                {calcs.map((c) => <Link key={c.id} to={`/calculators/${c.id}`}>{c.name}</Link>)}
-              </div>
+              <button type="button" className="method-calc-jump" onClick={jumpToCalcs}>
+                Calculate it <span aria-hidden="true">↓</span><span className="sr-only">: {calcs.length} calculator{calcs.length === 1 ? '' : 's'} below</span>
+              </button>
             )}
           </div>
         </div>
@@ -87,6 +94,22 @@ export default function Method() {
             <section className="block">
               <h2>How to do it</h2>
               <ol className="steps">{m.steps.map((s, i) => <li key={i}><span>{s}</span></li>)}</ol>
+            </section>
+          )}
+
+          {calcs.length > 0 && (
+            <section className="block" id="put-numbers" tabIndex={-1} aria-labelledby="put-numbers-h">
+              <h2 id="put-numbers-h">Put numbers on it</h2>
+              <p>{calcs.length === 1 ? 'This calculator works' : 'These calculators work'} with {m.name}. Each says the question it answers and where it fits in your study.</p>
+              <ShowMoreList as="ul" className="calc-uses" limit={4} noun="calculators">
+                {calcs.map((c) => (
+                  <li key={c.id}>
+                    <div className="top"><Link to={`/calculators/${c.id}`}>{c.name}</Link><StageBadges stages={c.stages} short={false} /></div>
+                    <p className="q">{c.question}</p>
+                    {firstWhen(c) && <p className="when"><b>Use it when</b>{plainText(firstWhen(c))}</p>}
+                  </li>
+                ))}
+              </ShowMoreList>
             </section>
           )}
 

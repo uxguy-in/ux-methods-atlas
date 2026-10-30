@@ -31,6 +31,7 @@
     "check:surveyx": "node server/scripts/check-surveyx.js",
     "check:humanfactors": "node server/scripts/check-humanfactors.js",
     "check:sensors": "node server/scripts/check-sensors.js",
+    "check:guides": "node server/scripts/check-guides.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

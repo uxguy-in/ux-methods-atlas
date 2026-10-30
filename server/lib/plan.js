@@ -697,7 +697,11 @@ function warnings(s, st) {
 
 // ── Markdown export ──
 
-export function planMarkdown(s, plan, { methodUrl = (id) => `/methods/${id}`, calcUrl = (id) => `/calculators/${id}`, goalText = '', materialText = '' } = {}) {
+// `calcInfo(id)` is optional: when the caller passes it ({ question, stage }), calculator links carry the question
+// each one answers and the plan ends with a "Calculators for this plan" list grouped by stage (in `stageOrder`).
+export function planMarkdown(s, plan, { methodUrl = (id) => `/methods/${id}`, calcUrl = (id) => `/calculators/${id}`, goalText = '', materialText = '', calcInfo = null, stageOrder = [] } = {}) {
+  const info = (c) => (calcInfo && calcInfo(c.id)) || null;
+  const calcLine = (calcs) => `  - Calculators: ${calcs.map((c) => `[${c.name}](${calcUrl(c.id)})${info(c)?.question ? ` (${info(c).question})` : ''}`).join(', ')}`;
   const L = [];
   const q = draftQuestion(s);
   L.push('# Research study plan', '');
@@ -723,7 +727,7 @@ export function planMarkdown(s, plan, { methodUrl = (id) => `/methods/${id}`, ca
     ph.items.forEach((it) => {
       L.push(`- **${it.label ? `${it.label}: ` : ''}[${it.method.name}](${methodUrl(it.method.id)})**. ${it.reason}`);
       if (it.alternatives.length) L.push(`  - Similar: ${it.alternatives.map((a) => `[${a.name}](${methodUrl(a.id)})`).join(', ')}`);
-      if (it.calcs.length) L.push(`  - Calculators: ${it.calcs.map((c) => `[${c.name}](${calcUrl(c.id)})`).join(', ')}`);
+      if (it.calcs.length) L.push(calcLine(it.calcs));
     });
     L.push('');
   });
@@ -732,10 +736,30 @@ export function planMarkdown(s, plan, { methodUrl = (id) => `/methods/${id}`, ca
     g.options.forEach((o) => {
       L.push(`- **${o.head}${o.recommended ? ' (suggested)' : ''}:** ${o.text}`);
       if (o.ids.length) L.push(`  - See: ${o.ids.map((m) => `[${m.name}](${methodUrl(m.id)})`).join(', ')}`);
-      if (o.calcs?.length) L.push(`  - Calculators: ${o.calcs.map((c) => `[${c.name}](${calcUrl(c.id)})`).join(', ')}`);
+      if (o.calcs?.length) L.push(calcLine(o.calcs));
     });
     L.push('');
   });
+  if (calcInfo) {
+    const all = new Map();
+    plan.phases.forEach((ph) => ph.items.forEach((it) => it.calcs.forEach((c) => all.set(c.id, c))));
+    plan.guidance.forEach((g) => g.options.forEach((o) => (o.calcs || []).forEach((c) => all.set(c.id, c))));
+    const byStage = new Map();
+    for (const c of all.values()) {
+      const stage = info(c)?.stage || 'Other';
+      if (!byStage.has(stage)) byStage.set(stage, []);
+      byStage.get(stage).push(c);
+    }
+    const order = [...stageOrder, ...[...byStage.keys()].filter((k) => !stageOrder.includes(k))];
+    if (byStage.size) {
+      L.push('## Calculators for this plan', '');
+      order.filter((k) => byStage.has(k)).forEach((k) => {
+        L.push(`### ${k}`, '');
+        byStage.get(k).forEach((c) => L.push(`- [${c.name}](${calcUrl(c.id)})${info(c)?.question ? `: ${info(c).question}` : ''}`));
+        L.push('');
+      });
+    }
+  }
   L.push('---', '', 'Made with the UX Methods Atlas study planner.');
   return L.join('\n');
 }

@@ -4,6 +4,8 @@ import { post, STATIC } from '../api.js';
 import { useMethods } from '../hooks.js';
 import { ShowMoreList } from '../components/ShowMore.jsx';
 import { Status } from '../components/MethodCard.jsx';
+import { StageBadges } from '../components/CalcLearn.jsx';
+import { STAGES, STAGE_KEYS, calcInfo } from '../calc/learn.js';
 import ModeSwitch, { PLAN_STORE as STORE, findLink } from '../components/ModeSwitch.jsx';
 import { QUESTIONS as FINDER } from './Finder.jsx';
 import { ACCESS, APPROACH, BUDGET, COLLECT, EXPERTISE, FRAMEWORKS, LIMITS, TIME, draftQuestion, planMarkdown, suggestFramework } from '../../../server/lib/plan.js';
@@ -270,6 +272,8 @@ function Roadmap({ s, set, go, reset }) {
       calcUrl: (id) => `${site}/calculators/${id}`,
       goalText: (s.goal || []).map((v) => GOAL_Q.options.find((o) => o.v === v)?.label).filter(Boolean).join(', '),
       materialText: MATERIAL_Q.options.find((o) => o.v === s.material)?.label || '',
+      calcInfo: (id) => { const c = calcInfo(id); return c && { question: c.question, stage: STAGES[c.stages[0]].label, stageKey: c.stages[0] }; },
+      stageOrder: STAGE_KEYS.map((k) => STAGES[k].label),
     });
     const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
     const a = Object.assign(document.createElement('a'), { href: url, download: 'study-plan.md' });
@@ -343,6 +347,7 @@ function Roadmap({ s, set, go, reset }) {
               </ShowMoreList>
             </section>
           ))}
+          <PlanCalculators plan={plan} />
           <p className="muted plan-foot no-print">
             This plan is a starting point built from rules, not a substitute for judgement. For a direction written for your exact problem, switch to <Link {...findLink(s)}>One method</Link> and describe it there.
           </p>
@@ -362,7 +367,20 @@ function PhaseItem({ it, onSwap, onReset }) {
       </h4>
       <p className="phase-reason">{it.reason}</p>
       {it.calcs.length > 0 && (
-        <p className="phase-calcs"><span className="lbl">Calculators</span>{it.calcs.map((c) => <Link key={c.id} to={`/calculators/${c.id}`}>{c.name}</Link>)}</p>
+        <div className="phase-calcs-block">
+          <span className="lbl">Calculators</span>
+          <ul className="phase-calc-list">
+            {it.calcs.map((c) => {
+              const info = calcInfo(c.id);
+              return (
+                <li key={c.id}>
+                  <span className="top"><Link to={`/calculators/${c.id}`}>{c.name}</Link>{info && <StageBadges stages={info.stages.slice(0, 1)} short={false} />}</span>
+                  {info && <span className="q">{info.question}</span>}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
       {it.alternatives.length > 0 && (
         <div className="swap">
@@ -380,5 +398,42 @@ function PhaseItem({ it, onSwap, onReset }) {
         </div>
       )}
     </div>
+  );
+}
+
+// Every calculator the plan mentions, grouped by the stage of the study where it is used first.
+function PlanCalculators({ plan }) {
+  const seen = new Map();
+  const add = (c, where) => {
+    const info = calcInfo(c.id);
+    if (!info) return;
+    if (!seen.has(c.id)) seen.set(c.id, { info, where: [] });
+    if (where && !seen.get(c.id).where.includes(where)) seen.get(c.id).where.push(where);
+  };
+  plan.phases.forEach((ph) => ph.items.forEach((it) => it.calcs.forEach((c) => add(c, ph.title))));
+  plan.guidance.forEach((g) => g.options.forEach((o) => (o.calcs || []).forEach((c) => add(c, g.title))));
+  if (!seen.size) return null;
+  const groups = STAGE_KEYS.map((k) => [k, [...seen.values()].filter((v) => v.info.stages[0] === k)]).filter(([, list]) => list.length);
+  return (
+    <section className="plan-calcs" aria-labelledby="plan-calcs-h">
+      <h2 id="plan-calcs-h">Calculators for this plan</h2>
+      <p>The numbers work this plan calls for, in the order you will meet it. Each calculator explains when to use it and walks you through it.</p>
+      <div className="plan-calcs-grid">
+        {groups.map(([k, list]) => (
+          <div key={k} className="plan-calcs-stage">
+            <h3><span className="n" aria-hidden="true">{STAGE_KEYS.indexOf(k) + 1}</span>{STAGES[k].label}</h3>
+            <ul>
+              {list.map(({ info, where }) => (
+                <li key={info.id}>
+                  <Link to={`/calculators/${info.id}`}>{info.name}</Link>
+                  <span className="q">{info.question}</span>
+                  {where.length > 0 && <span className="for">For: {where.join(', ')}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

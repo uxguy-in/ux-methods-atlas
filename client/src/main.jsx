@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './styles.css';
+// After styles.css, so the calculator finding and learning styles can refine the shared ones.
+import './components/calc-learn.css';
 
 // GitHub Pages serves only static files, so the Pages build uses hash URLs that need no server rewrites.
 const Router = import.meta.env.VITE_STATIC === '1' ? HashRouter : BrowserRouter;

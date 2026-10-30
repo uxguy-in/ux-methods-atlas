@@ -139,7 +139,7 @@ button { font: inherit; color: inherit; }
 
 .eyebrow { font: 900 13px/1.2 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
 /* Eyebrows open a section or page (red, 13px). Labels name a field or group inside one (grey, 12px). */
-.label, .card .fam, .kv dt, .aside-box h3, .calc-nav h3, .phase-label, .lbl, .answers-bar-label, .unearthed-sub, .spotlight dt, .spotlight-meta {
+.label, .card .fam, .kv dt, .aside-box h3, .phase-label, .lbl, .answers-bar-label, .unearthed-sub, .spotlight dt, .spotlight-meta {
   font: 800 12px/1.3 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
 }
 .unearthed-head .eyebrow, .card > .eyebrow, .plan-cta .eyebrow, .draft-q .label { margin: 0; }
@@ -272,8 +272,6 @@ a.tag:hover .tag-kind { color: inherit; }
 
 /* Method actions sit in the hero, so the finder and calculators are in view before the long content on every screen. */
 .method-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 30px; }
-.method-calcs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
-.method-calcs a { color: var(--accent); font-weight: 700; font-size: 15px; }
 @media (max-width: 640px) {
   .method-hero { padding: 40px 0 32px; }
   .method-actions .btn { width: 100%; white-space: normal; text-align: center; }
@@ -414,14 +412,6 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 @media (max-width: 860px) { .submit-form { grid-template-columns: 1fr; } .field-row { grid-template-columns: 1fr; } }
 
 /* ── Calculators ── */
-.calc-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: start; }
-.calc-pick { display: none; }
-.calc-nav { position: sticky; top: 92px; display: grid; gap: 18px; }
-.calc-nav h3 { margin: 0 0 6px; }
-.calc-nav a { display: block; padding: 6px 10px; margin: 0 -10px; border-radius: var(--radius-sm); text-decoration: none; color: var(--ink-2); font-weight: 600; font-size: 15px; }
-.calc-nav a:hover { background: var(--bg-soft); color: var(--ink); }
-.calc-nav a.active { background: var(--red); color: #fff; }
-.calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 .calc-main { min-width: 0; display: grid; gap: 22px; }
 .calc-inputs { display: flex; flex-wrap: wrap; gap: 16px 20px; align-items: flex-start; }
 .calc-field { display: grid; gap: 6px; min-width: 0; }
@@ -467,10 +457,6 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 .disc-table .bar { height: 10px; background: var(--bg-sunk); border-radius: 0; overflow: hidden; }
 .disc-table .bar i { display: block; height: 100%; background: var(--accent); }
 @media (max-width: 860px) {
-  .calc-layout { grid-template-columns: 1fr; gap: 24px; }
-  .calc-nav { display: none; }
-  .calc-pick { display: grid; gap: 6px; font-weight: 700; font-size: 14px; }
-  .calc-pick .select { width: 100%; }
   .calc-field input { width: 110px; }
 }
 .exp-wrap { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 24px; align-items: start; }
@@ -730,9 +716,8 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .clu-explain p { margin: 0; }
 @media (max-width: 860px) { .exp-wrap.clu-map { grid-template-columns: 1fr; } .persona-name input { font-size: 16px; } }
 @media print {
-  body:has(.clu-root) .hero, body:has(.clu-root) .calc-pick, body:has(.clu-root) .calc-nav,
+  body:has(.clu-root) .hero,
   .clu-root .calc-about, .clu-root .calc-inputs, .clu-root .clu-scroll, .clu-root .clu-actions, .clu-root .clu-charts, .clu-root .clu-multiples, .clu-root > .clu-h3, .clu-root .calc-stats, .clu-root .clu-h, .clu-root .clu-note { display: none !important; }
-  body:has(.clu-root) .calc-layout { grid-template-columns: 1fr; }
   .persona details { display: block; }
   .persona-grid { grid-template-columns: 1fr 1fr; }
   .persona-name input { border: 0; padding: 0; }

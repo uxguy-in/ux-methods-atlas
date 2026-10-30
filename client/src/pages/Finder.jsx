@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { post } from '../api.js';
 import { useMeta, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
+import { calcsForMethod } from '../calc/learn.js';
 import ModeSwitch, { planLink } from '../components/ModeSwitch.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
@@ -425,14 +426,14 @@ function Shelves({ recs, level, onShuffle }) {
         <section key={sh.key} className="shelf">
           <h2>{sh.title}{sh.level === level && <span className="flag">Your level</span>}</h2>
           <p>{sh.blurb}</p>
-          <div className="grid">{recs[sh.key].map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
+          <div className="grid">{recs[sh.key].map((m) => <MethodCard key={m.id} m={m} why={m.why} calcs={calcsForMethod(m.id)} />)}</div>
         </section>
       ))}
       {recs.tryNext?.length > 0 && (
         <section className="shelf">
           <h2>What else to try</h2>
           <p>Lost, borrowed and forgotten methods that fit the same situation and add something the usual toolkit misses.</p>
-          <div className="grid">{recs.tryNext.map((m) => <MethodCard key={m.id} m={m} why={m.why} />)}</div>
+          <div className="grid">{recs.tryNext.map((m) => <MethodCard key={m.id} m={m} why={m.why} calcs={calcsForMethod(m.id)} />)}</div>
         </section>
       )}
     </div>
@@ -464,6 +465,9 @@ function Plan({ plan }) {
             <div>
               <span className="label">{p.phase}</span>
               <h4><Link to={`/methods/${p.methodId}`}>{p.method?.name || p.methodId}</Link> <Status value={p.method?.status} /></h4>
+              {calcsForMethod(p.methodId)[0] && (
+                <p className="card-calc-inline"><span className="lbl">Calculator</span><Link to={`/calculators/${calcsForMethod(p.methodId)[0].id}`}>{calcsForMethod(p.methodId)[0].name}</Link></p>
+              )}
               <p><span className="lbl">Why</span>{p.why}</p>
               <p><span className="lbl">How</span>{p.how}</p>
               <p><span className="lbl">You get</span>{p.output}</p>
