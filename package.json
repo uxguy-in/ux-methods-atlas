@@ -21,7 +21,8 @@
     "check:surveystats": "node server/scripts/check-surveystats.js",
     "check:conjoint": "node server/scripts/check-conjoint.js",
     "check:expanalytics": "node server/scripts/check-expanalytics.js",
-    "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
+    "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site",
+    "check:runners": "node server/scripts/check-runners.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
