@@ -1,0 +1,58 @@
+/* The question library (/questions) and the "Answers questions like" line on method pages. */
+.ql-section { padding-top: 40px; }
+.ql-filters { display: grid; gap: 4px; }
+.ql-filters .filters { margin-top: 10px; }
+.ql-none { margin: 8px 0 24px; }
+.ql-linkbtn { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+
+.ql-theme { margin-top: 28px; }
+.ql-theme-head { border-top: 4px solid var(--accent); padding-top: 14px; margin-bottom: 8px; }
+.ql-theme-h { font-size: 24px; margin: 0; }
+.ql-theme-h .n { font-size: 14px; font-weight: 700; color: var(--ink-3); margin-left: 4px; }
+.ql-theme-blurb { margin: 4px 0 0; color: var(--ink-3); font-size: 15px; }
+
+.ql-items { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); background: var(--bg); }
+.ql-items > li { scroll-margin-top: 90px; min-width: 0; }
+.ql-items > li + li { border-top: 1px solid var(--line); }
+.ql-q { margin: 0; font-size: inherit; }
+.ql-q button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: transparent; border: 0; text-align: left; font: 700 17px/1.35 var(--font); color: var(--ink); cursor: pointer; }
+.ql-q button:hover { background: var(--bg-soft); }
+.ql-q button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.ql-q-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.ql-q .show-more-icon { flex: none; font-size: 20px; color: var(--ink-3); width: 20px; text-align: center; }
+.ql-trap { flex: none; }
+.ql-items > li.is-open { background: var(--bg-soft); }
+.ql-items > li.is-open .ql-q button { color: var(--accent); }
+
+.ql-detail { padding: 4px 16px 20px; display: grid; gap: 18px; min-width: 0; }
+.ql-answer { margin: 0; font-size: 17px; color: var(--ink); max-width: 72ch; }
+.ql-instead { background: var(--bg); border-left: 4px solid var(--accent); padding: 12px 16px; }
+.ql-instead .label { margin: 0 0 6px; }
+.ql-instead-q { margin: 0; font-weight: 700; color: var(--ink); }
+.ql-instead-why { margin: 4px 0 0; color: var(--ink-2); font-size: 15px; }
+.ql-block .label { margin: 0 0 8px; }
+.ql-methods { margin: 0; padding-left: 24px; display: grid; gap: 8px; }
+.ql-methods li { color: var(--ink-2); font-size: 15px; }
+.ql-methods a { display: block; font-weight: 800; color: var(--accent); font-size: 16px; }
+.ql-calcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.ql-calcs .calc-card { padding: 14px; min-width: 0; }
+.ql-actions { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.ql-stages { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ql-stages .label { margin: 0; }
+.ql-copied { margin: -8px 0 0; font-size: 14px; color: var(--ok); }
+.ql-md summary { cursor: pointer; font-weight: 700; font-size: 15px; }
+.ql-md textarea { box-sizing: border-box; width: 100%; margin-top: 10px; font: 13px/1.5 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: 12px; resize: vertical; }
+
+@media (max-width: 760px) {
+  .ql-q button { padding: 12px; font-size: 16px; }
+  .ql-detail { padding: 4px 12px 16px; }
+  .ql-calcs { grid-template-columns: minmax(0, 1fr); }
+}
+
+.ql-start { margin: 14px 0 0; font-size: 15.5px; }
+.ql-start a { color: var(--accent); font-weight: 800; }
+.ql-method-line { margin: 0 0 18px; font-size: 15px; color: var(--ink-2); }
+.ql-method-line .label { margin-right: 4px; }
+.ql-method-line a { color: var(--accent); font-weight: 700; }
+.ql-detail .tag { background: var(--bg); border: 1px solid var(--line); }
+.ql-detail .tag:hover { border-color: var(--ink); color: var(--ink); }
