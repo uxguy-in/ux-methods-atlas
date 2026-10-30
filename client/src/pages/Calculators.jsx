@@ -87,6 +87,7 @@ import SensorsCodeNetwork from '../calc/tools/sensors-CodeNet.jsx';
 import SensorsAdoption from '../calc/tools/sensors-Adoption.jsx';
 import SensorsJourney from '../calc/tools/sensors-Journey.jsx';
 import SensorsNash from '../calc/tools/sensors-Nash.jsx';
+import QualCoding from '../calc/tools/qual-Coding.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2764,6 +2765,7 @@ const COMPONENTS = {
   'fault-tree': HfFaultTree, ergonomics: HfErgonomics, 'steering-law': HfSteering, 'seev-attention': HfSeev, 'alarm-flood': HfAlarmFlood,
   hrv: SensorsHrv, 'gsr-peaks': SensorsGsrPeaks, 'eye-tracking': SensorsEyeTracking, 'cultural-consensus': SensorsConsensus,
   'code-network': SensorsCodeNetwork, 'sir-adoption': SensorsAdoption, 'journey-forecast': SensorsJourney, 'nash-games': SensorsNash,
+  'qual-coding': QualCoding,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));

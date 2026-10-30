@@ -5093,5 +5093,50 @@ export const GUIDES = {
       "decision-tree",
       "decision-matrix"
     ]
+  },
+  "qual-coding": {
+    "question": "How do I code my interview transcripts properly, and what do the codes add up to?",
+    "stages": [
+      "analyse"
+    ],
+    "data": [
+      "qual"
+    ],
+    "studies": [
+      "User interviews",
+      "Contextual inquiry",
+      "Diary study follow-ups",
+      "Open-ended survey answers"
+    ],
+    "needs": "Interview transcripts as text, ideally anonymised, with a heading per interview (# P3) and a speaker label at the start of each turn (P3:, I:). Exports from transcription tools usually paste straight in.",
+    "when": [
+      "After a round of 5-30 discovery or evaluative interviews, when you need themes you can defend",
+      "When you are new to qualitative coding and want to learn open, axial and selective coding by doing it",
+      "When a team wants a shared codebook with definitions and example quotes",
+      "When you want to check your coding with a colleague or see which codes travel together"
+    ],
+    "notFor": "Counting answers to closed questions, or replacing your own reading: sentiment, topics and latent classes here are prompts, not findings. For agreement between two coders use [Inter-coder agreement](/calculators/intercoder).",
+    "steps": [
+      "Paste the transcripts, anonymise names, emails and phone numbers, and split them into segments by speaker turn.",
+      "Open coding: read each segment, name what is going on, and write a one-line definition for every new code; compare segments that share a code.",
+      "Axial coding: group codes into categories (themes), merge or split codes, and read the co-occurrence and interview tables.",
+      "Choose a core category, write the storyline memo and pick example quotes from different participants.",
+      "Use sentiment, topics and latent classes only to find segments worth re-reading.",
+      "Download the project file to save, and export the codebook, themes and coded segments."
+    ],
+    "example": "Six interviews about a GP surgery app gave 39 participant segments. Open coding produced 13 codes; P1 added 8 new codes, P2 4, P3 1 and P4 none, a sign the codebook was settling. Axial coding grouped them into four themes, and \"Left guessing after acting\" (in 5 of 6 interviews) became the core category: the app confirms an action and then goes quiet.",
+    "learn": "Coding means labelling what is going on in each piece of an interview, then building those labels up into a few connected ideas. Open coding stays close to the words, axial coding relates codes to each other, and selective coding tells the story that ties them together. Definitions and memos are what make the analysis checkable by someone else.",
+    "deeper": "The steps follow Strauss and Corbin's (1998) open, axial and selective coding, with Charmaz's (2014) advice on naming codes as actions and writing memos, and work equally as thematic analysis (Braun and Clarke 2006). Saturation uses Guest, Namey and Chen's (2020) new-information ratio. Sentiment is a word-list score with negation and \"but\" rules; topics are LDA by collapsed Gibbs sampling (Griffiths and Steyvers 2004). See [open, axial and selective coding](/methods/open-axial-and-selective-coding-pipeline) and [thematic analysis](/methods/thematic-analysis).",
+    "mistakes": [
+      "Coding topics (\"login\") instead of meanings (\"locked out of my own record\").",
+      "Creating codes without definitions, so their meaning drifts.",
+      "Reporting code counts, sentiment or topics as findings without quotes.",
+      "Sharing exports before anonymising the transcripts."
+    ],
+    "next": [
+      "intercoder",
+      "saturation",
+      "code-network"
+    ]
   }
 };
