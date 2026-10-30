@@ -741,3 +741,11 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 @media (max-width: 640px) { .study-summary { padding: 16px; } .study-summary .ss-headline { font-size: 17px; } }
 .clu-root .study-summary { margin: 22px 0; }
 @media print { .study-summary .btn { display: none; } }
+
+/* ── Library: all calculators list ── */
+.calc-index .calc-q { display: block; font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.calc-index li { grid-template-columns: 52px minmax(0, 1fr) minmax(0, 220px) 170px; }
+.calc-index .name { font-weight: 700; }
+.calc-index .calc-q { font-weight: 400; }
+.calc-index li > :last-child { display: flex; flex-wrap: wrap; gap: 4px; }
+@media (max-width: 760px) { .calc-index li { grid-template-columns: 40px minmax(0, 1fr); } }
