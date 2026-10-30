@@ -10,6 +10,8 @@ import './components/bias-map.css';
 // Weak vs strong demos (/demos) and their strips on method, calculator and bias pages.
 import './components/weak-strong.css';
 import './components/questions.css';
+// Practice: scenario questions and the Test yourself links.
+import './components/practice.css';
 
 // GitHub Pages serves only static files, so the Pages build uses hash URLs that need no server rewrites.
 const Router = import.meta.env.VITE_STATIC === '1' ? HashRouter : BrowserRouter;

@@ -124,6 +124,7 @@ export default function Layout({ children }) {
             <Link to="/biases">Research biases</Link>
             <Link to="/demos">Weak vs strong</Link>
             <Link to="/questions">Questions</Link>
+            <Link to="/practice">Practice</Link>
             <Link to="/submit">Submit a method</Link>
             <Link to={loc.pathname === '/about' ? '/about?report=1' : `/about?report=1&page=${encodeURIComponent(loc.pathname)}`}>Report a problem</Link>
             {import.meta.env.VITE_REPO_URL && <a href={import.meta.env.VITE_REPO_URL}>Download the code</a>}

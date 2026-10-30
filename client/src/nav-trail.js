@@ -9,6 +9,7 @@ const PAGES = [
   [/^\/biases$/, () => 'Research biases'],
   [/^\/demos$/, () => 'Weak vs strong'],
   [/^\/questions$/, () => 'Question library'],
+  [/^\/practice$/, () => 'Practice'],
   [/^\/find$/, () => 'your results'],
   [/^\/plan$/, () => 'your study plan'],
   [/^\/methods\/.+/, () => 'previous method'],
