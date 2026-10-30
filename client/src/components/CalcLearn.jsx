@@ -191,7 +191,7 @@ export function LearnPanel({ c, methodName }) {
               </div>
             )}
             {tab === 'steps' && <ol className="steps calc-steps">{g.steps.map((s, i) => <li key={i}><span><RichText text={s} /></span></li>)}</ol>}
-            {tab === 'example' && <p className="calc-example"><RichText text={g.example} /></p>}
+            {tab === 'example' && <><p className="calc-example"><RichText text={g.example} /></p><p className="muted small">The numbers are a realistic scenario to show how to read the result; your own data will give different figures.</p></>}
             {tab === 'learn' && (
               <div className="calc-idea">
                 {g.learn && <p><RichText text={g.learn} /></p>}
