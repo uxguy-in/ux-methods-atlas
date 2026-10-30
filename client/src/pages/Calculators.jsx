@@ -54,6 +54,12 @@ import DecUseFmea from '../calc/tools/decisions-Fmea.jsx';
 import DecSeverityRatings from '../calc/tools/decisions-Severity.jsx';
 import DecHumanError from '../calc/tools/decisions-Hra.jsx';
 import DecColourContrast from '../calc/tools/decisions-Colour.jsx';
+import SxNonresponse from '../calc/tools/surveyx-Nonresponse.jsx';
+import SxSensitive from '../calc/tools/surveyx-Sensitive.jsx';
+import SxPairedScaling from '../calc/tools/surveyx-Paired.jsx';
+import SxImportancePerformance from '../calc/tools/surveyx-Ipa.jsx';
+import SxAnchoringVignettes from '../calc/tools/surveyx-Vignettes.jsx';
+import SxNorms from '../calc/tools/surveyx-Norms.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2723,6 +2729,8 @@ const COMPONENTS = {
   regression: SbRegression, mediation: SbMediation, resampling: SbResampling, 'distribution-check': SbDistribution, survival: SbSurvival, 'test-selector': SbTestSelector,
   counterbalancing: DecCounterbalance, 'value-of-information': DecValueOfInfo, 'decision-tree': DecDecisionTree, 'forecast-calibration': DecForecastCalibration,
   'use-fmea': DecUseFmea, 'severity-ratings': DecSeverityRatings, 'human-error': DecHumanError, 'colour-contrast': DecColourContrast,
+  nonresponse: SxNonresponse, 'sensitive-questions': SxSensitive, 'paired-scaling': SxPairedScaling, 'importance-performance': SxImportancePerformance,
+  'anchoring-vignettes': SxAnchoringVignettes, norms: SxNorms,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
