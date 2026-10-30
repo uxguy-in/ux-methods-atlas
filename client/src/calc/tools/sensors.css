@@ -1,0 +1,43 @@
+/* Styles for the sensors tools (HRV, EDA/GSR peaks, eye tracking, cultural consensus, code networks, adoption models,
+   journey forecast, Nash equilibria). Theme tokens only, so light and dark mode follow the site. */
+.sn-root { display: grid; gap: 18px; min-width: 0; }
+.sn-root > * { min-width: 0; }
+.sn-root .calc-field { min-width: 0; max-width: 100%; }
+.sn-root .select { max-width: 100%; text-overflow: ellipsis; }
+.sn-note { font-size: 13.5px; color: var(--ink-2); margin: 0; max-width: 75ch; }
+.sn-busy { font-size: 13.5px; color: var(--ink-3); margin: 0; }
+.sn-wrap { overflow-x: auto; max-width: 100%; contain: inline-size; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); }
+.sn-wrap > svg { display: block; max-width: none; }
+.sn-fig { margin: 0; min-width: 0; }
+.sn-fig > svg { width: 100%; height: auto; display: block; }
+.sn-mono { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+.sn-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); }
+.sn-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+.sn-heat td.h { text-align: center; font-variant-numeric: tabular-nums; font-size: 12.5px; padding: 6px 8px; }
+.sn-heat td.h.diag { color: var(--ink-3); }
+.sn-heat th { white-space: nowrap; }
+.sn-plot .seg { opacity: 0.08; }
+.sn-plot .art { fill: var(--bad); }
+.sn-plot .pk { fill: var(--c2); }
+.sn-plot .aoi { fill: none; stroke-width: 1.6; }
+.sn-plot .aoi-fill { opacity: 0.1; }
+.sn-plot .fx { opacity: 0.55; }
+.sn-plot .edge { stroke: var(--ink-3); stroke-linecap: round; }
+.sn-plot .node-lbl { font-size: 12px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.sn-plot .br-row { stroke: var(--c1); stroke-width: 3; fill: none; }
+.sn-plot .br-col { stroke: var(--c2); stroke-width: 3; fill: none; stroke-dasharray: 7 4; }
+.sn-plot .eq { fill: var(--bg); stroke: var(--ink); stroke-width: 2.2; }
+.sn-game { border-collapse: collapse; font-size: 14px; }
+.sn-game th, .sn-game td { border: 1px solid var(--line); padding: 6px 8px; text-align: center; }
+.sn-game th { background: var(--bg-soft); font-weight: 600; }
+.sn-game td.eq { background: color-mix(in srgb, var(--ok) 14%, transparent); }
+.sn-game td.dom { color: var(--ink-3); text-decoration: line-through; }
+.sn-game input { width: 46px; font: inherit; font-size: 13.5px; padding: 4px 5px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); text-align: center; box-sizing: border-box; }
+.sn-game input.c { border-color: color-mix(in srgb, var(--c2) 60%, var(--line)); }
+.sn-game input.r { border-color: color-mix(in srgb, var(--c1) 60%, var(--line)); }
+.sn-game .pair { display: inline-flex; gap: 4px; }
+.sn-game input.nm { width: 110px; text-align: left; }
+.sn-eqs { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.sn-eqs li { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.sn-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sn-game th.dom input { text-decoration: line-through; color: var(--ink-3); }

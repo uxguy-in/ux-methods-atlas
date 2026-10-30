@@ -30,6 +30,7 @@
     "check:causal": "node server/scripts/check-causal.js",
     "check:surveyx": "node server/scripts/check-surveyx.js",
     "check:humanfactors": "node server/scripts/check-humanfactors.js",
+    "check:sensors": "node server/scripts/check-sensors.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {
