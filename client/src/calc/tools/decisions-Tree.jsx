@@ -2,10 +2,48 @@ import { useMemo, useState } from 'react';
 import StudySummary from '../../components/StudySummary.jsx';
 import * as DT from './decisions-tree.js';
 import { fmt, pctS } from './decisions-core.js';
-import { Table, LoadExample } from './expanalytics-charts.jsx';
+import { Table } from './expanalytics-charts.jsx';
 import { Area, Choice, Result, Stats, Problem, About } from './ui.jsx';
+import TreeBuilder from './decisions-TreeBuilder.jsx';
 import './decisions.css';
 
+const AI = `# Should we add an AI help assistant to the app? Payoffs in £ thousands over two years.
+$p_adopt = 0.35 [0.2, 0.5]  chance customers adopt it widely
+$saving = 400 [250, 600]  support costs saved if it is widely adopted
+$some = 120 [60, 180]  saving if only some customers use it
+$build = 220 [160, 320]  cost to build it in-house
+$vendor = 90 [60, 140]  two-year cost of a vendor's assistant
+$beta = 30 [20, 45]  cost of a six-week beta with 200 customers
+
+AI help assistant [D]
+  Build it in-house: cost=$build [C]
+    Widely adopted: p=$p_adopt, value=$saving
+    Some customers use it: p=0.4, value=$some
+    Ignored: p=rest, value=0
+  Buy a vendor's assistant: cost=$vendor [C]
+    Widely adopted: p=$p_adopt, value=$saving*0.7
+    Some customers use it: p=0.4, value=$some*0.7
+    Ignored: p=rest, value=0
+  Run a beta first, then decide: cost=$beta [C]
+    Beta goes well: p=0.45 [D]
+      Build it in-house: cost=$build [C]
+        Widely adopted: p=0.6, value=$saving
+        Some customers use it: p=0.3, value=$some
+        Ignored: p=rest, value=0
+      Buy a vendor's assistant: cost=$vendor [C]
+        Widely adopted: p=0.6, value=$saving*0.7
+        Some customers use it: p=0.3, value=$some*0.7
+        Ignored: p=rest, value=0
+      Stop here: value=0
+    Beta disappoints: p=rest [D]
+      Build it in-house: cost=$build [C]
+        Widely adopted: p=0.15, value=$saving
+        Some customers use it: p=0.48, value=$some
+        Ignored: p=rest, value=0
+      Stop here: value=0
+  Don't add it: value=0`;
+
+// The checkout example is checked against an independent Python rollback in server/scripts/check-decisions.js.
 const EX = `# Checkout plan. Payoffs in £ thousands over two years.
 $p_big = 0.3 [0.15, 0.45]  chance a full redesign gives a big lift
 $big = 600 [400, 900]  value of a big conversion lift
@@ -37,6 +75,16 @@ Checkout plan [D]
       Quick fixes: cost=30, value=$small*0.6*0.55
       Do nothing: value=0
   Do nothing: value=0`;
+
+const SIMPLE = `# A first tree: one decision, two options. Payoffs in £ thousands.
+Launch the new search [D]
+  Launch it: cost=40 [C]
+    Customers find things faster: p=0.6, value=200
+    No real change: p=rest, value=0
+  Keep the old search: value=0`;
+
+const EXAMPLES = { ai: ['AI assistant (product)', AI], checkout: ['Checkout redesign', EX], simple: ['A first tree', SIMPLE] };
+
 
 const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 const short = (x) => fmt(x, Math.abs(x) < 10 && x % 1 ? 2 : Math.abs(x) < 100 && x % 1 ? 1 : 0);
@@ -124,8 +172,31 @@ function Tornado({ rows, base, unit }) {
 }
 
 // ── Decision tree with rollback and tornado ──
+// A plain-language guide to the outline, with a tiny annotated example.
+function HowToWrite() {
+  return (
+    <details className="dc-howto">
+      <summary>How to write a tree</summary>
+      <ol className="dc-steps">
+        <li><b>Start with the choice you face.</b> That is the first line, marked <span className="dc-mono">[D]</span> for decision.</li>
+        <li><b>List the options under it</b>, one per line, indented two spaces. Put what an option costs after a colon: <span className="dc-mono">Launch it: cost=40</span>.</li>
+        <li><b>Under each option, list what might happen</b>, indented two more spaces, with a chance and what it is worth: <span className="dc-mono">Goes well: p=0.6, value=200</span>. Mark the option <span className="dc-mono">[C]</span> for chance. The chances under one option must add up to 1; write <span className="dc-mono">p=rest</span> on the last one and the calculator fills in the remainder.</li>
+        <li><b>Need a later choice?</b> Put another <span className="dc-mono">[D]</span> line under an outcome, such as "Beta goes well", and list the options you would have then.</li>
+        <li><b>Optional: name your numbers</b> at the top, like <span className="dc-mono">$build = 220 [160, 320]  cost to build</span>. Use <span className="dc-mono">$build</span> anywhere in the tree. The range in brackets drives the tornado chart, which shows whether a better guess could change the answer.</li>
+      </ol>
+      <pre className="dc-annot">{`Launch the new search [D]        ← the choice (D = decision)
+  Launch it: cost=40 [C]         ← an option, what it costs (C = chance follows)
+    Faster: p=0.6, value=200     ← an outcome: 60% likely, worth 200
+    No change: p=rest, value=0   ← the other 40%
+  Keep the old search: value=0   ← the do-nothing option`}</pre>
+      <p className="dc-note">Use one unit throughout (for example £ thousands), lines starting with <span className="dc-mono">#</span> are notes, and the form below writes this outline for you if you would rather not type it.</p>
+    </details>
+  );
+}
+
 function DecDecisionTree() {
-  const [text, setText] = useState(EX);
+  const [text, setText] = useState(AI);
+  const [mode, setMode] = useState('form');
   const [goal, setGoal] = useState('max');
   const [unit, setUnit] = useState('£');
   const minimise = goal === 'min';
@@ -136,9 +207,18 @@ function DecDecisionTree() {
 
   return (
     <div className="dc-root">
-      <LoadExample onClick={() => { setText(EX); setGoal('max'); setUnit('£'); }} />
-      <Area label="Tree outline (two spaces per level)" value={text} onChange={setText} rows={16} wrap="off"
-        hint="Parameters: $name = value [low, high]. Nodes: Label [D] for a decision, Label: p=0.3, value=200, cost=40 [C] for a chance node; p=rest takes what is left. Lines starting with # are notes." />
+      <div className="dc-actions">
+        <span className="dc-note">Examples:</span>
+        {Object.entries(EXAMPLES).map(([k, [label, src]]) => (
+          <button key={k} type="button" className={`btn ghost small${text === src ? ' on' : ''}`} onClick={() => { setText(src); setGoal('max'); setUnit('£'); }}>{label}</button>
+        ))}
+      </div>
+      <HowToWrite />
+      <Choice label="Build the tree with" value={mode} onChange={setMode} options={[['form', 'A form'], ['text', 'The outline text']]} />
+      {mode === 'form'
+        ? <TreeBuilder text={text} onChange={setText} />
+        : <Area label="Tree outline (two spaces per level)" value={text} onChange={setText} rows={16} wrap="off"
+            hint="Each line is a step. Indent with two spaces to put a step under the one above. See How to write a tree above." />}
       <div className="calc-inputs ea-inputs">
         <Choice label="Goal" value={goal} onChange={setGoal} options={[['max', 'Maximise value'], ['min', 'Minimise cost']]} />
         <label className="calc-field"><span>Unit prefix</span><input className="ea-mini" value={unit} onChange={(e) => setUnit(e.target.value.slice(0, 4))} /></label>
