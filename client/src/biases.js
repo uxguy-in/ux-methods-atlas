@@ -620,6 +620,7 @@ export const BIASES = [
     methods: ['writing-qualitative-findings-evidence-standards', 'confirmability-audit', 'dependability-audit-trail', 'member-checking', 'negative-case-analysis'],
     threatens: ['thematic-analysis', 'research-reporting-and-readouts', 'usability-findings-report-and-recommendations', 'affinity-diagramming'],
     calcs: ['qual-coding'],
+    source: { author: 'Morse, J. M.', year: 2010, title: '“Cherry picking”: writing from thin data', where: 'Qualitative Health Research' },
   },
   {
     id: 'clustering-illusion',
