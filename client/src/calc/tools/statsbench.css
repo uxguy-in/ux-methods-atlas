@@ -1,0 +1,47 @@
+/* Styles for the statistics workbench tools (regression, moderation and mediation, resampling, distribution check,
+   survival, test selector). Theme tokens only, so light and dark mode follow the site. */
+.sb-fig { margin: 0; min-width: 0; }
+.sb-band { fill-opacity: 0.16; stroke: none; }
+.sb-bar { fill-opacity: 0.55; }
+.sb-pt { fill-opacity: 0.75; }
+.sb-pt.hl { fill-opacity: 1; }
+.sb-region.ok { fill: color-mix(in srgb, var(--ok) 12%, transparent); }
+.sb-region.bad { fill: color-mix(in srgb, var(--bad) 8%, transparent); }
+.sb-region.soft { fill: var(--bg-soft); }
+.sb-progress { position: relative; height: 26px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-soft); overflow: hidden; }
+.sb-progress i { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--accent) 25%, transparent); transition: width .2s; }
+.sb-progress span { position: relative; display: block; padding: 4px 10px; font-size: 13px; color: var(--ink-2); }
+.sb-cols { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0; font-size: 13px; }
+.sb-cols .qtag em { font-style: normal; font-weight: 400; color: var(--ink-3); }
+.sb-muted { color: var(--ink-3); }
+.sb-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px 24px; align-items: start; }
+.sb-grid2 > * { min-width: 0; }
+.sb-card { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; background: var(--bg); display: grid; gap: 10px; min-width: 0; }
+.sb-card h4 { margin: 0; font-size: 15px; }
+.sb-preds { display: grid; gap: 6px; }
+.sb-pred { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 180px); gap: 10px; align-items: center; font-size: 14px; }
+.sb-pred label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.sb-pred input[type='checkbox'] { width: 18px; height: 18px; accent-color: var(--accent); }
+.sb-pred .sb-muted { font-size: 13px; }
+.sb-pred select { width: 100%; }
+@media (max-width: 640px) { .sb-pred { grid-template-columns: auto minmax(0, 1fr); } .sb-pred > :last-child { grid-column: 1 / -1; } }
+.sb-inputs { min-width: 0; }
+.sb-inputs > .calc-field { max-width: 100%; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.sb-inputs .seg { max-width: 100%; flex-wrap: wrap; }
+.sb-contain { contain: inline-size; }
+.sb-flow { display: grid; gap: 16px; }
+.sb-q { display: grid; gap: 8px; }
+.sb-q > span { font-weight: 700; }
+.sb-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.sb-opts button { font: inherit; font-size: 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); cursor: pointer; text-align: left; }
+.sb-opts button:hover { border-color: var(--ink-3); }
+.sb-opts button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 700; }
+.sb-rec .big { font-size: clamp(24px, 4vw, 34px); }
+.sb-rec .tl-row { margin-top: 14px; }
+.sb-alts { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+.sb-node { fill: var(--bg-soft); stroke: var(--ink-3); stroke-width: 1.2; }
+.sb-edge { stroke: var(--ink-2); stroke-width: 1.8; }
+.sb-arrowhead { fill: var(--ink-2); }
+/* Long button labels wrap on phones instead of widening the page. */
+.sb-row .btn { white-space: normal; text-align: left; max-width: 100%; }
+.sb-card .btn, .sb-rec .btn { white-space: normal; text-align: left; max-width: 100%; }
