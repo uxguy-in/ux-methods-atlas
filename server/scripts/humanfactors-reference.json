@@ -1,0 +1,5024 @@
+{
+ "trees": {
+  "example": {
+   "Q": 0.0003469049639999999,
+   "cuts": [
+    [
+     0,
+     2,
+     6,
+     7
+    ],
+    [
+     0,
+     2,
+     6,
+     8
+    ],
+    [
+     0,
+     2,
+     7,
+     8
+    ],
+    [
+     0,
+     4,
+     6,
+     7
+    ],
+    [
+     0,
+     4,
+     6,
+     8
+    ],
+    [
+     0,
+     4,
+     7,
+     8
+    ],
+    [
+     0,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     5,
+     6,
+     8
+    ],
+    [
+     0,
+     5,
+     7,
+     8
+    ],
+    [
+     1,
+     2,
+     6,
+     7
+    ],
+    [
+     1,
+     2,
+     6,
+     8
+    ],
+    [
+     1,
+     2,
+     7,
+     8
+    ],
+    [
+     1,
+     4,
+     6,
+     7
+    ],
+    [
+     1,
+     4,
+     6,
+     8
+    ],
+    [
+     1,
+     4,
+     7,
+     8
+    ],
+    [
+     1,
+     5,
+     6,
+     7
+    ],
+    [
+     1,
+     5,
+     6,
+     8
+    ],
+    [
+     1,
+     5,
+     7,
+     8
+    ],
+    [
+     2,
+     3,
+     6,
+     7
+    ],
+    [
+     2,
+     3,
+     6,
+     8
+    ],
+    [
+     2,
+     3,
+     7,
+     8
+    ]
+   ],
+   "rare": 0.000406,
+   "mcub": 0.0004059268252954995,
+   "importance": [
+    {
+     "birnbaum": 0.03743098799999999,
+     "criticality": 0.32369950174595946,
+     "fv": 0.3236995017459593,
+     "raw": 108.57613441357387,
+     "rrw": 1.4786326530612242
+    },
+    {
+     "birnbaum": 0.03739348199999999,
+     "criticality": 0.2155834356985448,
+     "fv": 0.21558343569854477,
+     "raw": 108.57613441357387,
+     "rrw": 1.27483284457478
+    },
+    {
+     "birnbaum": 0.0014625212000000012,
+     "criticality": 0.6323869727041445,
+     "fv": 0.6323869727041439,
+     "raw": 4.583526178656819,
+     "rrw": 2.7202518021625957
+    },
+    {
+     "birnbaum": 0.015880295759999996,
+     "criticality": 0.45777078473861216,
+     "fv": 0.45777078473861177,
+     "raw": 46.3193076891226,
+     "rrw": 1.844238509940741
+    },
+    {
+     "birnbaum": 0.00036132588799999994,
+     "criticality": 0.05207851220024629,
+     "fv": 0.05207851220024567,
+     "raw": 1.98949173180468,
+     "rrw": 1.054939689489608
+    },
+    {
+     "birnbaum": 0.00042907449199999987,
+     "criticality": 0.24737293295116988,
+     "fv": 0.2473729329511691,
+     "raw": 1.98949173180468,
+     "rrw": 1.3286792938781185
+    },
+    {
+     "birnbaum": 0.0019040648400000001,
+     "criticality": 0.548872180451128,
+     "fv": 0.5488721804511275,
+     "raw": 5.939849624060152,
+     "rrw": 2.2166666666666655
+    },
+    {
+     "birnbaum": 0.0018910233000000011,
+     "criticality": 0.43609022556391014,
+     "fv": 0.43609022556390964,
+     "raw": 6.015037593984967,
+     "rrw": 1.773333333333333
+    },
+    {
+     "birnbaum": 0.0005347031400000004,
+     "criticality": 0.9248120300751888,
+     "fv": 0.924812030075188,
+     "raw": 1.61654135338346,
+     "rrw": 13.299999999999994
+    }
+   ]
+  },
+  "tree2": {
+   "Q": 0.017320599999999995,
+   "cuts": [
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   "rare": 0.018000000000000002,
+   "mcub": 0.017897257708120007,
+   "importance": [
+    {
+     "birnbaum": 0.074412,
+     "criticality": 0.2148078011154349,
+     "fv": 0.21480780111543452,
+     "raw": 5.081348221193263,
+     "rrw": 1.2735735294117643
+    },
+    {
+     "birnbaum": 0.048510000000000005,
+     "criticality": 0.16804267750539825,
+     "fv": 0.1680426775053979,
+     "raw": 3.63266861425124,
+     "rrw": 1.201984732824427
+    },
+    {
+     "birnbaum": 0.11480599999999998,
+     "criticality": 0.6628292322436868,
+     "fv": 0.6628292322436866,
+     "raw": 6.965463090193181,
+     "rrw": 2.965856164383561
+    },
+    {
+     "birnbaum": 0.11480599999999998,
+     "criticality": 0.6628292322436868,
+     "fv": 0.6628292322436866,
+     "raw": 6.965463090193181,
+     "rrw": 2.965856164383561
+    },
+    {
+     "birnbaum": 0.21752999999999997,
+     "criticality": 0.2511806750343522,
+     "fv": 0.2511806750343521,
+     "raw": 13.307853076683259,
+     "rrw": 1.3354356206630684
+    }
+   ]
+  },
+  "tree3": {
+   "Q": 0.03838892499999998,
+   "cuts": [
+    [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    [
+     0,
+     1,
+     2,
+     3,
+     5
+    ],
+    [
+     0,
+     1,
+     2,
+     3,
+     6
+    ],
+    [
+     0,
+     1,
+     2,
+     4,
+     5
+    ],
+    [
+     0,
+     1,
+     2,
+     4,
+     6
+    ],
+    [
+     0,
+     1,
+     2,
+     5,
+     6
+    ],
+    [
+     0,
+     1,
+     3,
+     4,
+     5
+    ],
+    [
+     0,
+     1,
+     3,
+     4,
+     6
+    ],
+    [
+     0,
+     1,
+     3,
+     5,
+     6
+    ],
+    [
+     0,
+     1,
+     4,
+     5,
+     6
+    ],
+    [
+     2,
+     5,
+     7
+    ],
+    [
+     5,
+     7,
+     8
+    ]
+   ],
+   "rare": 0.053485,
+   "mcub": 0.05231812767270372,
+   "importance": [
+    {
+     "birnbaum": 0.05212975000000001,
+     "criticality": 0.4073811652709736,
+     "fv": 0.407381165270973,
+     "raw": 1.9505560522989391,
+     "rrw": 1.6874252747252738
+    },
+    {
+     "birnbaum": 0.039097312499999995,
+     "criticality": 0.4073811652709735,
+     "fv": 0.40738116527097323,
+     "raw": 1.6110717479064605,
+     "rrw": 1.6874252747252745
+    },
+    {
+     "birnbaum": 0.04625615000000001,
+     "criticality": 0.6024673782868372,
+     "fv": 0.6024673782868366,
+     "raw": 1.6024673782868377,
+     "rrw": 2.5155168290101795
+    },
+    {
+     "birnbaum": 0.03280650000000002,
+     "criticality": 0.17091648177176125,
+     "fv": 0.17091648177176072,
+     "raw": 1.6836659270870453,
+     "rrw": 1.2061511030119272
+    },
+    {
+     "birnbaum": 0.03123930000000002,
+     "criticality": 0.20343953366758796,
+     "fv": 0.20343953366758782,
+     "raw": 1.6103186010027641,
+     "rrw": 1.2553974773619891
+    },
+    {
+     "birnbaum": 0.09082549999999998,
+     "criticality": 0.8280754149797112,
+     "fv": 0.8280754149797108,
+     "raw": 2.5378543421051782,
+     "rrw": 5.816503787878785
+    },
+    {
+     "birnbaum": 0.03406950000000001,
+     "criticality": 0.13312237839428961,
+     "fv": 0.1331223783942891,
+     "raw": 1.7543601442343084,
+     "rrw": 1.1535653650254662
+    },
+    {
+     "birnbaum": 0.2165642499999999,
+     "criticality": 0.5641321032042446,
+     "fv": 0.5641321032042442,
+     "raw": 6.077188928838201,
+     "rrw": 2.294273121171372
+    },
+    {
+     "birnbaum": 0.017284750000000015,
+     "criticality": 0.13507606686042936,
+     "fv": 0.1350760668604287,
+     "raw": 1.3151774893410024,
+     "rrw": 1.1561710361859436
+    }
+   ]
+  }
+ },
+ "niosh": [
+  {
+   "input": {
+    "units": "metric",
+    "load": 12,
+    "H": 45,
+    "V": 20,
+    "D": 80,
+    "A": 45,
+    "F": 3,
+    "duration": "2",
+    "coupling": "fair",
+    "control": true,
+    "Hd": 35,
+    "Vd": 100,
+    "name": "page example"
+   },
+   "origin": {
+    "RWL": 6.006124060930556,
+    "LI": 1.9979607277943547,
+    "mult": [
+     0.5555555555555556,
+     0.835,
+     0.87625,
+     0.856,
+     0.79,
+     0.95
+    ]
+   },
+   "destination": {
+    "RWL": 9.004724291071431,
+    "LI": 1.332633805556769,
+    "mult": [
+     0.7142857142857143,
+     0.925,
+     0.87625,
+     0.856,
+     0.79,
+     1.0
+    ]
+   }
+  },
+  {
+   "input": {
+    "units": "us",
+    "load": 35,
+    "H": 15,
+    "V": 27,
+    "D": 17,
+    "A": 0,
+    "F": 0.2,
+    "duration": "1",
+    "coupling": "poor",
+    "control": true,
+    "Hd": 20,
+    "Vd": 10,
+    "round2": true,
+    "name": "NIOSH manual example 2"
+   },
+   "origin": {
+    "RWL": 28.028284200000005,
+    "LI": 1.248738586716628,
+    "mult": [
+     0.67,
+     0.98,
+     0.93,
+     1.0,
+     1.0,
+     0.9
+    ]
+   },
+   "destination": {
+    "RWL": 18.141975000000002,
+    "LI": 1.929227661266207,
+    "mult": [
+     0.5,
+     0.85,
+     0.93,
+     1.0,
+     1.0,
+     0.9
+    ]
+   }
+  },
+  {
+   "input": {
+    "units": "metric",
+    "load": 20,
+    "H": 30,
+    "V": 60,
+    "D": 40,
+    "A": 20,
+    "F": 4.5,
+    "duration": "8",
+    "coupling": "poor",
+    "control": false,
+    "name": "interpolated F"
+   },
+   "origin": {
+    "RWL": 5.751447389999999,
+    "LI": 3.4773855420765662,
+    "mult": [
+     0.8333333333333334,
+     0.955,
+     0.9325,
+     0.9359999999999999,
+     0.4,
+     0.9
+    ]
+   },
+   "destination": null
+  },
+  {
+   "input": {
+    "units": "metric",
+    "load": 8,
+    "H": 20,
+    "V": 180,
+    "D": 20,
+    "A": 150,
+    "F": 0.1,
+    "duration": "1",
+    "coupling": "good",
+    "control": false,
+    "name": "out of range"
+   },
+   "origin": {
+    "RWL": 0.0,
+    "LI": null,
+    "mult": [
+     1,
+     0,
+     1,
+     0,
+     1.0,
+     1.0
+    ]
+   },
+   "destination": null
+  },
+  {
+   "input": {
+    "units": "us",
+    "load": 25,
+    "H": 18,
+    "V": 40,
+    "D": 30,
+    "A": 60,
+    "F": 11,
+    "duration": "2",
+    "coupling": "fair",
+    "control": true,
+    "Hd": 12,
+    "Vd": 20,
+    "name": "US, F = 11 at 2 h"
+   },
+   "origin": {
+    "RWL": 4.286089866666668,
+    "LI": 5.832822170721943,
+    "mult": [
+     0.5555555555555556,
+     0.925,
+     0.88,
+     0.808,
+     0.23,
+     1.0
+    ]
+   },
+   "destination": {
+    "RWL": 0.0,
+    "LI": null,
+    "mult": [
+     0.8333333333333334,
+     0.925,
+     0.88,
+     0.808,
+     0.0,
+     0.95
+    ]
+   }
+  },
+  {
+   "input": {
+    "units": "metric",
+    "load": 10,
+    "H": 63,
+    "V": 0,
+    "D": 175,
+    "A": 135,
+    "F": 15,
+    "duration": "1",
+    "coupling": "fair",
+    "control": false,
+    "name": "range edges"
+   },
+   "origin": {
+    "RWL": 0.0,
+    "LI": null,
+    "mult": [
+     0.3968253968253968,
+     0.775,
+     0.8457142857142856,
+     0.5680000000000001,
+     0.0,
+     0.95
+    ]
+   },
+   "destination": null
+  }
+ ],
+ "rulaTables": {
+  "A": [
+   [
+    [
+     1,
+     2,
+     2,
+     2,
+     2,
+     3,
+     3,
+     3
+    ],
+    [
+     2,
+     2,
+     2,
+     2,
+     3,
+     3,
+     3,
+     3
+    ],
+    [
+     2,
+     3,
+     3,
+     3,
+     3,
+     3,
+     4,
+     4
+    ]
+   ],
+   [
+    [
+     2,
+     3,
+     3,
+     3,
+     3,
+     4,
+     4,
+     4
+    ],
+    [
+     3,
+     3,
+     3,
+     3,
+     3,
+     4,
+     4,
+     4
+    ],
+    [
+     3,
+     4,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5
+    ]
+   ],
+   [
+    [
+     3,
+     3,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5
+    ],
+    [
+     3,
+     4,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5
+    ],
+    [
+     4,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5,
+     5
+    ]
+   ],
+   [
+    [
+     4,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5,
+     5
+    ],
+    [
+     4,
+     4,
+     4,
+     4,
+     4,
+     5,
+     5,
+     5
+    ],
+    [
+     4,
+     4,
+     4,
+     5,
+     5,
+     5,
+     6,
+     6
+    ]
+   ],
+   [
+    [
+     5,
+     5,
+     5,
+     5,
+     5,
+     6,
+     6,
+     7
+    ],
+    [
+     5,
+     6,
+     6,
+     6,
+     6,
+     7,
+     7,
+     7
+    ],
+    [
+     6,
+     6,
+     6,
+     7,
+     7,
+     7,
+     7,
+     8
+    ]
+   ],
+   [
+    [
+     7,
+     7,
+     7,
+     7,
+     7,
+     8,
+     8,
+     9
+    ],
+    [
+     8,
+     8,
+     8,
+     8,
+     8,
+     9,
+     9,
+     9
+    ],
+    [
+     9,
+     9,
+     9,
+     9,
+     9,
+     9,
+     9,
+     9
+    ]
+   ]
+  ],
+  "B": [
+   [
+    1,
+    3,
+    2,
+    3,
+    3,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7
+   ],
+   [
+    2,
+    3,
+    2,
+    3,
+    4,
+    5,
+    5,
+    5,
+    6,
+    7,
+    7,
+    7
+   ],
+   [
+    3,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    7
+   ],
+   [
+    5,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8
+   ],
+   [
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ],
+   [
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    9
+   ]
+  ],
+  "C": [
+   [
+    1,
+    2,
+    3,
+    3,
+    4,
+    5,
+    5
+   ],
+   [
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    5
+   ],
+   [
+    3,
+    3,
+    3,
+    4,
+    4,
+    5,
+    6
+   ],
+   [
+    3,
+    3,
+    3,
+    4,
+    5,
+    6,
+    6
+   ],
+   [
+    4,
+    4,
+    4,
+    5,
+    6,
+    7,
+    7
+   ],
+   [
+    4,
+    4,
+    5,
+    6,
+    6,
+    7,
+    7
+   ],
+   [
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    7
+   ],
+   [
+    5,
+    5,
+    6,
+    7,
+    7,
+    7,
+    7
+   ]
+  ]
+ },
+ "rebaTables": {
+  "A": [
+   [
+    [
+     1,
+     2,
+     3,
+     4
+    ],
+    [
+     2,
+     3,
+     4,
+     5
+    ],
+    [
+     2,
+     4,
+     5,
+     6
+    ],
+    [
+     3,
+     5,
+     6,
+     7
+    ],
+    [
+     4,
+     6,
+     7,
+     8
+    ]
+   ],
+   [
+    [
+     1,
+     2,
+     3,
+     4
+    ],
+    [
+     3,
+     4,
+     5,
+     6
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     5,
+     6,
+     7,
+     8
+    ],
+    [
+     6,
+     7,
+     8,
+     9
+    ]
+   ],
+   [
+    [
+     3,
+     3,
+     5,
+     6
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     5,
+     6,
+     7,
+     8
+    ],
+    [
+     6,
+     7,
+     8,
+     9
+    ],
+    [
+     7,
+     8,
+     9,
+     9
+    ]
+   ]
+  ],
+  "B": [
+   [
+    [
+     1,
+     2,
+     2
+    ],
+    [
+     1,
+     2,
+     3
+    ],
+    [
+     3,
+     4,
+     5
+    ],
+    [
+     4,
+     5,
+     5
+    ],
+    [
+     6,
+     7,
+     8
+    ],
+    [
+     7,
+     8,
+     8
+    ]
+   ],
+   [
+    [
+     1,
+     2,
+     3
+    ],
+    [
+     2,
+     3,
+     4
+    ],
+    [
+     4,
+     5,
+     5
+    ],
+    [
+     5,
+     6,
+     7
+    ],
+    [
+     7,
+     8,
+     8
+    ],
+    [
+     8,
+     9,
+     9
+    ]
+   ]
+  ],
+  "C": [
+   [
+    1,
+    1,
+    1,
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    7,
+    7,
+    7
+   ],
+   [
+    1,
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8
+   ],
+   [
+    2,
+    3,
+    3,
+    3,
+    4,
+    5,
+    6,
+    7,
+    7,
+    8,
+    8,
+    8
+   ],
+   [
+    3,
+    4,
+    4,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9
+   ],
+   [
+    4,
+    4,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9
+   ],
+   [
+    6,
+    6,
+    6,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    10,
+    10
+   ],
+   [
+    7,
+    7,
+    7,
+    8,
+    9,
+    9,
+    9,
+    10,
+    10,
+    11,
+    11,
+    11
+   ],
+   [
+    8,
+    8,
+    8,
+    9,
+    10,
+    10,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11
+   ],
+   [
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12
+   ],
+   [
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    12,
+    12
+   ],
+   [
+    11,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12
+   ],
+   [
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12
+   ]
+  ]
+ },
+ "rula": [
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 4,
+    "grand": 5
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 6,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 5,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 4,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 9,
+    "scoreD": 9,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 9,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 7,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 8,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 9,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 6,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 3,
+    "grand": 4
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 9,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 12,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 1,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 4,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 3,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 6,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 10,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 4,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 7,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 3,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 10,
+    "scoreD": 6,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 4,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 5,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 3,
+    "scoreD": 8,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 9,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 12,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 12,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 7,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 4,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 5,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 3,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 5,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 10,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 10,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 11,
+    "scoreD": 7,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 12,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": false,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 7,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 3,
+    "neck": 4,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 3,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 10,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": false,
+    "wristTwist": 1,
+    "muscleA": true,
+    "forceA": 0,
+    "neck": 2,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 12,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 1,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 3,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 6,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 4,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 3,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 1,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 3
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 8,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 4,
+    "scoreD": 9,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 1,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 11,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 2,
+    "neck": 4,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": true,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 0
+   },
+   "out": {
+    "scoreC": 7,
+    "scoreD": 9,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 2,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 3,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": true,
+    "forceA": 1,
+    "neck": 3,
+    "neckTwist": true,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 1,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 8,
+    "scoreD": 10,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "across": true,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 2,
+    "muscleA": false,
+    "forceA": 1,
+    "neck": 2,
+    "neckTwist": false,
+    "neckSide": false,
+    "trunk": 3,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": false,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 6,
+    "scoreD": 6,
+    "grand": 7
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": false,
+    "abducted": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 2,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 0,
+    "neck": 1,
+    "neckTwist": false,
+    "neckSide": true,
+    "trunk": 4,
+    "trunkTwist": false,
+    "trunkSide": true,
+    "legs": 1,
+    "muscleB": false,
+    "forceB": 2
+   },
+   "out": {
+    "scoreC": 3,
+    "scoreD": 8,
+    "grand": 6
+   }
+  },
+  {
+   "input": {
+    "upperArm": 3,
+    "shoulderRaised": true,
+    "abducted": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "across": false,
+    "wrist": 1,
+    "wristDeviated": true,
+    "wristTwist": 1,
+    "muscleA": false,
+    "forceA": 1,
+    "neck": 1,
+    "neckTwist": true,
+    "neckSide": false,
+    "trunk": 2,
+    "trunkTwist": true,
+    "trunkSide": false,
+    "legs": 2,
+    "muscleB": true,
+    "forceB": 1
+   },
+   "out": {
+    "scoreC": 5,
+    "scoreD": 7,
+    "grand": 7
+   }
+  }
+ ],
+ "reba": [
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 4,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 1,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 5,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 2,
+    "load": 1,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 3,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": false,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": true,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 9,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 2,
+    "load": 2,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 4,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 0,
+    "load": 2,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 3,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 2,
+    "load": 2,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 2,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 2,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 5,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 1,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 6,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 2,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 10,
+    "score": 14
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 6,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 7,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 1,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 3,
+    "static": true,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 9,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 2,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 5,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 0,
+    "load": 1,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 5,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 2,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 0,
+    "load": 1,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 9,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 2,
+    "load": 1,
+    "shock": false,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 8,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 2,
+    "load": 0,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 4,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 0,
+    "load": 2,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 3,
+    "scoreB": 6,
+    "score": 6
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 1,
+    "load": 2,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 9,
+    "scoreB": 5,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 2,
+    "load": 0,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 9,
+    "scoreB": 2,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 2,
+    "load": 0,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 3,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 10,
+    "score": 14
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 2,
+    "load": 1,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 6,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 2,
+    "load": 2,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 1,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 3,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 3,
+    "scoreB": 5,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 2,
+    "load": 1,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 10,
+    "scoreB": 5,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 2,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 3,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 6,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 4,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 2,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 2,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 3,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 6,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 3,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 4,
+    "scoreB": 6,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 0,
+    "load": 0,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 2,
+    "scoreB": 6,
+    "score": 5
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 0,
+    "load": 0,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 3,
+    "scoreB": 3,
+    "score": 4
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 0,
+    "load": 1,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 5,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 2,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 6,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 2,
+    "load": 1,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 3,
+    "score": 8
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 1,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 1,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 5,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 3,
+    "scoreB": 5,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 2,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": true,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 6,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 0,
+    "shock": false,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 2,
+    "scoreB": 8,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 0,
+    "load": 1,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 5,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 2,
+    "load": 2,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 3,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 9,
+    "scoreB": 7,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 9,
+    "scoreB": 11,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 2,
+    "load": 2,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 5,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 1,
+    "load": 0,
+    "shock": true,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 0,
+    "static": false,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 4,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 1,
+    "load": 2,
+    "shock": false,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 2,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 2,
+    "load": 1,
+    "shock": true,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 11,
+    "scoreB": 3,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 2,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 6,
+    "scoreB": 7,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": false,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": false,
+    "coupling": 2,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 4,
+    "scoreB": 10,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 0,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 4,
+    "scoreB": 4,
+    "score": 6
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 2,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 3,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": true,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 3,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 8,
+    "score": 11
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 2,
+    "knees": 1,
+    "load": 0,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 3,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 5,
+    "scoreB": 6,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 2,
+    "knees": 0,
+    "load": 2,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 1,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 2,
+    "score": 9
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 2,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 3,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 9,
+    "scoreB": 11,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 4,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 2,
+    "load": 0,
+    "shock": false,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": false,
+    "coupling": 0,
+    "static": false,
+    "repeated": false,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 3,
+    "score": 7
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": false,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 2,
+    "wristTwist": true,
+    "coupling": 2,
+    "static": true,
+    "repeated": true,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 8,
+    "scoreB": 7,
+    "score": 13
+   }
+  },
+  {
+   "input": {
+    "trunk": 3,
+    "trunkTwist": false,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 2,
+    "shock": true,
+    "upperArm": 4,
+    "abducted": true,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": true,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 8,
+    "score": 12
+   }
+  },
+  {
+   "input": {
+    "trunk": 2,
+    "trunkTwist": true,
+    "neck": 2,
+    "neckTwist": true,
+    "legs": 1,
+    "knees": 1,
+    "load": 0,
+    "shock": true,
+    "upperArm": 2,
+    "abducted": false,
+    "shoulderRaised": true,
+    "armSupported": false,
+    "lowerArm": 2,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": false,
+    "repeated": false,
+    "rapid": true
+   },
+   "out": {
+    "scoreA": 7,
+    "scoreB": 5,
+    "score": 10
+   }
+  },
+  {
+   "input": {
+    "trunk": 1,
+    "trunkTwist": true,
+    "neck": 1,
+    "neckTwist": false,
+    "legs": 1,
+    "knees": 1,
+    "load": 1,
+    "shock": false,
+    "upperArm": 1,
+    "abducted": true,
+    "shoulderRaised": false,
+    "armSupported": false,
+    "lowerArm": 1,
+    "wrist": 1,
+    "wristTwist": true,
+    "coupling": 0,
+    "static": false,
+    "repeated": true,
+    "rapid": false
+   },
+   "out": {
+    "scoreA": 4,
+    "scoreB": 2,
+    "score": 5
+   }
+  }
+ ],
+ "anthro": {
+  "min": {
+   "per": [
+    0.7598693486232886,
+    0.9901846713713547
+   ],
+   "total": 0.8750270099973216,
+   "pct": [
+    0.24013065137671147,
+    0.009815328628645334
+   ]
+  },
+  "max": {
+   "total": 0.1249729900026784
+  },
+  "range": {
+   "total": 1.6646260902973214e-17
+  },
+  "designMin": 180.01211210752322,
+  "designMax": 217.57939527697894,
+  "designRange": [
+   176.966738583698,
+   220.8233706095328
+  ],
+  "p5": [
+   177.01874417091247,
+   191.19631735743675
+  ],
+  "p95": [
+   204.9812558290875,
+   220.80368264256325
+  ]
+ },
+ "borg": {
+  "mean": 13.75,
+  "sd": 1.764549903980152,
+  "median": 13.5,
+  "lo": 12.628858479228821,
+  "hi": 14.871141520771179,
+  "high": 4
+ },
+ "swat": {
+  "example": {
+   "r2": 1.0,
+   "importance": [
+    0.6923076923076925,
+    0.23076923076923073,
+    0.07692307692307683
+   ],
+   "scores": {
+    "111": 0.0,
+    "112": 3.846153846153837,
+    "113": 7.692307692307682,
+    "121": 11.538461538461531,
+    "122": 15.384615384615367,
+    "123": 19.230769230769212,
+    "131": 23.076923076923077,
+    "132": 26.923076923076913,
+    "133": 30.769230769230752,
+    "211": 34.61538461538461,
+    "212": 38.46153846153845,
+    "213": 42.3076923076923,
+    "221": 46.15384615384614,
+    "222": 49.99999999999998,
+    "223": 53.846153846153825,
+    "231": 57.69230769230769,
+    "232": 61.53846153846152,
+    "233": 65.38461538461537,
+    "311": 69.23076923076925,
+    "312": 73.07692307692308,
+    "313": 76.92307692307693,
+    "321": 80.76923076923079,
+    "322": 84.61538461538463,
+    "323": 88.46153846153847,
+    "331": 92.30769230769232,
+    "332": 96.15384615384616,
+    "333": 100.00000000000001
+   }
+  },
+  "custom": {
+   "r2": 0.9990503323836657,
+   "importance": [
+    0.22553191489361854,
+    0.6893617021276585,
+    0.085106382978723
+   ],
+   "scores": {
+    "111": 0.0,
+    "112": 4.255319148936129,
+    "113": 8.510638297872301,
+    "121": 34.468085106382894,
+    "122": 38.723404255319025,
+    "123": 42.9787234042552,
+    "131": 68.93617021276586,
+    "132": 73.19148936170198,
+    "133": 77.44680851063815,
+    "211": 11.91489361702142,
+    "212": 16.170212765957544,
+    "213": 20.425531914893725,
+    "221": 46.382978723404314,
+    "222": 50.638297872340445,
+    "223": 54.89361702127662,
+    "231": 80.85106382978726,
+    "232": 85.10638297872339,
+    "233": 89.36170212765957,
+    "311": 22.55319148936185,
+    "312": 26.80851063829798,
+    "313": 31.063829787234152,
+    "321": 57.02127659574475,
+    "322": 61.276595744680876,
+    "323": 65.53191489361704,
+    "331": 91.48936170212771,
+    "332": 95.74468085106383,
+    "333": 99.99999999999999
+   }
+  }
+ },
+ "steering": {
+  "a": 280.46428571428555,
+  "b": 47.07936507936508,
+  "r2": 0.990598550931022,
+  "seA": 24.689250495917445,
+  "seB": 0.9778400286587319,
+  "bLo": 45.05144897921124,
+  "bHi": 49.10728117951893,
+  "aLo": 229.26191404406626,
+  "aHi": 331.66665738450484,
+  "p": 8.566779646755846e-24,
+  "designs": [
+   594.3267195767194,
+   468.7817460317459,
+   1457.4484126984125,
+   484.4748677248676
+  ]
+ },
+ "steeringId": {
+  "narrowing": 13.86294361119891,
+  "widening": 11.443878006959476,
+  "circle": 31.41592653589793
+ },
+ "seev": {
+  "add": {
+   "pred": [
+    34.78260869565217,
+    8.695652173913043,
+    13.043478260869565,
+    17.391304347826086,
+    17.391304347826086,
+    8.695652173913043
+   ],
+   "r": 0.9426915438427651,
+   "p": 0.004832280810017565,
+   "lo": 0.5581245210550188,
+   "hi": 0.9938816915949851,
+   "rho": 0.8827348295047495,
+   "mad": 9.072463768115943
+  },
+  "mult": {
+   "pred": [
+    50.0,
+    4.545454545454546,
+    9.090909090909092,
+    18.181818181818183,
+    13.636363636363637,
+    4.545454545454546
+   ],
+   "r": 0.967841612286557,
+   "p": 0.0015346143608175747,
+   "lo": 0.7284532308853124,
+   "hi": 0.9966059861081995,
+   "rho": 0.8406680016960504,
+   "mad": 5.151515151515151
+  }
+ },
+ "alarm": {
+  "total": 674,
+  "nb": 432,
+  "perHour": 9.36111111111111,
+  "per10": 1.5601851851851851,
+  "perDay": 224.66666666666666,
+  "over": 4,
+  "floodBins": 5,
+  "floods": [
+   [
+    85,
+    87,
+    60
+   ],
+   [
+    304,
+    305,
+    32
+   ]
+  ],
+  "max10": 25,
+  "peakRolling": 25,
+  "top10Count": 419,
+  "topTags": [
+   "TI-100HI",
+   "PI-107LO",
+   "FI-114HH",
+   "LSH-207",
+   "LI-121LL",
+   "AI-128HI",
+   "TI-135LO",
+   "FI-149LL",
+   "PI-142HH",
+   "AI-163LO"
+  ],
+  "chatter": [
+   "LSH-207"
+  ],
+  "stale": [
+   "PDI-330HI"
+  ],
+  "prio": {
+   "high": 155,
+   "medium": 174,
+   "low": 345
+  },
+  "over30h": 0.027777777777777776,
+  "nTags": 69
+ }
+}

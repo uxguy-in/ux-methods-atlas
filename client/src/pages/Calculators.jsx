@@ -71,6 +71,11 @@ import SxPairedScaling from '../calc/tools/surveyx-Paired.jsx';
 import SxImportancePerformance from '../calc/tools/surveyx-Ipa.jsx';
 import SxAnchoringVignettes from '../calc/tools/surveyx-Vignettes.jsx';
 import SxNorms from '../calc/tools/surveyx-Norms.jsx';
+import HfFaultTree from '../calc/tools/humanfactors-Fault.jsx';
+import HfErgonomics from '../calc/tools/humanfactors-Ergo.jsx';
+import HfSteering from '../calc/tools/humanfactors-Steering.jsx';
+import HfSeev from '../calc/tools/humanfactors-Seev.jsx';
+import HfAlarmFlood from '../calc/tools/humanfactors-Alarm.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2745,6 +2750,7 @@ const COMPONENTS = {
   'brand-lift': CausalBrandLift, 'market-sizing': CausalMarket,
   nonresponse: SxNonresponse, 'sensitive-questions': SxSensitive, 'paired-scaling': SxPairedScaling, 'importance-performance': SxImportancePerformance,
   'anchoring-vignettes': SxAnchoringVignettes, norms: SxNorms,
+  'fault-tree': HfFaultTree, ergonomics: HfErgonomics, 'steering-law': HfSteering, 'seev-attention': HfSeev, 'alarm-flood': HfAlarmFlood,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
