@@ -1,0 +1,48 @@
+/* Styles for the questionnaire scorer, agreement indices, item analysis and survey weighting tools ("scorers").
+   Theme tokens only, so light and dark mode follow the site. */
+.sc-contain { contain: inline-size; max-width: 100%; }
+.sc-wide { display: block; max-width: none; }
+.sc-b { font-weight: 700; }
+.sc-ref { stroke: var(--ink-3); stroke-dasharray: 4 3; stroke-width: 1.2; }
+.sc-zero { stroke: var(--line); stroke-width: 1.5; }
+.sc-bias { stroke: var(--c2); stroke-width: 2; }
+.sc-fit { stroke: var(--c3); stroke-width: 1.5; stroke-dasharray: 6 3; }
+.sc-mark { stroke: var(--ink); stroke-width: 2; }
+.sc-pt { fill: var(--c1); fill-opacity: .8; }
+.sc-ciband { fill: color-mix(in srgb, var(--c2) 12%, transparent); }
+.sc-band { fill: transparent; }
+.sc-band-bad { fill: color-mix(in srgb, var(--bad) 10%, transparent); }
+.sc-band-warn { fill: color-mix(in srgb, var(--warn) 10%, transparent); }
+.sc-band-ok { fill: color-mix(in srgb, var(--ok) 8%, transparent); }
+.sc-band-good { fill: color-mix(in srgb, var(--ok) 16%, transparent); }
+.sc-bar { fill: var(--c1); }
+.sc-bar.tone-bad { fill: var(--bad); }
+.sc-bar.tone-ok { fill: var(--ok); }
+.sc-bar.tone-warn { fill: var(--warn); }
+.sc-inputs { min-width: 0; }
+.sc-inputs > .calc-field { max-width: 100%; grid-template-columns: minmax(0, 1fr); }
+.sc-inputs .seg { max-width: 100%; flex-wrap: wrap; }
+.sc-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px 24px; align-items: start; }
+.sc-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-tabs .seg { flex-wrap: wrap; }
+.sc-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin: 6px 0 0; padding: 0; list-style: none; }
+.sc-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.sc-items { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 14px; color: var(--ink-2); }
+.sc-items li span { color: var(--ink-3); font-size: 12.5px; }
+.sc-pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 7px; border-radius: var(--radius-sm); background: var(--bg-sunk); color: var(--ink-2); white-space: nowrap; }
+.sc-pill.ok { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.sc-pill.warn { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); }
+.sc-pill.bad { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.sc-wright .pbar { fill: var(--c1); fill-opacity: .75; }
+.sc-wright .axis { stroke: var(--ink-3); stroke-width: 1.5; }
+.sc-wright .item { fill: var(--c2); }
+.sc-wright .item-t { font-size: 11px; fill: var(--ink); }
+.sc-wright .item-t.misfit { fill: var(--bad); font-weight: 700; }
+.sc-profile .ln { fill: none; stroke-width: 2.2; }
+.sc-profile .mid { stroke: var(--line); stroke-dasharray: 4 3; }
+.sc-small { font-size: 13px; color: var(--ink-3); }
+.sc-targets { display: grid; gap: 6px; }
+/* Long "Load example" labels wrap instead of widening the page on phones. */
+.sc-row .btn { white-space: normal; text-align: left; max-width: 100%; }
+.sc-inputs .seg button { white-space: normal; }
+.sc-inputs select.select { max-width: 100%; }
