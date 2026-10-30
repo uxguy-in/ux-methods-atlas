@@ -7,6 +7,8 @@ import './styles.css';
 import './components/calc-learn.css';
 // The research bias map and its strips on method and calculator pages.
 import './components/bias-map.css';
+// Practice: scenario questions and the Test yourself links.
+import './components/practice.css';
 
 // GitHub Pages serves only static files, so the Pages build uses hash URLs that need no server rewrites.
 const Router = import.meta.env.VITE_STATIC === '1' ? HashRouter : BrowserRouter;

@@ -3,6 +3,7 @@ import { cameFrom } from '../nav-trail.js';
 import { calcsForMethod, firstWhen, plainText } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
 import { MethodBiasBox } from '../components/BiasWatch.jsx';
+import { TestYourself } from '../components/PracticeLink.jsx';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
@@ -174,6 +175,7 @@ export default function Method() {
             </div>
           )}
           <MethodBiasBox methodId={m.id || id} />
+          <TestYourself kind="method" id={m.id || id} />
           {m.status === 'community' && (
             <div className="aside-box">
               <h3>{VALIDATION[m.validation === 'tested' ? 'tested' : 'untested'].label}</h3>

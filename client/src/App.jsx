@@ -14,6 +14,7 @@ import About from './pages/About.jsx';
 import Submit from './pages/Submit.jsx';
 import Calculators from './pages/Calculators.jsx';
 import Biases from './pages/Biases.jsx';
+import Practice from './pages/Practice.jsx';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/calculators/:calc" element={<Calculators />} />
         <Route path="/biases" element={<Biases />} />
+        <Route path="/practice" element={<Practice />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />
