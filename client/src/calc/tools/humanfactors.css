@@ -1,0 +1,59 @@
+/* Styles for the human factors tools (fault tree, ergonomics, steering law and MHP, SEEV, alarm floods).
+   Theme tokens only, so light and dark mode follow the site. */
+.hf-root { display: grid; gap: 18px; min-width: 0; }
+.hf-root > * { min-width: 0; }
+.hf-root .calc-field { min-width: 0; max-width: 100%; }
+.hf-root .select { max-width: 100%; text-overflow: ellipsis; }
+.hf-root .ea-card { grid-template-columns: minmax(0, 1fr); }
+.hf-root .ea-card > *, .hf-root .calc-field > * { min-width: 0; max-width: 100%; }
+.hf-note { font-size: 13.5px; color: var(--ink-2); margin: 0; max-width: 75ch; }
+.hf-err { color: var(--bad); font-size: 13.5px; margin: 0; }
+.hf-errs { margin: 0; padding-left: 20px; color: var(--bad); font-size: 13.5px; }
+.hf-code textarea { font-family: var(--mono); font-size: 13px; line-height: 1.45; }
+.hf-wrap { overflow-x: auto; max-width: 100%; contain: inline-size; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.hf-wrap > svg { display: block; max-width: none; }
+.hf-checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.hf-checks .tl-check { font-size: 14px; font-weight: 500; }
+.hf-tabs .seg { flex-wrap: wrap; }
+.hf-num { font-variant-numeric: tabular-nums; }
+.hf-big { font-size: 15px; }
+
+/* Fault tree diagram */
+.hf-tree text { font-size: 12px; fill: var(--ink); }
+.hf-tree text.sub { font-size: 11px; fill: var(--ink-2); }
+.hf-tree text.op { font-size: 11px; font-weight: 700; fill: var(--bg); }
+.hf-tree path.edge { stroke: var(--ink-3); stroke-width: 1.3; fill: none; }
+.hf-tree rect.box { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; }
+.hf-tree rect.box.top { stroke: var(--ink-2); stroke-width: 2; }
+.hf-tree .g-and { fill: var(--c1); }
+.hf-tree .g-or { fill: var(--c2); }
+.hf-tree .g-kofn { fill: var(--c4); }
+.hf-tree circle.ev { fill: var(--bg-sunk); stroke: var(--ink-3); stroke-width: 1.2; }
+.hf-tree circle.ev.hot { fill: color-mix(in srgb, var(--bad) 30%, var(--bg)); stroke: var(--bad); }
+.hf-tree circle.ev.warm { fill: color-mix(in srgb, var(--warn) 30%, var(--bg)); stroke: var(--warn); }
+.hf-tree .shared { stroke-dasharray: 3 2; }
+.hf-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); }
+.hf-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+
+/* Alarm timeline */
+.hf-timeline rect.b { fill: var(--c1); }
+.hf-timeline rect.b.over { fill: var(--bad); }
+.hf-timeline rect.flood { fill: color-mix(in srgb, var(--bad) 13%, transparent); }
+.hf-timeline .thr { stroke: var(--bad); stroke-dasharray: 4 3; stroke-width: 1.2; }
+.hf-timeline .ok { stroke: var(--ok); stroke-dasharray: 4 3; stroke-width: 1.2; }
+
+/* Paired bars (SEEV predicted vs observed) */
+.hf-pair rect.p { fill: var(--c1); }
+.hf-pair rect.o { fill: var(--c3); }
+.hf-pair rect.w { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 3 2; }
+
+.hf-ch { display: grid; gap: 10px; }
+.hf-ch .q { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 14.5px; }
+.hf-ch .q > span { flex: 1 1 260px; min-width: 0; }
+.hf-ratings { display: grid; gap: 6px; }
+.hf-ratings button { text-align: left; white-space: normal; }
+.hf-tag-ok { color: var(--ok); }
+.hf-tag-warn { color: var(--warn); }
+.hf-tag-bad { color: var(--bad); }
+.hf-root .calc-field input.hf-text { width: 260px; max-width: 100%; }
+.hf-root .calc-field input.hf-text.short { width: 90px; }
