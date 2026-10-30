@@ -35,6 +35,7 @@
     "check:qual": "node server/scripts/check-qual.js",
     "check:biases": "node server/scripts/check-biases.js",
     "check:demos": "node server/scripts/check-demos.js",
+    "check:questions": "node server/scripts/check-questions.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

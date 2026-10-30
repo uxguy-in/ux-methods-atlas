@@ -9,6 +9,7 @@ import { CALC_INFO, stageLabel } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
 import { BIASES } from '../biases.js';
 import { DEMOS } from '../demos.js';
+import { QUESTIONS } from '../questions.js';
 
 // Books listed at a time; "Show more books" adds the next batch.
 const BOOK_PAGE = 40;
@@ -121,6 +122,7 @@ function ViewSwitch({ view, counts }) {
       {counts.design > 0 && <Link className="chip" to="/design">{DESIGN_KIND} ({counts.design})</Link>}
       <Link className="chip" to="/biases">Research biases ({BIASES.length})</Link>
       <Link className="chip" to="/demos">Weak vs strong ({DEMOS.length})</Link>
+      <Link className="chip" to="/questions">Questions ({QUESTIONS.length})</Link>
     </div>
   );
 }

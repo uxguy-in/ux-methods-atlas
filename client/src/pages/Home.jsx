@@ -59,6 +59,7 @@ export default function Home() {
             <Link to="/find" className="btn accent">Find the right method</Link>
             <Link to="/methods" className="btn ghost">Browse the atlas</Link>
           </div>
+          <p className="ql-start"><Link to="/questions">Or start from a question someone asked you →</Link></p>
           <div className="stats">
             <div className="stat"><b>{methods ? methods.length : '—'}</b><span>methods</span></div>
             <div className="stat"><b>{lost ?? '—'}</b><span>lost or borrowed</span></div>

@@ -4,6 +4,7 @@ import { calcsForMethod, firstWhen, plainText } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
 import { MethodBiasBox } from '../components/BiasWatch.jsx';
 import { DemoStrip } from '../components/WeakStrong.jsx';
+import { MethodQuestionsLine } from '../components/QuestionLinks.jsx';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
@@ -87,6 +88,7 @@ export default function Method() {
 
       <div className="wrap method-body" key={m.id}>
         <article>
+          <MethodQuestionsLine methodId={m.id || id} />
           <section className="block">
             <h2>What it is</h2>
             {paras(m.description).map((p, i) => <p key={i}>{p}</p>)}
