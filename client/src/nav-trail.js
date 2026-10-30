@@ -7,6 +7,7 @@ const PAGES = [
   [/^\/families/, () => 'Disciplines'],
   [/^\/design$/, () => 'Design & product'],
   [/^\/biases$/, () => 'Research biases'],
+  [/^\/demos$/, () => 'Weak vs strong'],
   [/^\/find$/, () => 'your results'],
   [/^\/plan$/, () => 'your study plan'],
   [/^\/methods\/.+/, () => 'previous method'],

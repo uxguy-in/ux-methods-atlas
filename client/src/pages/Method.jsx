@@ -3,6 +3,7 @@ import { cameFrom } from '../nav-trail.js';
 import { calcsForMethod, firstWhen, plainText } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
 import { MethodBiasBox } from '../components/BiasWatch.jsx';
+import { DemoStrip } from '../components/WeakStrong.jsx';
 import { useApi } from '../hooks.js';
 import Loading from '../components/Loading.jsx';
 import { Status, Validation } from '../components/MethodCard.jsx';
@@ -125,6 +126,7 @@ export default function Method() {
             {m.useWhen && <div className="panel good"><h3>Use it when</h3><p>{m.useWhen}</p></div>}
             {m.avoidWhen && <div className="panel bad"><h3>Avoid it when</h3><p>{m.avoidWhen}</p></div>}
           </section>
+          <DemoStrip methodId={m.id || id} />
 
           {m.whyLost && (
             <section className="block">

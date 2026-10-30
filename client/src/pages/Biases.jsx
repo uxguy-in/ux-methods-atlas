@@ -3,6 +3,7 @@ import { Link, useHref, useNavigationType, useSearchParams } from 'react-router-
 import { BIASES, BIAS_BY_ID, CHECK_METHODS, GROUPS, STAGE_ORDER, biasesForStudy, groupOf } from '../biases.js';
 import { STAGES, calcInfo } from '../calc/learn.js';
 import { CalcCard, StageBadges, useMethodNames } from '../components/CalcLearn.jsx';
+import { SeeItLink } from '../components/WeakStrong.jsx';
 
 const NARROW = '(max-width: 760px)';
 
@@ -163,6 +164,7 @@ function BiasCard({ b, methodName, onClose, id = 'bias-card' }) {
           <div className="bm-calcs">{calcs.map((c) => <CalcCard key={c.id} c={c} />)}</div>
         </div>
       )}
+      <SeeItLink biasId={b.id} />
       {b.source && (
         <p className="bm-source"><span className="label">Further reading</span>{b.source.author} ({b.source.year}). <i>{b.source.title}</i>{b.source.where ? `. ${b.source.where}.` : '.'}</p>
       )}
