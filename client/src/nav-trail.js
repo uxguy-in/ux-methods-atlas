@@ -6,6 +6,7 @@ const PAGES = [
   [/^\/lost$/, () => 'Lost methods'],
   [/^\/families/, () => 'Disciplines'],
   [/^\/design$/, () => 'Design & product'],
+  [/^\/biases$/, () => 'Research biases'],
   [/^\/find$/, () => 'your results'],
   [/^\/plan$/, () => 'your study plan'],
   [/^\/methods\/.+/, () => 'previous method'],

@@ -121,6 +121,7 @@ export default function Layout({ children }) {
           </div>
           <nav aria-label="Footer">
             {LINKS.map(([to, label]) => <Link key={to} to={to}>{label}</Link>)}
+            <Link to="/biases">Research biases</Link>
             <Link to="/submit">Submit a method</Link>
             <Link to={loc.pathname === '/about' ? '/about?report=1' : `/about?report=1&page=${encodeURIComponent(loc.pathname)}`}>Report a problem</Link>
             {import.meta.env.VITE_REPO_URL && <a href={import.meta.env.VITE_REPO_URL}>Download the code</a>}

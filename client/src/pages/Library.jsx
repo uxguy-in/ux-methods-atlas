@@ -7,6 +7,7 @@ import { ShowMoreList } from '../components/ShowMore.jsx';
 import { CORE_LABEL, DESIGN_KIND, readingLevel } from '../vocab.js';
 import { CALC_INFO, stageLabel } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
+import { BIASES } from '../biases.js';
 
 // Books listed at a time; "Show more books" adds the next batch.
 const BOOK_PAGE = 40;
@@ -117,6 +118,7 @@ function ViewSwitch({ view, counts }) {
       <Link role="tab" aria-selected={view === 'methods'} className={`chip${view === 'methods' ? ' on' : ''}`} to="/library?view=methods">All methods{counts.methods ? ` (${counts.methods})` : ''}</Link>
       <Link role="tab" aria-selected={view === 'calculators'} className={`chip${view === 'calculators' ? ' on' : ''}`} to="/library?view=calculators">All calculators ({CALC_INFO.length})</Link>
       {counts.design > 0 && <Link className="chip" to="/design">{DESIGN_KIND} ({counts.design})</Link>}
+      <Link className="chip" to="/biases">Research biases ({BIASES.length})</Link>
     </div>
   );
 }

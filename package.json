@@ -33,6 +33,7 @@
     "check:sensors": "node server/scripts/check-sensors.js",
     "check:guides": "node server/scripts/check-guides.js",
     "check:qual": "node server/scripts/check-qual.js",
+    "check:biases": "node server/scripts/check-biases.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

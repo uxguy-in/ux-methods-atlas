@@ -7,6 +7,7 @@ import * as CL from '../calc/cluster.js';
 import { CATALOG } from '../calc/catalog.js';
 import { STAGES, calcInfo } from '../calc/learn.js';
 import { CalcSwitcher, LearnPanel, NextSteps, useMethodNames } from '../components/CalcLearn.jsx';
+import { CalcBiasStrip } from '../components/BiasWatch.jsx';
 import CalculatorIndex from './CalculatorIndex.jsx';
 import ShannonInfo from '../calc/tools/ShannonInfo.jsx';
 import InfoForaging from '../calc/tools/InfoForaging.jsx';
@@ -2809,6 +2810,7 @@ function CalculatorPage({ current }) {
           <div className="calc-main">
             <current.C />
           </div>
+          <CalcBiasStrip calcId={current.id} />
           <NextSteps c={info} />
         </div>
       </section>
