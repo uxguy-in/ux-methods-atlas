@@ -552,7 +552,13 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
   .answers-bar .skip-link { white-space: nowrap; flex: none; }
 }
 
-/* Method page: return to the page the visitor came from */
+/* Every page: return to the page the visitor came from (BackBar.jsx) */
+.back-bar { padding-top: 14px; }
+/* Sit on the hero's background and take the place of its top padding, so the page does not grow. */
+.back-bar:has(+ .hero) { background: var(--bg-soft); }
+.back-bar + .hero, .back-bar + .method-hero { padding-top: 24px; }
+.back-bar + .section { padding-top: 32px; }
+.back-bar .back-link { margin: 0; text-decoration: none; }
 .back-link {
   display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 6px 0;
   background: none; border: 0; font: 700 15px var(--font); color: var(--accent); cursor: pointer;

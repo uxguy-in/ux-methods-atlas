@@ -1,5 +1,4 @@
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { cameFrom } from '../nav-trail.js';
+import { Link, useParams } from 'react-router-dom';
 import { calcsForMethod, firstWhen, plainText } from '../calc/learn.js';
 import { StageBadges } from '../components/CalcLearn.jsx';
 import { MethodBiasBox } from '../components/BiasWatch.jsx';
@@ -22,9 +21,6 @@ const LONG_NOTES = 300;
 export default function Method() {
   const { id } = useParams();
   const { data: m, error } = useApi(`/api/methods/${id}`);
-  const { key } = useLocation();
-  const navigate = useNavigate();
-  const from = cameFrom(key);
   if (!m) return <Loading error={error} />;
   const f = m.facets || {};
   // Design & product practices sit outside the research atlas, so they skip its filters and the finder.
@@ -45,11 +41,6 @@ export default function Method() {
     <>
       <section className="method-hero">
         <div className="wrap">
-          {from && (
-            <button type="button" className="back-link" onClick={() => navigate(-1)}>
-              <span aria-hidden="true">←</span> Back to {from.label}
-            </button>
-          )}
           <div className="crumbs">
             {design ? (
               <Link to="/design">Design & product</Link>

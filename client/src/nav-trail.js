@@ -13,8 +13,24 @@ const PAGES = [
   [/^\/find$/, () => 'your results'],
   [/^\/plan$/, () => 'your study plan'],
   [/^\/methods\/.+/, () => 'previous method'],
+  [/^\/calculators$/, () => 'Calculators'],
+  [/^\/calculators\/.+/, () => 'previous calculator'],
+  [/^\/about$/, () => 'About'],
+  [/^\/submit$/, () => 'Submit a method'],
   [/^\/$/, () => 'Home'],
 ];
+
+// Where to send a visitor who landed straight on a page and has nothing in this site to go back to.
+export function parentOf(pathname) {
+  if (/^\/methods\/.+/.test(pathname)) return { label: 'Atlas', path: '/methods' };
+  if (/^\/calculators\/.+/.test(pathname)) return { label: 'Calculators', path: '/calculators' };
+  if (pathname === '/plan') return { label: 'Find a method', path: '/find' };
+  if (pathname === '/' ) return null;
+  return { label: 'Home', path: '/' };
+}
+
+// React Router stores the position in this tab's history; above 0 means there is a page of this site to go back to.
+export const canGoBack = () => { try { return (window.history.state?.idx ?? 0) > 0; } catch { return false; } };
 
 let last = null;
 
@@ -23,7 +39,7 @@ export function noteLocation(loc, navType) {
   if (last && last.key === loc.key && last.pathname === loc.pathname && last.search === loc.search) return;
   if (navType === 'PUSH' && last) {
     const hit = PAGES.find(([re]) => re.test(last.pathname));
-    const from = hit ? { label: hit[1](last.search), path: last.pathname + last.search } : null;
+    const from = { label: hit ? hit[1](last.search) : 'previous page', path: last.pathname + last.search };
     try { sessionStorage.setItem(`atlas-from:${loc.key}`, JSON.stringify(from)); } catch { /* storage unavailable */ }
   }
   last = { key: loc.key, pathname: loc.pathname, search: loc.search };

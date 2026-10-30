@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigationType } from 'react-router-dom';
 import { noteLocation } from '../nav-trail.js';
+import BackBar from './BackBar.jsx';
 import { useApi } from '../hooks.js';
 
 const THEME_KEY = 'atlas-theme';
@@ -110,7 +111,7 @@ export default function Layout({ children }) {
           </div>
         </div>
       </header>
-      <main id="main" tabIndex={-1}>{children}</main>
+      <main id="main" tabIndex={-1}><BackBar />{children}</main>
       <footer className="site-footer">
         <div className="wrap">
           <div>
