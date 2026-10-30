@@ -1,0 +1,36 @@
+/* Styles for the "signals" tools (top tasks, site search, control charts, concentration, classifier metrics, reaction
+   times, risk and harm, queueing). Theme tokens only, so light and dark mode follow the site. */
+.sg-fig { margin: 0; min-width: 0; }
+.sg-ref { stroke: var(--ink-3); stroke-dasharray: 4 3; stroke-width: 1.2; }
+.sg-lim { stroke: var(--bad); stroke-dasharray: 6 3; stroke-width: 1.4; }
+.sg-mid { stroke: var(--ok); stroke-width: 1.4; }
+.sg-bar { fill: var(--c1); }
+.sg-bar.sg-soft { fill: color-mix(in srgb, var(--c1) 55%, transparent); }
+.sg-bar.tone-bad { fill: var(--bad); }
+.sg-bar.tone-ok { fill: var(--ok); }
+.sg-bar.tone-warn { fill: var(--warn); }
+.sg-bar.tone-mute { fill: var(--ink-3); }
+.sg-line { fill: none; stroke: var(--c2); stroke-width: 2.4; }
+.sg-band { fill: color-mix(in srgb, var(--c1) 14%, transparent); }
+.sg-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px 24px; align-items: start; }
+.sg-card { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; background: var(--bg); display: grid; gap: 10px; min-width: 0; }
+.sg-card h4 { margin: 0; font-size: 15px; }
+.sg-inputs > .calc-field { max-width: 100%; grid-template-columns: minmax(0, 1fr); }
+.sg-inputs { min-width: 0; }
+.sg-inputs .seg { max-width: 100%; }
+.sg-contain { contain: inline-size; }
+.sg-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.sg-mono { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+.sg-matrix { display: grid; grid-template-columns: auto repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; font-size: 14px; max-width: 460px; }
+.sg-matrix > div { background: var(--bg); padding: 10px 12px; font-variant-numeric: tabular-nums; }
+.sg-matrix > div.h { background: var(--bg-soft); font-weight: 700; color: var(--ink-2); }
+.sg-matrix > div.ok { background: color-mix(in srgb, var(--ok) 12%, var(--bg)); }
+.sg-matrix > div.bad { background: color-mix(in srgb, var(--bad) 10%, var(--bg)); }
+.sg-matrix b { display: block; font-size: 20px; }
+.sg-matrix small { color: var(--ink-3); }
+.sg-progress { height: 8px; background: var(--bg-sunk); overflow: hidden; border-radius: 0; max-width: 360px; }
+.sg-progress i { display: block; height: 100%; background: var(--accent); }
+/* Long button labels wrap instead of widening the page on phones. */
+.sg-load .btn { white-space: normal; max-width: 100%; text-align: left; line-height: 1.3; height: auto; }
+.sg-text { width: 100%; max-width: 280px; font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); box-sizing: border-box; }
+.sg-legend-sw { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 50%; }

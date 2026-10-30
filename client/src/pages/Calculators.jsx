@@ -32,6 +32,14 @@ import ScorersQuestionnaires from '../calc/tools/scorers-Questionnaires.jsx';
 import ScorersAgreement from '../calc/tools/scorers-Agreement.jsx';
 import ScorersItemAnalysis from '../calc/tools/scorers-ItemAnalysis.jsx';
 import ScorersWeighting from '../calc/tools/scorers-Weighting.jsx';
+import SignalsTopTasks from '../calc/tools/signals-TopTasks.jsx';
+import SignalsSearchAnalytics from '../calc/tools/signals-SearchAnalytics.jsx';
+import SignalsControlCharts from '../calc/tools/signals-ControlCharts.jsx';
+import SignalsConcentration from '../calc/tools/signals-Concentration.jsx';
+import SignalsClassifierMetrics from '../calc/tools/signals-ClassifierMetrics.jsx';
+import SignalsReactionTime from '../calc/tools/signals-ReactionTime.jsx';
+import SignalsRiskHarm from '../calc/tools/signals-RiskHarm.jsx';
+import SignalsQueueing from '../calc/tools/signals-Queueing.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2696,6 +2704,8 @@ const COMPONENTS = {
   'ab-health': ExpAbHealth, 'multi-compare': ExpMultiCompare, 'decision-matrix': ExpDecisionMatrix, 'retention-funnel': ExpRetentionFunnel, 'meta-analysis': ExpMetaAnalysis,
   'preference-test': RunnersPreference, 'maxdiff-runner': RunnersMaxDiff, 'reaction-cards': RunnersReactionCards,
   questionnaires: ScorersQuestionnaires, agreement: ScorersAgreement, 'item-analysis': ScorersItemAnalysis, 'survey-weighting': ScorersWeighting,
+  'top-tasks': SignalsTopTasks, 'search-analytics': SignalsSearchAnalytics, 'control-charts': SignalsControlCharts, concentration: SignalsConcentration,
+  'classifier-metrics': SignalsClassifierMetrics, 'reaction-time': SignalsReactionTime, 'risk-harm': SignalsRiskHarm, queueing: SignalsQueueing,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
