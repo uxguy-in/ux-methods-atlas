@@ -3,13 +3,45 @@ import { Link } from 'react-router-dom';
 import StudySummary from '../../components/StudySummary.jsx';
 import * as FT from './humanfactors-fault.js';
 import { sig, fmtP, toCsv } from './humanfactors-core.js';
-import { Table, LoadExample } from './expanalytics-charts.jsx';
-import { Area, Result, Stats, About, Bars, Problem, download } from './ui.jsx';
+import { Table } from './expanalytics-charts.jsx';
+import { Area, Choice, Result, Stats, About, Bars, Problem, download } from './ui.jsx';
+import FaultBuilder from './humanfactors-FaultBuilder.jsx';
 import './humanfactors.css';
+
+const SIMPLE = `# A first fault tree: a participant misses the start of a remote usability session.
+Participant misses the session [OR]
+  Forgets the session: 0.05
+  Cannot join the call [AND]
+    Link in the invitation is wrong: 0.02
+    No backup phone number given: 0.3`;
+const EXAMPLES = { pump: ['Infusion pump overdose', FT.EXAMPLE], simple: ['A first fault tree', SIMPLE] };
+
+// A plain-language guide to the outline, with a tiny annotated example.
+function HowToWrite() {
+  return (
+    <details className="dc-howto">
+      <summary>How to write a fault tree</summary>
+      <ol className="dc-steps">
+        <li><b>Start with the failure you want to prevent.</b> That is the top line, such as "Overdose reaches patient". It is always a gate.</li>
+        <li><b>Choose how its causes combine.</b> <span className="dc-mono">[AND]</span> means all of the causes under it must happen; <span className="dc-mono">[OR]</span> means any one is enough; <span className="dc-mono">[2/3]</span> means at least 2 of its 3 causes must happen (useful for a set of checks).</li>
+        <li><b>List the causes under it</b>, one per line, indented two spaces. A cause you can put a number on is a basic event: write its name, a colon and its probability, <span className="dc-mono">Barcode scan bypassed: 0.08</span>. The probability is a number from 0 to 1, so "1 in 1,000" is <span className="dc-mono">0.001</span>.</li>
+        <li><b>Break a cause down further</b> by making it a gate too, with its own causes indented under it.</li>
+        <li><b>Reuse a shared cause</b> by writing its name again in another branch, without the probability. The calculator counts it as one event, so the answer stays exact.</li>
+      </ol>
+      <pre className="dc-annot">{`Participant misses the session [OR]   ← the failure; any cause is enough
+  Forgets the session: 0.05           ← a basic event, 1 in 20
+  Cannot join the call [AND]          ← a gate: both causes below are needed
+    Link is wrong: 0.02               ← basic event
+    No backup phone number: 0.3       ← basic event`}</pre>
+      <p className="dc-note">Use the same unit for every probability (per session, per shift, per programming episode). Lines starting with <span className="dc-mono">#</span> are notes, and the form below writes this outline for you if you would rather not type it.</p>
+    </details>
+  );
+}
 
 // ── Fault tree analysis ──
 function HfFaultTree() {
   const [text, setText] = useState(FT.EXAMPLE);
+  const [mode, setMode] = useState('form');
   const tree = useMemo(() => FT.parseFaultTree(text), [text]);
   const res = useMemo(() => {
     if (!tree.root || tree.errors.length) return null;
@@ -25,11 +57,22 @@ function HfFaultTree() {
   };
   return (
     <div className="hf-root">
-      <LoadExample onClick={() => setText(FT.EXAMPLE)} />
-      <div className="hf-code">
-        <Area label="Fault tree outline" rows={14} value={text} onChange={setText} wrap="off"
-          hint="One line per node, children indented under their gate. Gates: Label [AND], Label [OR], Label [2/3] (k of n). Basic events: Label: 0.003. Write an event's label again (without a probability) to reuse it in another branch. Lines starting with # are comments." />
+      <div className="tl-row hf-examples">
+        <span className="hf-note">Examples:</span>
+        {Object.entries(EXAMPLES).map(([k, [label, src]]) => (
+          <button key={k} type="button" className={`btn ghost small${text === src ? ' on' : ''}`} onClick={() => setText(src)}>{label}</button>
+        ))}
       </div>
+      <HowToWrite />
+      <Choice label="Build the tree with" value={mode} onChange={setMode} options={[['form', 'A form'], ['text', 'The outline text']]} />
+      {mode === 'form'
+        ? <FaultBuilder text={text} onChange={setText} />
+        : (
+          <div className="hf-code">
+            <Area label="Fault tree outline" rows={14} value={text} onChange={setText} wrap="off"
+              hint="One line per node, children indented under their gate. Gates: Label [AND], Label [OR], Label [2/3] (k of n). Basic events: Label: 0.003. Write an event's label again (without a probability) to reuse it in another branch. Lines starting with # are comments." />
+          </div>
+        )}
       {tree.errors?.length > 0 && <Problem>{tree.errors.length === 1 ? tree.errors[0] : <>Fix these lines:<ul className="hf-errs">{tree.errors.slice(0, 8).map((e) => <li key={e}>{e}</li>)}</ul></>}</Problem>}
       {res?.error && <Problem>{res.error}</Problem>}
       {r && (
