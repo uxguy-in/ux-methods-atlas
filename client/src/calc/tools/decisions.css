@@ -1,0 +1,78 @@
+/* Styles for the decision and risk tools (counterbalancing, value of information, decision trees, forecast calibration,
+   use FMEA, severity ratings, human error, colour contrast). Theme tokens only, so light and dark mode follow the site. */
+.dc-root { display: grid; gap: 18px; min-width: 0; }
+.dc-root > * { min-width: 0; }
+.dc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dc-note { font-size: 13.5px; color: var(--ink-2); margin: 0; max-width: 75ch; }
+.dc-err { color: var(--bad); font-size: 13.5px; margin: 0; }
+.dc-mono { font-family: var(--mono); font-size: 13px; }
+.dc-order { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+.dc-heat td.h { text-align: center; font-variant-numeric: tabular-nums; }
+.dc-heat td.h.off { color: var(--ink-3); }
+.dc-heat td.h.diag { background: var(--bg-sunk); color: var(--ink-3); }
+.dc-heat th.r { text-align: right; }
+.dc-wrap { overflow-x: auto; max-width: 100%; contain: inline-size; }
+.dc-wrap > svg { display: block; max-width: none; }
+.dc-tree text { font-size: 12px; fill: var(--ink); }
+.dc-tree text.sub { fill: var(--ink-3); font-size: 11.5px; }
+.dc-tree text.ev { font-weight: 700; font-size: 12px; }
+.dc-tree line, .dc-tree path.br { stroke: var(--ink-3); stroke-width: 1.4; fill: none; }
+.dc-tree .best line, .dc-tree path.br.best { stroke: var(--ok); stroke-width: 3; }
+.dc-tree .nd-d { fill: var(--c1); }
+.dc-tree .nd-c { fill: var(--c3); }
+.dc-tree .nd-t { fill: var(--c2); }
+.dc-tree .cut { stroke: var(--bad); stroke-width: 2; }
+.dc-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); }
+.dc-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; }
+.dc-tornado .lo { fill: var(--c2); }
+.dc-tornado .hi { fill: var(--c1); }
+.dc-tornado .flip { fill: none; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 3 2; }
+.dc-band { fill: var(--c1); opacity: 0.16; }
+.dc-swatch { display: grid; gap: 6px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px 18px; }
+.dc-swatch .lg { font-size: 24px; font-weight: 700; line-height: 1.2; }
+.dc-swatch .md { font-size: 16px; line-height: 1.45; }
+.dc-swatch .sm { font-size: 13px; }
+.dc-colours { display: flex; flex-wrap: wrap; gap: 16px 20px; align-items: flex-end; }
+.dc-colour { display: grid; gap: 4px; font-size: 14px; }
+.dc-colour > span { font-weight: 600; }
+.dc-colour .row { display: flex; gap: 6px; align-items: center; }
+.dc-colour input[type='color'] { width: 44px; height: 38px; padding: 2px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); }
+.dc-colour input[type='text'] { width: 110px; font: inherit; font-family: var(--mono); font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); }
+.dc-chip { display: inline-block; width: 14px; height: 14px; border: 1px solid var(--line); vertical-align: -2px; margin-right: 6px; }
+.dc-pm td.cell { text-align: center; font-size: 12.5px; font-variant-numeric: tabular-nums; padding: 6px 8px; white-space: nowrap; }
+.dc-pm td.cell .s { display: block; font-size: 11px; font-weight: 700; }
+.dc-pm .aa { color: var(--ok); }
+.dc-pm .fail { color: var(--bad); }
+.dc-pm .large { color: var(--warn); }
+.dc-pm td.same { color: var(--ink-3); }
+.dc-edit { width: 100%; min-width: 120px; font: inherit; font-size: 13.5px; padding: 5px 7px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); box-sizing: border-box; }
+.dc-edit.num { min-width: 52px; width: 58px; }
+.dc-fmea td { vertical-align: top; }
+.dc-fmea td.c { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dc-fmea th { white-space: nowrap; }
+.dc-ap { display: inline-block; min-width: 24px; text-align: center; }
+.dc-matrix td.mx { text-align: center; min-width: 30px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.dc-matrix td.mx.H { background: color-mix(in srgb, var(--bad) 22%, transparent); }
+.dc-matrix td.mx.M { background: color-mix(in srgb, var(--warn) 20%, transparent); }
+.dc-matrix td.mx.L { background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.dc-epc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, 200px) 74px 28px; gap: 8px 10px; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.dc-epc input[type='range'] { width: 100%; accent-color: var(--accent); }
+.dc-epc .v { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+@media (max-width: 640px) {
+  .dc-epc { grid-template-columns: minmax(0, 1fr) 70px 28px; }
+  .dc-epc .nm { grid-column: 1 / -1; }
+}
+.dc-quiz { display: grid; gap: 8px; }
+.dc-q { display: grid; grid-template-columns: minmax(0, 1fr) 96px 96px; gap: 8px; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.dc-q.done { grid-template-columns: minmax(0, 1fr) 96px 96px 120px; }
+.dc-q input { width: 100%; font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); box-sizing: border-box; }
+@media (max-width: 640px) {
+  .dc-q, .dc-q.done { grid-template-columns: 1fr 1fr; }
+  .dc-q > span:first-child { grid-column: 1 / -1; }
+}
+.dc-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Long option labels (task types, conditions) must not widen the page on phones. */
+.dc-root .calc-field { min-width: 0; max-width: 100%; }
+.dc-root .select { max-width: 100%; text-overflow: ellipsis; }
+.dc-root .ea-card { grid-template-columns: minmax(0, 1fr); }
+.dc-root .ea-card > *, .dc-root .calc-field > * { min-width: 0; max-width: 100%; }
