@@ -1,0 +1,60 @@
+/* Styles for the cogia tools (IA graph analysis, IAT D-score, mouse-tracking curvature, correspondence analysis,
+   tolerance intervals). Theme tokens only, so light and dark mode follow the site. */
+.cg-root { display: grid; gap: 18px; min-width: 0; }
+.cg-root > * { min-width: 0; }
+.cg-root .calc-field { min-width: 0; max-width: 100%; }
+.cg-root .select { max-width: 100%; text-overflow: ellipsis; }
+.cg-root .ea-card { grid-template-columns: minmax(0, 1fr); }
+.cg-root .ea-card > *, .cg-root .calc-field > * { min-width: 0; max-width: 100%; }
+.cg-root textarea { max-width: 100%; }
+.cg-note { font-size: 13.5px; color: var(--ink-2); margin: 0; max-width: 75ch; }
+.cg-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.cg-wrap { overflow-x: auto; max-width: 100%; contain: inline-size; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); }
+.cg-wrap > svg { display: block; max-width: none; }
+.cg-fit > svg { width: 100%; height: auto; max-width: 100%; }
+.cg-plot text { font-family: var(--font); font-size: 12px; fill: var(--ink); }
+.cg-plot text.ax { fill: var(--ink-3); }
+.cg-plot text.sub { fill: var(--ink-2); font-size: 11px; }
+.cg-plot text.b { font-weight: 700; }
+.cg-plot .grid { stroke: var(--line); }
+.cg-plot .axis0 { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.cg-plot .edge { stroke: var(--ink-3); stroke-width: 1.1; fill: none; opacity: 0.7; }
+.cg-plot .edge.cross { stroke: var(--c4); stroke-dasharray: 4 3; opacity: 0.8; }
+.cg-plot .edge.hl { stroke: var(--accent); stroke-width: 2.6; opacity: 1; }
+.cg-plot .nd { fill: var(--c1); stroke: var(--bg); stroke-width: 1.5; }
+.cg-plot .nd.home { fill: var(--ink); }
+.cg-plot .nd.dead { fill: var(--warn); }
+.cg-plot .nd.lost { fill: var(--bad); }
+.cg-plot .nd.sel { stroke: var(--accent); stroke-width: 3; }
+.cg-plot .pt-row { fill: var(--c1); }
+.cg-plot .pt-col { fill: var(--c2); }
+.cg-plot text.lr { fill: var(--c1); font-weight: 700; }
+.cg-plot text.lc { fill: var(--c2); font-weight: 700; }
+.cg-plot .halo { paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.cg-plot .band { opacity: 0.12; }
+.cg-plot .tl { stroke-width: 2; }
+.cg-plot .trj { fill: none; stroke-width: 1; opacity: 0.22; }
+.cg-plot .trj.mean { stroke-width: 3; opacity: 1; }
+.cg-plot .direct { stroke: var(--ink-3); stroke-dasharray: 5 4; fill: none; }
+.cg-plot .bar { fill: var(--c1); }
+.cg-plot .bar.alt { fill: var(--c3); }
+.cg-plot .dot { fill: var(--c1); opacity: 0.8; }
+.cg-plot .dot.off { fill: var(--ink-3); opacity: 0.5; }
+.cg-plot .lim { stroke-width: 2.4; }
+.cg-plot .lim.n { stroke: var(--c1); }
+.cg-plot .lim.np { stroke: var(--c3); stroke-dasharray: 6 3; }
+.cg-plot .lim.m { stroke: var(--ink-3); stroke-dasharray: 2 3; }
+.cg-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); }
+.cg-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 50%; }
+.cg-legend i.ln { height: 3px; border-radius: 0; vertical-align: 3px; width: 18px; }
+.cg-flag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 6px; margin: 0 4px 2px 0; border-radius: var(--radius-sm); background: var(--bg-sunk); color: var(--ink-2); white-space: nowrap; }
+.cg-flag.bad { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.cg-flag.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.cg-flag.ok { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.cg-path { font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere; }
+.cg-root .clu-table td.cg-path { min-width: 220px; }
+.cg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.cg-zero { display: grid; gap: 12px; }
+@media (max-width: 640px) {
+  .cg-root .calc-field input { width: 110px; }
+}
