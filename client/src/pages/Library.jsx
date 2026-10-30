@@ -132,8 +132,8 @@ export default function Library() {
         <section className="hero">
           <div className="wrap">
             <p className="eyebrow">The library</p>
-            <h1 className="h1">{counts.methods ?? '…'} methods, every one listed.</h1>
-            <p className="lede">Every method in the atlas, numbered A to Z. Each number is one record with its own page, so you can count them, open any one, or download the list.</p>
+            <h1 className="h1">Books, methods and calculators in one place.</h1>
+            <p className="lede">All {counts.methods ?? '…'} methods in the atlas, numbered A to Z. Each number is one record with its own page, so you can count them, open any one, or download the list.</p>
             <ViewSwitch view={view} counts={counts} />
           </div>
         </section>
@@ -147,8 +147,8 @@ export default function Library() {
         <section className="hero">
           <div className="wrap">
             <p className="eyebrow">The library</p>
-            <h1 className="h1">{CALC_INFO.length} calculators, every one listed.</h1>
-            <p className="lede">Every calculator on the site, numbered A to Z, with the question it answers and where it fits in a study. To find one by your study stage or your data instead, use the <Link to="/calculators">calculators page</Link>.</p>
+            <h1 className="h1">Books, methods and calculators in one place.</h1>
+            <p className="lede">All {CALC_INFO.length} calculators on the site, numbered A to Z, with the question it answers and where it fits in a study. To find one by your study stage or your data instead, use the <Link to="/calculators">calculators page</Link>.</p>
             <ViewSwitch view={view} counts={counts} />
           </div>
         </section>
@@ -188,8 +188,8 @@ function BookList({ counts }) {
       <section className="hero">
         <div className="wrap">
           <p className="eyebrow">The library</p>
-          <h1 className="h1">{books.length} books behind the methods.</h1>
-          <p className="lede">The books the atlas was mined from. Books with methods attached show you exactly what each one teaches.</p>
+          <h1 className="h1">Books, methods and calculators in one place.</h1>
+          <p className="lede">{books.length} books the atlas was mined from. Books with methods attached show you exactly what each one teaches. Switch tabs for every method or every calculator.</p>
           <div className="stats">
             <div className="stat"><b>{books.filter((b) => b.methods?.length).length}</b><span>books with methods</span></div>
             <div className="stat"><b>{books.filter((b) => b.core).length}</b><span>{CORE_LABEL.toLowerCase()} books</span></div>
