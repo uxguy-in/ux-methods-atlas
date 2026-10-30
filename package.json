@@ -27,6 +27,7 @@
     "check:statsbench": "node server/scripts/check-statsbench.js",
     "check:decisions": "node server/scripts/check-decisions.js",
     "check:cogia": "node server/scripts/check-cogia.js",
+    "check:causal": "node server/scripts/check-causal.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

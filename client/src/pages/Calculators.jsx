@@ -59,6 +59,12 @@ import CogiaIat from '../calc/tools/cogia-Iat.jsx';
 import CogiaMouse from '../calc/tools/cogia-Mouse.jsx';
 import CogiaCorrespondence from '../calc/tools/cogia-Correspondence.jsx';
 import CogiaTolerance from '../calc/tools/cogia-Tolerance.jsx';
+import CausalDiD from '../calc/tools/causal-DiD.jsx';
+import CausalEValue from '../calc/tools/causal-EValue.jsx';
+import CausalFactorial from '../calc/tools/causal-Factorial.jsx';
+import CausalBandit from '../calc/tools/causal-Bandit.jsx';
+import CausalBrandLift from '../calc/tools/causal-BrandLift.jsx';
+import CausalMarket from '../calc/tools/causal-Market.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2729,6 +2735,8 @@ const COMPONENTS = {
   counterbalancing: DecCounterbalance, 'value-of-information': DecValueOfInfo, 'decision-tree': DecDecisionTree, 'forecast-calibration': DecForecastCalibration,
   'use-fmea': DecUseFmea, 'severity-ratings': DecSeverityRatings, 'human-error': DecHumanError, 'colour-contrast': DecColourContrast,
   'ia-graph': CogiaIaGraph, 'iat-dscore': CogiaIat, 'mouse-tracking': CogiaMouse, 'correspondence-analysis': CogiaCorrespondence, 'tolerance-intervals': CogiaTolerance,
+  'diff-in-diff': CausalDiD, 'e-value': CausalEValue, 'factorial-designs': CausalFactorial, 'bandit-simulator': CausalBandit,
+  'brand-lift': CausalBrandLift, 'market-sizing': CausalMarket,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
