@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SUBMIT_URL } from '../vocab.js';
 import { useMeta } from '../hooks.js';
+import ReportProblem from '../components/ReportProblem.jsx';
 
 export default function About() {
   const { data: meta } = useMeta();
@@ -46,6 +47,7 @@ export default function About() {
           one says whether it has been tested (published evidence of use beyond the person who proposed it) or not yet tested.
           Anyone can <a href={SUBMIT_URL} target="_blank" rel="noreferrer">submit a method</a>.
         </p>
+        <ReportProblem />
         <h2>Copyright</h2>
         <p>
           Copyright © 2026 Vivek Gopinath and Danny Hope. All rights reserved. This covers the site, its code and the

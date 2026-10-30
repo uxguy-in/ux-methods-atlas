@@ -1,0 +1,50 @@
+name: Report a problem
+description: Tell us about a bug, a wrong calculation, a broken link or a mistake in a method write-up.
+title: "Problem: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping fix the atlas. Reports are public, so leave out email addresses, phone numbers and any participant or client data.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem?
+      options:
+        - A calculator gives a wrong or odd result
+        - Something is broken or does not load
+        - A method write-up is wrong, missing something or out of date
+        - A book or source is wrong
+        - A link is broken
+        - Accessibility problem
+        - Typo or wording
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The address of the page, or the name of the method or calculator.
+  - type: textarea
+    id: what
+    attributes:
+      label: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, or what should it say?
+      description: For a calculation, the value you expected and where it comes from (a textbook, R, SPSS, a paper).
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we see it?
+      description: Steps to reproduce, or the numbers you entered. Use made-up or anonymised numbers.
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      description: For example Chrome on Windows, Safari on iPhone.

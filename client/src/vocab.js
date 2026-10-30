@@ -67,3 +67,4 @@ export const slug = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-
 // Community submissions go through a GitHub issue form, so the static site needs no backend.
 export const REPO_URL = import.meta.env.VITE_REPO_URL || 'https://github.com/uxguy-in/ux-methods-atlas';
 export const SUBMIT_URL = `${REPO_URL}/issues/new?template=submit-method.yml`;
+export const REPORT_URL = `${REPO_URL}/issues/new?template=report-problem.yml`;
