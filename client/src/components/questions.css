@@ -56,3 +56,15 @@
 .ql-method-line a { color: var(--accent); font-weight: 700; }
 .ql-detail .tag { background: var(--bg); border: 1px solid var(--line); }
 .ql-detail .tag:hover { border-color: var(--ink); color: var(--ink); }
+
+/* From the library: insights, rules of thumb, pitfalls and further reading from the reading notes */
+.ql-library { border-top: 1px solid var(--line); padding-top: 14px; }
+.ql-library .label + .ql-lib { margin-top: 6px; }
+.ql-lib { margin: 0 0 14px; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.ql-src { display: block; font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+.ql-src cite { font-style: italic; }
+.ql-pitfalls li::marker { color: var(--bad); }
+.ql-rules li::marker { color: var(--ok); }
+.ql-reading { list-style: none; padding-left: 0; }
+.ql-reading .ql-src { font-size: 14.5px; color: var(--ink); margin: 0; }
+.ql-why { display: block; font-size: 13.5px; color: var(--ink-2); }

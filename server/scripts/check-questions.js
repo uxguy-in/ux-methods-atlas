@@ -6,6 +6,8 @@ import { CATALOG } from '../../client/src/calc/catalog.js';
 import { STAGES } from '../../client/src/calc/guides.js';
 import { BIAS_BY_ID } from '../../client/src/biases.js';
 import { kinds } from '../lib/data.js';
+import { readFileSync } from 'node:fs';
+import { LIBRARY } from '../../client/src/questions-library.js';
 
 const problems = [];
 const calcIds = new Set(CATALOG.map((c) => c.id));
@@ -19,7 +21,7 @@ for (const t of THEMES) if (!isStr(t.id) || !isStr(t.name) || !isStr(t.blurb)) p
 for (const d of dupes(THEMES.map((t) => t.id))) problems.push(`duplicate theme id ${d}`);
 for (const d of dupes(QUESTIONS.map((q) => q.id))) problems.push(`duplicate question id ${d}`);
 for (const d of dupes(QUESTIONS.map((q) => q.question.toLowerCase()))) problems.push(`duplicate question text ${d}`);
-if (QUESTIONS.length < 60 || QUESTIONS.length > 90) problems.push(`expected 60-90 questions, found ${QUESTIONS.length}`);
+if (QUESTIONS.length < 60 || QUESTIONS.length > 130) problems.push(`expected 60-130 questions, found ${QUESTIONS.length}`);
 
 for (const q of QUESTIONS) {
   const id = q.id || '(no id)';
@@ -54,5 +56,20 @@ if (problems.length) {
   process.exit(1);
 }
 const counts = THEMES.map((t) => `${t.name} ${QUESTIONS.filter((q) => q.theme === t.id).length}`).join(', ');
+// Library notes: every key is a question, every source has a title, and every linked book is in the library.
+const booksRaw = JSON.parse(readFileSync(new URL('../data/books.json', import.meta.url), 'utf8'));
+const bookIds = new Set((Array.isArray(booksRaw) ? booksRaw : booksRaw.books || []).map((b) => b.id));
+const qIds = new Set(QUESTIONS.map((q) => q.id));
+let libItems = 0;
+for (const [qid, lib] of Object.entries(LIBRARY)) {
+  if (!qIds.has(qid)) problems.push(`library notes for unknown question ${qid}`);
+  for (const f of ['insights', 'rules', 'pitfalls']) for (const it of lib[f] || []) {
+    libItems++;
+    if (!it.text || !it.source?.title) problems.push(`${qid}: ${f} item without text or source`);
+    if (it.source?.book && !bookIds.has(it.source.book)) problems.push(`${qid}: unknown book ${it.source.book}`);
+  }
+  for (const r of lib.reading || []) if (r.book && !bookIds.has(r.book)) problems.push(`${qid}: unknown book ${r.book} in further reading`);
+}
+
 const reframes = QUESTIONS.filter((q) => q.askInstead).length;
 console.log(`check:questions OK: ${QUESTIONS.length} questions in ${THEMES.length} themes (${counts}); ${reframes} reframes; all ${CATALOG.length} calculators reachable; every method, calculator and bias id found.`);

@@ -20,7 +20,9 @@ export const THEMES = [
 
 const m = (id, why) => ({ id, why });
 
-export const QUESTIONS = [
+import { MORE_QUESTIONS } from './questions-library.js';
+
+const BASE_QUESTIONS = [
   // ---------------------------------------------------------------- Is it working?
   {
     id: 'is-it-easy-to-use',
@@ -1434,6 +1436,8 @@ export const QUESTIONS = [
 ];
 
 // Words people use for the same idea, so a search for one finds questions written with another.
+export const QUESTIONS = [...BASE_QUESTIONS, ...MORE_QUESTIONS];
+
 export const SYNONYMS = [
   ['drop', 'dropout', 'drop-off', 'abandon', 'abandonment', 'leave', 'quit', 'funnel', 'bounce'],
   ['churn', 'retention', 'cancel', 'leave', 'keeping', 'switching'],
