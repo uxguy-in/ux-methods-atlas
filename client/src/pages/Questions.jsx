@@ -3,6 +3,7 @@ import { Link, useHref, useNavigationType, useSearchParams } from 'react-router-
 import { QUESTIONS, QUESTION_BY_ID, THEMES, matchQuestion, themeOf } from '../questions.js';
 import { BIAS_BY_ID } from '../biases.js';
 import { LIBRARY } from '../questions-library.js';
+import { FromLibrary, cite } from '../components/QuestionLinks.jsx';
 import { STAGES, STAGE_KEYS, calcInfo } from '../calc/learn.js';
 import { CalcCard, StageBadges, useMethodNames } from '../components/CalcLearn.jsx';
 
@@ -43,39 +44,6 @@ function toMarkdown(q, methodName, abs) {
   if (lib?.reading) { lines.push('## Further reading', ''); for (const r of lib.reading) lines.push(`- ${cite(r)}${r.why ? `: ${r.why}` : ''}`); lines.push(''); }
   lines.push(`Source: ${abs(`/questions?id=${q.id}`)}`);
   return lines.join('\n').trim() + '\n';
-}
-
-const cite = (s) => [s.author, s.year && `(${s.year})`, s.author ? `, ${s.title}` : s.title].filter(Boolean).join(' ').replace(' ,', ',');
-
-// A source line: the book (linked to the library when it is listed there), author and year.
-function Source({ s }) {
-  const title = s.book ? <Link to={`/library?q=${encodeURIComponent(s.title)}`}><cite>{s.title}</cite></Link> : <cite>{s.title}</cite>;
-  return <span className="ql-src">{title}{s.author ? `, ${s.author}` : ''}{s.year ? ` (${s.year})` : ''}</span>;
-}
-
-// What the books in the atlas's library say about this question: paraphrased insights, rules of thumb, pitfalls
-// and further reading, from the reading notes behind the atlas.
-function FromLibrary({ id }) {
-  const lib = LIBRARY[id];
-  if (!lib) return null;
-  const list = (items, cls) => (
-    <ul className={`ql-lib ${cls || ''}`}>
-      {items.map((it, i) => <li key={i}>{it.text} <Source s={it.source} /></li>)}
-    </ul>
-  );
-  return (
-    <div className="ql-block ql-library">
-      {lib.insights && <><h4 className="label">From the library</h4>{list(lib.insights)}</>}
-      {lib.rules && <><h4 className="label">Rules of thumb</h4>{list(lib.rules, 'ql-rules')}</>}
-      {lib.pitfalls && <><h4 className="label">Pitfalls</h4>{list(lib.pitfalls, 'ql-pitfalls')}</>}
-      {lib.reading && (
-        <>
-          <h4 className="label">Further reading</h4>
-          <ul className="ql-lib ql-reading">{lib.reading.map((r, i) => <li key={i}><Source s={r} />{r.why ? <span className="ql-why">{r.why}</span> : null}</li>)}</ul>
-        </>
-      )}
-    </div>
-  );
 }
 
 function Detail({ q, methodName, abs }) {

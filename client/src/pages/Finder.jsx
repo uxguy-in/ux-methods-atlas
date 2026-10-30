@@ -5,6 +5,7 @@ import { useMeta, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { calcsForMethod } from '../calc/learn.js';
 import ModeSwitch, { planLink } from '../components/ModeSwitch.jsx';
+import { LibraryQuestionPanel, QuestionPicker, goalsForQuestion } from '../components/QuestionLinks.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
 // Shared with the study planner, which asks the same goal and material questions.
@@ -130,6 +131,7 @@ export default function Finder() {
   const [sel, setSel] = useRemembered('answers', () => carry || {});
   const [editing, setEditing] = useRemembered('editing', false); // changing one answer from the summary
   const [brief, setBrief] = useRemembered('brief', '');
+  const [qid, setQid] = useRemembered('qid', ''); // a question picked from the question library
   const [recs, setRecs] = useState(null);
   const [plan, setPlan] = useRemembered('plan', null);
   const [busy, setBusy] = useState(false);
@@ -217,7 +219,7 @@ export default function Finder() {
     }
   }
 
-  const reset = () => { setSel({}); setEditing(false); setDir(-1); setStep(0); setRecs(null); setPlan(null); setBrief(''); };
+  const reset = () => { setSel({}); setEditing(false); setDir(-1); setStep(0); setRecs(null); setPlan(null); setBrief(''); setQid(''); };
 
   if (!done) {
     const val = sel[q.id];
@@ -252,6 +254,17 @@ export default function Finder() {
               );
             })}
           </div>
+          {step === 0 && (
+            <QuestionPicker
+              label="Or start from a question someone asked you"
+              onPick={(x) => {
+                setQid(x.id);
+                if (!brief.trim()) setBrief(x.question);
+                setSel({ ...sel, goal: goalsForQuestion(x) });
+                advance();
+              }}
+            />
+          )}
         </div>
         </div>
         <div className="finder-nav question-nav">
@@ -313,6 +326,7 @@ export default function Finder() {
         onChange={(e) => setBrief(e.target.value)}
         placeholder="e.g. On our trading app, first-time investors sometimes tap Sell when they meant Buy. Support tickets spiked after the order screen redesign. We need to know whether the redesign caused it and what to change before the next release."
       />
+      {!qid && <QuestionPicker compact seedText={brief} label="Match it to a question in the library" onPick={(x) => setQid(x.id)} />}
       <div className="finder-nav">
         <span className="muted" style={{ fontSize: 14, alignSelf: 'center' }}>
           {serverKey ? 'Uses Claude to read your brief against the atlas.' : visitorKey
@@ -338,6 +352,7 @@ export default function Finder() {
       )}
 
       {error && <div className="notice error" style={{ marginTop: 24 }}>{error}</div>}
+      <LibraryQuestionPanel id={qid} onClear={() => setQid('')} />
       {plan && <Plan plan={plan} />}
 
       {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}

@@ -8,6 +8,8 @@ import { StageBadges } from '../components/CalcLearn.jsx';
 import { STAGES, STAGE_KEYS, calcInfo } from '../calc/learn.js';
 import ModeSwitch, { PLAN_STORE as STORE, findLink } from '../components/ModeSwitch.jsx';
 import { QUESTIONS as FINDER } from './Finder.jsx';
+import { LibraryQuestionPanel, QuestionPicker, goalsForQuestion } from '../components/QuestionLinks.jsx';
+import { QUESTION_BY_ID } from '../questions.js';
 import { ACCESS, APPROACH, BUDGET, COLLECT, EXPERTISE, FRAMEWORKS, LIMITS, TIME, draftQuestion, planMarkdown, suggestFramework } from '../../../server/lib/plan.js';
 
 // The answers live in the URL (?a=...&step=...), so a plan can be bookmarked, shared and revisited.
@@ -135,6 +137,14 @@ function QuestionStep({ s, set }) {
       <h2>Do you have a research question?</h2>
       <p className="help">A clear question decides everything after it. If you do not have one yet, we will help you get to one.</p>
       <Choice label="Research question" options={[{ v: 'yes', label: 'Yes, I have one', hint: 'Write it down and sharpen it' }, { v: 'no', label: 'Not yet', hint: 'Start from the decision it should inform' }]} value={s.hasRQ} onChange={(v) => set({ hasRQ: v })} />
+      {!s.qid && (
+        <QuestionPicker
+          seedText={s.hasRQ === 'yes' ? s.rq : ''}
+          label="Or start from a question in the library"
+          onPick={(x) => set({ hasRQ: 'yes', rq: s.rq?.trim() ? s.rq : x.question, qid: x.id, ...(s.goal?.length ? {} : { goal: goalsForQuestion(x) }) })}
+        />
+      )}
+      {s.qid && <p className="qpick-chosen">Linked to <b>{QUESTION_BY_ID.get(s.qid)?.question}</b> from the question library. You will see what the library says about it with your plan. <button type="button" className="skip-link" onClick={() => set({ qid: undefined })}>Unlink</button></p>}
 
       {s.hasRQ === 'yes' && (
         <div className="plan-sub">
@@ -347,6 +357,7 @@ function Roadmap({ s, set, go, reset }) {
               </ShowMoreList>
             </section>
           ))}
+          <LibraryQuestionPanel id={s.qid} onClear={() => set({ qid: undefined })} />
           <PlanCalculators plan={plan} />
           <p className="muted plan-foot no-print">
             This plan is a starting point built from rules, not a substitute for judgement. For a direction written for your exact problem, switch to <Link {...findLink(s)}>One method</Link> and describe it there.
