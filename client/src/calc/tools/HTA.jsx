@@ -3,6 +3,8 @@ import StudySummary from '../../components/StudySummary.jsx';
 import { KLM_K } from '../stats.js';
 import * as H from './hta.js';
 import { Area, Choice, Result, Stats, Problem, About, Bars, download, num, pct } from './ui.jsx';
+import HTABuilder from './HTA-Builder.jsx';
+import './hta.css';
 
 const wrap = (text, max) => {
   const words = String(text).split(/\s+/); const lines = []; let cur = '';
@@ -125,9 +127,33 @@ function exportPng(svg, name) {
 }
 
 // ── Hierarchical task analysis ──
+// A plain-language guide to the outline, with a small annotated example.
+function HowToWrite() {
+  return (
+    <details className="htb-howto">
+      <summary>How to write a task analysis</summary>
+      <ol className="htb-steps">
+        <li><b>Start with the main goal</b>: what the person is trying to get done, in their words, such as "Book a train ticket online".</li>
+        <li><b>Break it into a few steps</b> (about 3 to 7), each one a smaller goal. In the outline, put each on its own line, indented two spaces under the goal it belongs to. The steps are numbered for you: 1, 2, 3, then 1.1, 1.2 under step 1.</li>
+        <li><b>Keep breaking a step down</b> until it is a single action you could watch someone do, such as "Type the card number". Those bottom-level steps are <i>operations</i>; stop when going further would not tell you anything new.</li>
+        <li><b>Give each goal a plan</b>: the order its steps are done in, using their numbers. For example <span className="htb-mono">do 1 then 2; if card declined do 3</span>, <span className="htb-mono">do 1 and 2 in any order</span>, <span className="htb-mono">repeat 2-3 until paid</span> or <span className="htb-mono">do 4 as required</span>. Steps a plan leaves out are assumed to be done once, in order.</li>
+        <li><b>Optional: time each operation</b> in seconds (<span className="htb-mono">t=8</span>), or build the time from small actions with the Keystroke-Level Model: <span className="htb-mono">M</span> think, <span className="htb-mono">P</span> point, <span className="htb-mono">BB</span> click, <span className="htb-mono">H</span> move hands to the keyboard or mouse, <span className="htb-mono">K</span> or <span className="htb-mono">"text"</span> keystrokes, <span className="htb-mono">R(2)</span> wait 2 seconds.</li>
+        <li><b>Optional: rate the risk</b> of each operation: how likely an error is (<span className="htb-mono">p=L/M/H</span>) and how bad it would be (<span className="htb-mono">c=L/M/H</span>). The riskiest ones are listed first.</li>
+      </ol>
+      <pre className="htb-annot">{`Buy a coffee in the app               ← main goal (0)
+  Plan: do 1 then 2; if card declined do 3   ← the order of steps 1 to 3
+  Choose a drink | t=10               ← operation 1, takes 10 seconds
+  Pay | klm=M P BB R(2) | p=M | c=H   ← 2: think, point, click, wait 2 s; medium chance, high cost
+  Use another card | t=15             ← 3: only if the card is declined`}</pre>
+      <p className="htb-note">Lines starting with <span className="htb-mono">#</span> are notes. The form below writes this outline for you if you would rather not type it, and you can switch to the text at any time.</p>
+    </details>
+  );
+}
+
 function HTA() {
   const [text, setText] = useState(H.HTA_EXAMPLE);
   const [k, setK] = useState(0.28);
+  const [mode, setMode] = useState('form');
   const [view, setView] = useState('diagram');
   const svgRef = useRef(null);
   const [fit, setFit] = useState(false);
@@ -139,9 +165,13 @@ function HTA() {
   const maxTop = st ? Math.max(...st.top.map((t) => t.total), 0) : 0;
   return (
     <>
+      <HowToWrite />
+      <Choice label="Build the task analysis with" value={mode} onChange={setMode} options={[['form', 'A form'], ['text', 'The outline text']]} />
+      {mode === 'form'
+        ? <HTABuilder text={text} onChange={setText} k={k} />
+        : <Area label="Your task analysis: one goal or operation per line, indented under its parent" value={text} onChange={setText} rows={16} wrap="off"
+            hint={'Numbers are added for you. Under a goal, write "Plan: do 1 then 2; if card declined do 3; repeat 2–3 until done". After an operation, add fields with |: t=8 (seconds, or 2 min), klm=M P BB "text" (KLM operators), f=3 (times it is done), p=L/M/H (error likelihood), c=L/M/H (criticality), mode=A/C/R/I/S (action, checking, retrieval, communication, selection), note=…'} />}
       <div className="calc-inputs">
-        <Area label="Your task analysis: one goal or operation per line, indented under its parent" value={text} onChange={setText} rows={16} wrap="off"
-          hint={'Numbers are added for you. Under a goal, write "Plan: do 1 then 2; if card declined do 3; repeat 2–3 until done". After an operation, add fields with |: t=8 (seconds, or 2 min), klm=M P BB "text" (KLM operators), f=3 (times it is done), p=L/M/H (error likelihood), c=L/M/H (criticality), mode=A/C/R/I/S (action, checking, retrieval, communication, selection), note=…'} />
         <Choice label="Typing speed for KLM (K)" value={k} onChange={setK} options={KLM_K.map(([v, l]) => [v, `${l.split(' (')[0]} ${v} s`])} />
       </div>
       {parsed.bad.length > 0 && <Problem>Check line{parsed.bad.length > 1 ? 's' : ''} {parsed.bad.slice(0, 8).join(', ')}: a field without = or a plan with no task above it.</Problem>}
