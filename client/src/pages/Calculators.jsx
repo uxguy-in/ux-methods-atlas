@@ -19,6 +19,7 @@ import LossAversion from '../calc/tools/LossAversion.jsx';
 import WeberJND from '../calc/tools/WeberJND.jsx';
 import TreeTest from '../calc/tools/TreeTest.jsx';
 import HTA from '../calc/tools/HTA.jsx';
+import KlmBuilder, { KlmHowTo } from '../calc/tools/KLM-Builder.jsx';
 import CardSort from '../calc/tools/studytools-CardSort.jsx';
 import FirstClick from '../calc/tools/studytools-FirstClick.jsx';
 import SurveystatsFactor from '../calc/tools/SurveystatsFactor.jsx';
@@ -1565,6 +1566,7 @@ function CaptureRecapture() {
 const KLM_SAMPLE = 'H          # hand to the mouse\nP BB       # point at the File menu and click\nP BB       # point at Save As and click\nH          # hands back to the keyboard\n"Q3 report" # type the new name\nK          # press Enter\nR(0.5)     # wait for the save';
 function KLM() {
   const [text, setText] = useState(KLM_SAMPLE); const [k, setK] = useState(0.28); const [auto, setAuto] = useState(true);
+  const [mode, setMode] = useState('form');
   const parsed = S.parseKlm(text);
   const ops = auto ? S.placeM(parsed.ops) : parsed.ops;
   const r = S.klmTime(ops, k);
@@ -1573,8 +1575,12 @@ function KLM() {
   return (
     <>
       <div className="calc-inputs">
-        <Area label="Operators, in order" value={text} onChange={setText} rows={8}
-          hint={'K keystroke, P point, B mouse button press or release (a click is BB), H move hands between mouse and keyboard, M think, R(2) wait 2 seconds for the system. Write 5K for five keystrokes and "text" for one K per character. Anything after # is a comment.'} />
+        <KlmHowTo />
+        <Choice label="Write the steps with" value={mode} onChange={setMode} options={[['form', 'A form'], ['text', 'The operator text']]} />
+        {mode === 'form' ? <KlmBuilder text={text} onChange={setText} k={k} auto={auto} /> : (
+          <Area label="Operators, in order" value={text} onChange={setText} rows={8}
+            hint={'K keystroke, P point, B mouse button press or release (a click is BB), H move hands between mouse and keyboard, M think, R(2) wait 2 seconds for the system. Write 5K for five keystrokes and "text" for one K per character. Anything after # is a comment. See How to write a KLM sequence above.'} />
+        )}
         <Choice label="Typing speed (K)" value={k} onChange={setK} options={S.KLM_K.map(([v, l]) => [v, `${l.split(' (')[0]} ${v} s`])} />
         <Choice label="Mental operators" value={auto ? 'auto' : 'manual'} onChange={(v) => setAuto(v === 'auto')} options={[['auto', 'Place M for me'], ['manual', 'Use my Ms']]} />
       </div>
