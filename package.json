@@ -24,6 +24,7 @@
     "check:runners": "node server/scripts/check-runners.js",
     "check:scorers": "node server/scripts/check-scorers.js",
     "check:signals": "node server/scripts/check-signals.js",
+    "check:statsbench": "node server/scripts/check-statsbench.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

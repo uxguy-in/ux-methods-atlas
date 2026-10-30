@@ -40,6 +40,12 @@ import SignalsClassifierMetrics from '../calc/tools/signals-ClassifierMetrics.js
 import SignalsReactionTime from '../calc/tools/signals-ReactionTime.jsx';
 import SignalsRiskHarm from '../calc/tools/signals-RiskHarm.jsx';
 import SignalsQueueing from '../calc/tools/signals-Queueing.jsx';
+import SbRegression from '../calc/tools/statsbench-Regression.jsx';
+import SbMediation from '../calc/tools/statsbench-Mediation.jsx';
+import SbResampling from '../calc/tools/statsbench-Resampling.jsx';
+import SbDistribution from '../calc/tools/statsbench-Distribution.jsx';
+import SbSurvival from '../calc/tools/statsbench-Survival.jsx';
+import SbTestSelector from '../calc/tools/statsbench-TestSelector.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2706,6 +2712,7 @@ const COMPONENTS = {
   questionnaires: ScorersQuestionnaires, agreement: ScorersAgreement, 'item-analysis': ScorersItemAnalysis, 'survey-weighting': ScorersWeighting,
   'top-tasks': SignalsTopTasks, 'search-analytics': SignalsSearchAnalytics, 'control-charts': SignalsControlCharts, concentration: SignalsConcentration,
   'classifier-metrics': SignalsClassifierMetrics, 'reaction-time': SignalsReactionTime, 'risk-harm': SignalsRiskHarm, queueing: SignalsQueueing,
+  regression: SbRegression, mediation: SbMediation, resampling: SbResampling, 'distribution-check': SbDistribution, survival: SbSurvival, 'test-selector': SbTestSelector,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
