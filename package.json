@@ -28,6 +28,7 @@
     "check:decisions": "node server/scripts/check-decisions.js",
     "check:cogia": "node server/scripts/check-cogia.js",
     "check:causal": "node server/scripts/check-causal.js",
+    "check:surveyx": "node server/scripts/check-surveyx.js",
     "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
   },
   "dependencies": {

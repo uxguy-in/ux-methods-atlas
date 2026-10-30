@@ -65,6 +65,12 @@ import CausalFactorial from '../calc/tools/causal-Factorial.jsx';
 import CausalBandit from '../calc/tools/causal-Bandit.jsx';
 import CausalBrandLift from '../calc/tools/causal-BrandLift.jsx';
 import CausalMarket from '../calc/tools/causal-Market.jsx';
+import SxNonresponse from '../calc/tools/surveyx-Nonresponse.jsx';
+import SxSensitive from '../calc/tools/surveyx-Sensitive.jsx';
+import SxPairedScaling from '../calc/tools/surveyx-Paired.jsx';
+import SxImportancePerformance from '../calc/tools/surveyx-Ipa.jsx';
+import SxAnchoringVignettes from '../calc/tools/surveyx-Vignettes.jsx';
+import SxNorms from '../calc/tools/surveyx-Norms.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2737,6 +2743,8 @@ const COMPONENTS = {
   'ia-graph': CogiaIaGraph, 'iat-dscore': CogiaIat, 'mouse-tracking': CogiaMouse, 'correspondence-analysis': CogiaCorrespondence, 'tolerance-intervals': CogiaTolerance,
   'diff-in-diff': CausalDiD, 'e-value': CausalEValue, 'factorial-designs': CausalFactorial, 'bandit-simulator': CausalBandit,
   'brand-lift': CausalBrandLift, 'market-sizing': CausalMarket,
+  nonresponse: SxNonresponse, 'sensitive-questions': SxSensitive, 'paired-scaling': SxPairedScaling, 'importance-performance': SxImportancePerformance,
+  'anchoring-vignettes': SxAnchoringVignettes, norms: SxNorms,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
