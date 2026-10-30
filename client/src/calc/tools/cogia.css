@@ -58,3 +58,47 @@
 @media (max-width: 640px) {
   .cg-root .calc-field input { width: 110px; }
 }
+
+/* IA graph analysis: how-to guide and form builder (after the decision tree's .dc-howto and .tb-* rules) */
+.cg-mono { font-family: var(--mono); font-size: 13px; }
+.cg-howto { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 16px; background: var(--bg-soft); }
+.cg-howto summary { font-weight: 700; cursor: pointer; }
+.cg-steps { margin: 12px 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14.5px; line-height: 1.5; }
+.cg-annot { font-family: var(--mono); font-size: 12.5px; background: var(--bg); border: 1px solid var(--line); padding: 10px 12px; overflow-x: auto; margin: 0 0 10px; white-space: pre; }
+.ib { display: grid; gap: 18px; min-width: 0; }
+.ib ul { list-style: none; margin: 0; padding: 0; }
+.ib-part { display: grid; gap: 8px; min-width: 0; }
+.ib-h { margin: 0; font-size: 16px; }
+.ib-kids { margin-left: 6px !important; padding-left: 14px !important; border-left: 2px solid var(--line); }
+.ib-node { padding: 5px 0; min-width: 0; }
+.ib-row { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; min-width: 0; }
+.ib-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c2); flex: none; }
+.ib-dot.top { background: var(--c1); border-radius: 2px; }
+.ib input, .ib select { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); min-width: 0; }
+.ib-label { flex: 1 1 180px; display: flex; min-width: 0; }
+.ib-label input { width: 100%; font-weight: 600; }
+.ib-tools { display: flex; gap: 4px; flex: none; }
+.ib-btn { border: 1px solid var(--line); background: var(--bg); color: var(--ink-2); height: 32px; padding: 0 8px; cursor: pointer; border-radius: var(--radius-sm); font: 600 12.5px var(--font); white-space: nowrap; }
+.ib-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
+.ib-btn:disabled { opacity: 0.4; cursor: default; }
+.ib-x { width: 32px; padding: 0; font-size: 16px; }
+.ib-x:hover:not(:disabled) { color: var(--bad); border-color: var(--bad); }
+.ib-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 4px 0 0 18px; font-size: 12.5px; }
+.ib-role { color: var(--ink-3); overflow-wrap: anywhere; }
+.ib-add { background: none; border: 0; padding: 2px 0; color: var(--accent); font: 700 13px var(--font); cursor: pointer; justify-self: start; }
+.ib-add:hover { text-decoration: underline; }
+.ib-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ib-links { display: grid; gap: 8px; }
+.ib-link { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 32px; gap: 6px 8px; align-items: center; }
+.ib-pick { display: flex; min-width: 0; }
+.ib-pick select { width: 100%; }
+.ib-arrow { color: var(--ink-3); }
+.ib-warn { grid-column: 1 / -1; font-size: 12.5px; color: var(--warn, var(--ink-2)); }
+@media (max-width: 600px) {
+  .ib-kids { margin-left: 2px !important; padding-left: 10px !important; }
+  .ib-label { flex-basis: 100%; }
+  .ib-meta { margin-left: 0; }
+  .ib-links { gap: 0; }
+  .ib-link { grid-template-columns: auto minmax(0, 1fr) 32px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .ib-link .ib-pick:nth-of-type(1) { grid-column: 1 / -1; }
+}

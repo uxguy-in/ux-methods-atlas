@@ -4,6 +4,7 @@ import * as GR from './cogia-graph.js';
 import { fmt, sig } from './cogia-core.js';
 import { Table, LoadExample } from './expanalytics-charts.jsx';
 import { Area, Choice, Pick, Result, Stats, Problem, About, Bars, download } from './ui.jsx';
+import IaGraphBuilder from './cogia-IaGraphBuilder.jsx';
 import './cogia.css';
 
 const short = (s, k = 22) => (s.length > k ? `${s.slice(0, k - 1)}…` : s);
@@ -52,6 +53,30 @@ function GraphSvg({ r, layout, sel, onSel }) {
   );
 }
 
+// A plain-language guide to describing a site, with a tiny annotated example.
+function HowToDescribe() {
+  return (
+    <details className="cg-howto">
+      <summary>How to describe your site</summary>
+      <ol className="cg-steps">
+        <li><b>Start with the home page.</b> It is the first line, with nothing in front of it.</li>
+        <li><b>List the main sections under it</b>, one per line, indented two spaces. Each page links to the pages listed under it.</li>
+        <li><b>Go deeper the same way:</b> indent two more spaces to put a page under a section. In the form, use <b>+ Add a child page</b>, or <b>In →</b> and <b>← Out</b> to move a page.</li>
+        <li><b>Add cross-links</b>: links that do not follow the sitemap, such as a "Basket" button on every product page. Write one per line as <span className="cg-mono">From page -&gt; To page</span>, or add them under Cross-links in the form.</li>
+        <li><b>Already have a sitemap?</b> Switch to the text view and paste it in: an exported or copied outline with tabs, spaces, bullets (- or *) or numbers (1.2) works as it is. Names match regardless of case, so "Contact us" and "contact Us" are the same page.</li>
+      </ol>
+      <pre className="cg-annot">{`Home                  ← the home page
+  Shop                ← a section: Home links to Shop
+    Shoes             ← a page in Shop
+  Help
+    Contact us
+# Cross-links         ← lines starting with # are notes
+Shoes -> Contact us   ← an extra link from Shoes to Contact us`}</pre>
+      <p className="cg-note">The options below the editor can add the links most sites have on every page: a link back to the parent page (breadcrumbs) and a link to home (the logo).</p>
+    </details>
+  );
+}
+
 const SORTS = [['pagerank', 'PageRank'], ['betweenness', 'Betweenness'], ['closeness', 'Closeness (out)'], ['integration', 'Integration'], ['depth', 'Clicks from home'], ['input', 'Input order']];
 
 function CogiaIaGraph() {
@@ -60,6 +85,7 @@ function CogiaIaGraph() {
   const [homeLinks, setHomeLinks] = useState(false);
   const [homeName, setHomeName] = useState('');
   const [layout, setLayout] = useState('tree');
+  const [mode, setMode] = useState('form');
   const [sort, setSort] = useState('pagerank');
   const [sel, setSel] = useState(-1);
   const load = () => { setText(GR.EXAMPLE); setUpLinks(false); setHomeLinks(false); setHomeName(''); setSel(-1); };
@@ -74,7 +100,11 @@ function CogiaIaGraph() {
   return (
     <div className="cg-root">
       <LoadExample onClick={load} />
-      <Area label="Sitemap (indent children under their parent) and/or links, one per line as From -> To" value={text} onChange={(v) => { setText(v); setSel(-1); }} rows={10} wrap="off" hint="Indent with spaces or tabs; bullets (-, *) are ignored. A line with ->, → or a tab between two names is a link. Lines starting with # are comments. Names match regardless of case." />
+      <HowToDescribe />
+      <Choice label="Describe your site with" value={mode} onChange={setMode} options={[['form', 'A form'], ['text', 'The text']]} />
+      {mode === 'form'
+        ? <IaGraphBuilder text={text} onChange={(v) => { setText(v); setSel(-1); }} />
+        : <Area label="Sitemap (indent children under their parent) and/or links, one per line as From -> To" value={text} onChange={(v) => { setText(v); setSel(-1); }} rows={10} wrap="off" hint="Indent with spaces or tabs; bullets (-, *) are ignored. A line with ->, → or a tab between two names is a link. Lines starting with # are comments. Names match regardless of case. See How to describe your site above." />}
       <div className="calc-inputs">
         <label className="tl-check"><input type="checkbox" checked={upLinks} onChange={(e) => setUpLinks(e.target.checked)} /> Child pages link back to their parent (breadcrumbs)</label>
         <label className="tl-check"><input type="checkbox" checked={homeLinks} onChange={(e) => setHomeLinks(e.target.checked)} /> Every page links to home (logo)</label>
