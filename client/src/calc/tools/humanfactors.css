@@ -57,3 +57,22 @@
 .hf-tag-bad { color: var(--bad); }
 .hf-root .calc-field input.hf-text { width: 260px; max-width: 100%; }
 .hf-root .calc-field input.hf-text.short { width: 90px; }
+
+/* Fault tree form builder (shares the .tb-* and .dc-howto rules in decisions.css) */
+.hf-examples { align-items: center; gap: 6px; flex-wrap: wrap; }
+.ftb-icon { width: 14px; height: 14px; flex: none; align-self: center; box-sizing: border-box; }
+.ftb-i-and { background: var(--c1); border-radius: 7px 7px 2px 2px; }
+.ftb-i-or { background: var(--c2); border-radius: 7px 7px 2px 2px; }
+.ftb-i-kofn { background: var(--c4); border-radius: 7px 7px 2px 2px; }
+.ftb-i-event { border: 2px solid var(--ink-2); border-radius: 50%; }
+.ftb-i-shared { border: 2px dashed var(--ink-2); border-radius: 50%; }
+.ftb select { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); max-width: 100%; }
+.tb-f.ftb-op { width: 236px; max-width: 100%; }
+.tb-f.ftb-p { width: 136px; }
+.tb-f.ftb-k { width: auto; }
+.ftb-kof { display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 14px; }
+.ftb-kof input { width: 58px; }
+@media (max-width: 600px) {
+  .tb-f.ftb-op { width: calc(100% - 40px); }
+  .tb-f.ftb-p { width: calc(100% - 40px); }
+}
