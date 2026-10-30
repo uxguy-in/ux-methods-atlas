@@ -25,6 +25,10 @@ import ExpMultiCompare from '../calc/tools/expanalytics-MultiCompare.jsx';
 import ExpDecisionMatrix from '../calc/tools/expanalytics-DecisionMatrix.jsx';
 import ExpRetentionFunnel from '../calc/tools/expanalytics-RetentionFunnel.jsx';
 import ExpMetaAnalysis from '../calc/tools/expanalytics-MetaAnalysis.jsx';
+import ScorersQuestionnaires from '../calc/tools/scorers-Questionnaires.jsx';
+import ScorersAgreement from '../calc/tools/scorers-Agreement.jsx';
+import ScorersItemAnalysis from '../calc/tools/scorers-ItemAnalysis.jsx';
+import ScorersWeighting from '../calc/tools/scorers-Weighting.jsx';
 
 // ── Formatting ──
 const pct = (x, d = 1) => (Number.isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—');
@@ -2687,6 +2691,7 @@ const COMPONENTS = {
   'factor-analysis': SurveystatsFactor, 'scale-validity': SurveystatsValidity, 'key-drivers': SurveystatsDrivers, crosstab: SurveystatsCrosstab,
   conjoint: ConjointStudio,
   'ab-health': ExpAbHealth, 'multi-compare': ExpMultiCompare, 'decision-matrix': ExpDecisionMatrix, 'retention-funnel': ExpRetentionFunnel, 'meta-analysis': ExpMetaAnalysis,
+  questionnaires: ScorersQuestionnaires, agreement: ScorersAgreement, 'item-analysis': ScorersItemAnalysis, 'survey-weighting': ScorersWeighting,
 };
 // Names, groups, blurbs and linked methods live in calc/catalog.js, shared with the method pages and the planner.
 const CALCS = CATALOG.map((c) => ({ ...c, C: COMPONENTS[c.id] }));
