@@ -762,3 +762,9 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .report-problem .form-error { margin-bottom: 12px; }
 .report-problem .small-print { margin-top: 12px; }
 @media (max-width: 760px) { .report-problem { padding: 16px; } .report-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* "Ask by voice" in the header: icon and label on wide screens, icon only when space is tight */
+.icon-btn.voice-nav { display: inline-flex; align-items: center; gap: 6px; width: auto; padding: 0 10px; text-decoration: none; }
+.icon-btn.voice-nav.active { outline: 2px solid currentColor; outline-offset: -2px; }
+.voice-nav-label { font-size: 13px; font-weight: 700; white-space: nowrap; }
+@media (max-width: 1500px) { .voice-nav-label { display: none; } .icon-btn.voice-nav { padding: 0; width: 40px; justify-content: center; } }

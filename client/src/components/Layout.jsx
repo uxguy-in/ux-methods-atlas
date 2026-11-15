@@ -100,6 +100,10 @@ export default function Layout({ children }) {
             <button className="icon-btn" onClick={toggle} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
               {isDark ? '☀' : '☾'}
             </button>
+            <NavLink to="/voice" className={({ isActive }) => `icon-btn voice-nav${isActive ? ' active' : ''}`} aria-label="Ask by voice" title="Ask by voice">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z" /></svg>
+              <span className="voice-nav-label">Ask by voice</span>
+            </NavLink>
             <Link to="/find" className="btn small accent">Start here</Link>
             <button className="icon-btn menu-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Menu">≡</button>
           </div>
