@@ -379,7 +379,7 @@ function PlanCta({ sel }) {
   );
 }
 
-function KeyPanel({ current, onSave, onForget, onClose }) {
+export function KeyPanel({ current, onSave, onForget, onClose }) {
   const [key, setKey] = useState('');
   const [remember, setRemember] = useState(isRemembered);
   const [bad, setBad] = useState(false);
@@ -457,7 +457,7 @@ function Shelves({ recs, level, onShuffle }) {
   );
 }
 
-function Plan({ plan }) {
+export function Plan({ plan }) {
   return (
     <article className="ai-plan" aria-live="polite">
       <p className="eyebrow">Research direction</p>

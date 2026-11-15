@@ -1,4 +1,4 @@
-// Say it out loud: speak a research question, or upload an interview recording, and get text back from Whisper running
+// Say it out loud: talk through a research problem and get methods back, speak a research question, or upload an interview recording, and get text back from Whisper running
 // inside the browser (voice/voice.worker.js). A spoken question is matched to the question library and the atlas's
 // methods; a recording becomes a timed transcript for the interview coding workbench. Audio and transcripts stay in
 // this tab: nothing is uploaded, stored or put in a URL, apart from what the visitor chooses to carry into a study plan.
@@ -7,9 +7,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { post } from '../api.js';
 import MethodCard from '../components/MethodCard.jsx';
 import { calcsForMethod } from '../calc/learn.js';
-import { LibraryQuestionPanel, goalsForQuestion, similarQuestions } from '../components/QuestionLinks.jsx';
+import { LibraryQuestionPanel, bestQuestion, goalsForQuestion, similarQuestions } from '../components/QuestionLinks.jsx';
 import { QUESTION_BY_ID, themeOf } from '../questions.js';
-import { toAnswers } from './Finder.jsx';
+import { KeyPanel, Plan, QUESTIONS as FINDER, toAnswers } from './Finder.jsx';
+import { useMeta, useMethods } from '../hooks.js';
+import { planLink } from '../components/ModeSwitch.jsx';
+import { forgetVisitorKey, getVisitorKey, setVisitorKey } from '../visitor-key.js';
+import { TALK_STEPS, adviceText, composeBrief, understand } from '../voice/voice-understand.js';
 import { giveHandoff } from '../voice/handoff.js';
 import { LANGUAGES, MODELS, chunkCount, cleanSpeech, mergeUp, modelId, stamp, toMono, toParagraphs, transcriptText } from '../voice/voice-core.js';
 import '../voice/voice.css';
@@ -111,7 +115,9 @@ function useWhisper() {
 
 export default function Voice() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState('ask');
+  const [mode, setMode] = useState('talk');
+  const [talk, setTalk] = useState({ step: 0, answers: TALK_STEPS.map(() => ''), done: false });
+  const [voiceOn, setVoiceOn] = useState(() => readSettings().voiceOn !== false);
   const [settings, setSettings] = useState(() => ({ size: 'balanced', language: 'english', translate: false, ...readSettings() }));
   const setS = (patch) => setSettings((s) => { const n = { ...s, ...patch }; try { localStorage.setItem(SETTINGS, JSON.stringify(n)); } catch { /* storage unavailable */ } return n; });
   const [rec, startRec, stopRec] = useRecorder();
@@ -145,7 +151,10 @@ export default function Voice() {
       chunks: chunkCount(audio.seconds),
     });
     if (!out) return;
-    if (mode === 'ask') setHeard(cleanSpeech(out.text));
+    if (mode === 'talk') {
+      const said = cleanSpeech(out.text);
+      setTalk((t) => ({ ...t, answers: t.answers.map((a, i) => (i === t.step ? `${a} ${said}`.trim() : a)) }));
+    } else if (mode === 'ask') setHeard(cleanSpeech(out.text));
     else {
       setParas(toParagraphs(out.chunks.length ? out.chunks : [{ start: 0, end: audio.seconds, text: out.text }]));
       if (fileName && !name) setName(fileName.replace(/\.[^.]+$/, '').slice(0, 40));
@@ -165,8 +174,9 @@ export default function Voice() {
           <p className="eyebrow">Voice</p>
           <h1 className="h1">Say it out loud.</h1>
           <p className="lede">
-            Speak a research question and get the methods, calculators and reading that answer it. Or turn an interview
-            recording into a transcript you can code.
+            Tell it about your research: the product, the problem, your users, your time. It comes back with the methods
+            to use and what to do first. You can also ask one quick question, or turn an interview recording into a
+            transcript you can code.
           </p>
           <p className="voice-private"><b>Private by design.</b> The speech model runs in this browser, so your audio never leaves your device. The first time, the browser downloads the model from Hugging Face ({MODELS[settings.size].size}) and keeps it for next time.</p>
         </div>
@@ -175,7 +185,7 @@ export default function Voice() {
       <section className="section">
         <div className="wrap">
           <div className="options compact voice-modes" role="radiogroup" aria-label="What do you want to do?">
-            {[['ask', 'Ask a question', 'Speak for a few seconds and get an answer'], ['transcribe', 'Transcribe a recording', 'Upload or record an interview and get a transcript']].map(([v, l, h]) => (
+            {[['talk', 'Talk it through', 'Describe your research and get methods and a plan back'], ['ask', 'Ask a question', 'Speak for a few seconds and get an answer'], ['transcribe', 'Transcribe a recording', 'Upload or record an interview and get a transcript']].map(([v, l, h]) => (
               <button key={v} type="button" role="radio" className={`option${mode === v ? ' on' : ''}`} aria-checked={mode === v} onClick={() => switchMode(v)} disabled={busy && mode !== v}>
                 <b>{l}</b><small>{h}</small>
               </button>
@@ -202,18 +212,21 @@ export default function Voice() {
             </div>
           </details>
 
-          <div className="voice-input">
+          {mode === 'talk' && !talk.done && (
+            <TalkPrompt talk={talk} voiceOn={voiceOn} setVoiceOn={(v) => { setVoiceOn(v); setS({ voiceOn: v }); if (!v) window.speechSynthesis?.cancel(); }} />
+          )}
+          {!(mode === 'talk' && talk.done) && <div className="voice-input">
             <button type="button" className={`voice-mic${rec.on ? ' on' : ''}`} onClick={toggleRec} disabled={busy && !rec.on} aria-pressed={rec.on}
               style={{ '--level': rec.level }}>
               <svg viewBox="0 0 24 24" aria-hidden="true" width="34" height="34"><path fill="currentColor" d={rec.on ? 'M7 7h10v10H7z' : 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z'} /></svg>
-              <span>{rec.on ? `Stop · ${stamp(rec.seconds)}` : mode === 'ask' ? 'Tap and speak your question' : 'Record'}</span>
+              <span>{rec.on ? `Stop · ${stamp(rec.seconds)}` : mode === 'talk' ? 'Tap and answer' : mode === 'ask' ? 'Tap and speak your question' : 'Record'}</span>
             </button>
             <div className="voice-or">
               <span>or</span>
               <button type="button" className="btn ghost" onClick={() => fileRef.current?.click()} disabled={busy}>Upload an audio file</button>
               <input ref={fileRef} type="file" accept="audio/*,video/webm,video/mp4,.m4a,.mp3,.wav,.ogg,.webm,.flac,.aac" onChange={onFile} hidden />
             </div>
-          </div>
+          </div>}
           {mode === 'ask' && !rec.on && !heard && asr.phase === 'idle' && (
             <p className="voice-tip">Try: “We redesigned checkout and conversions dropped. How do we find out why?”</p>
           )}
@@ -233,6 +246,12 @@ export default function Voice() {
             </div>
           )}
 
+          {mode === 'talk' && !talk.done && <TalkAnswer talk={talk} setTalk={setTalk} busy={busy} />}
+          {mode === 'talk' && talk.done && (
+            <TalkResult answers={talk.answers} voiceOn={voiceOn} navigate={navigate}
+              onEdit={() => setTalk((t) => ({ ...t, done: false, step: 0 }))}
+              onRestart={() => setTalk({ step: 0, answers: TALK_STEPS.map(() => ''), done: false })} />
+          )}
           {mode === 'ask' && heard && <AskResult heard={heard} setHeard={setHeard} navigate={navigate} />}
           {mode === 'transcribe' && paras.length > 0 && (
             <TranscriptResult paras={paras} setParas={setParas} name={name} setName={setName} stamps={stamps} setStamps={setStamps} navigate={navigate} />
@@ -385,6 +404,183 @@ function TranscriptResult({ paras, setParas, name, setName, stamps, setStamps, n
         <button type="button" className="btn ghost" onClick={save}>Download as text</button>
       </div>
       <p className="muted">Nothing here is saved. Download the transcript or carry it into the workbench before you close the tab. Check it against the recording before you quote anyone: speech models mishear names and jargon.</p>
+    </div>
+  );
+}
+
+// ── Talk it through ────────────────────────────────────────────────────────────────────────────────────────────
+function TalkPrompt({ talk, voiceOn, setVoiceOn }) {
+  const s = TALK_STEPS[talk.step];
+  useEffect(() => {
+    if (voiceOn) speak(s.ask, () => {});
+    return () => window.speechSynthesis?.cancel();
+  }, [talk.step]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <div className="talk-prompt" aria-live="polite">
+      <p className="eyebrow">Question {talk.step + 1} of {TALK_STEPS.length}</p>
+      <h2>{s.ask}</h2>
+      <p className="voice-tip">{s.hint} Answer out loud, type, or both. {talk.step === 0 && 'You can also say everything at once here and skip the rest.'}</p>
+      <label className="voice-check"><input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} /> Read the questions and advice aloud</label>
+    </div>
+  );
+}
+
+function TalkAnswer({ talk, setTalk, busy }) {
+  const last = talk.step === TALK_STEPS.length - 1;
+  const any = talk.answers.some((a) => a.trim());
+  const set = (v) => setTalk((t) => ({ ...t, answers: t.answers.map((a, i) => (i === t.step ? v : a)) }));
+  const go = (step) => setTalk((t) => ({ ...t, step }));
+  return (
+    <div className="talk-answer">
+      <label className="field voice-heard">
+        <span>Your answer{talk.answers[talk.step] ? '. Fix any words it got wrong.' : ''}</span>
+        <textarea rows={3} value={talk.answers[talk.step]} onChange={(e) => set(e.target.value)} placeholder="Tap the microphone and talk, or type here." />
+      </label>
+      <div className="voice-actions">
+        {talk.step > 0 && <button type="button" className="btn ghost" onClick={() => go(talk.step - 1)} disabled={busy}>Back</button>}
+        {!last && <button type="button" className="btn accent" onClick={() => go(talk.step + 1)} disabled={busy}>{talk.answers[talk.step].trim() ? 'Next question' : 'Skip this one'}</button>}
+        <button type="button" className={`btn ${last ? 'accent' : 'ghost'}`} onClick={() => setTalk((t) => ({ ...t, done: true }))} disabled={busy || !any}>
+          {last ? 'Get my advice' : 'That is everything, advise me'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const firstSentence = (t) => (String(t || '').match(/^.*?[.!?](?=\s|$)/) || [String(t || '')])[0].slice(0, 220);
+const optionLabel = (qid, v) => FINDER.find((q) => q.id === qid)?.options.find((o) => o.v === v)?.label;
+
+function TalkResult({ answers, voiceOn, navigate, onEdit, onRestart }) {
+  const brief = useMemo(() => composeBrief(answers), [answers]);
+  const read = useMemo(() => understand(brief), [brief]);
+  const [sel, setSel] = useState(read.sel);
+  const [recs, setRecs] = useState(null);
+  useEffect(() => {
+    let live = true;
+    post('/api/recommend', { answers: toAnswers(sel), brief, seed: 1 }).then((r) => { if (live) setRecs(r); }).catch(() => {});
+    return () => { live = false; };
+  }, [JSON.stringify(sel), brief]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Long descriptions dilute a match, so each turn is matched on its own as well as together.
+  const libQ = useMemo(() => bestQuestion([answers[0], answers[1], `${answers[0]} ${answers[1]}`]) || bestQuestion([brief]), [answers, brief]);
+  const { data: all } = useMethods();
+  const { methods, extra } = useMemo(() => {
+    if (!recs) return { methods: [], extra: null };
+    // The question library's methods are hand-picked and ordered easiest first, so they lead; the matcher fills in.
+    const byId = new Map((all || []).map((m) => [m.id, m]));
+    const seen = new Set(), list = [];
+    for (const lm of libQ?.methods || []) { const m = byId.get(lm.id); if (m && !seen.has(m.id)) { seen.add(m.id); list.push({ ...m, libWhy: lm.why }); } }
+    const order = [sel.level || 'newcomer', 'newcomer', 'mid', 'expert'];
+    for (const k of order) for (const m of recs[k] || []) if (!seen.has(m.id)) { seen.add(m.id); list.push(m); }
+    return { methods: list.slice(0, 6), extra: (recs.tryNext || []).find((m) => !seen.has(m.id)) || null };
+  }, [recs, sel.level, libQ, all]);
+  const advice = useMemo(() => adviceText({
+    goalLabels: (sel.goal || []).map((v) => optionLabel('goal', v)).filter(Boolean),
+    timeLabel: sel.time ? optionLabel('time', sel.time) : '',
+    methods: methods.slice(0, 3).map((m) => ({ name: m.name, why: m.libWhy || firstSentence(m.summary) })), extra: libQ ? null : extra, libraryQuestion: libQ?.question || '',
+  }), [sel, methods, extra, libQ]);
+
+  const [talking, setTalking] = useState(false);
+  const say = (text) => { if (speak(text, () => setTalking(false))) setTalking(true); };
+  const spoke = useRef(false);
+  useEffect(() => {
+    if (voiceOn && recs && !spoke.current) { spoke.current = true; say(advice); }
+  }, [recs]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+
+  // The fuller answer: the atlas's AI research direction (Claude), with the server's key or the visitor's own.
+  const { data: meta } = useMeta();
+  const serverKey = Boolean(meta?.ai);
+  const [visitorKey, setKeyState] = useState(getVisitorKey);
+  const [showKey, setShowKey] = useState(false);
+  const [ai, setAi] = useState({ busy: false, plan: null, error: '' });
+  const askClaude = async () => {
+    if (!serverKey && !visitorKey) { setShowKey(true); return; }
+    setAi({ busy: true, plan: null, error: '' });
+    try {
+      const headers = !serverKey && visitorKey ? { 'x-visitor-api-key': visitorKey } : {};
+      const plan = await post('/api/brief', { answers: toAnswers(sel), brief }, headers);
+      setAi({ busy: false, plan, error: '' });
+      if (voiceOn) {
+        const steps = plan.plan.slice(0, 3).map((p, i) => `${['First', 'Then', 'After that'][i]}, ${p.method?.name || 'a method'}: ${p.why}`).join(' ');
+        say(`${plan.decision} ${steps}`);
+      }
+    } catch (e) {
+      setAi({ busy: false, plan: null, error: e.message });
+      if (e.needsKey) setShowKey(true);
+    }
+  };
+
+  const toFinder = () => { giveHandoff('brief', brief); navigate('/find', { state: { carry: sel } }); };
+  const link = planLink(sel);
+  const QS = FINDER.filter((q) => q.id !== 'appetite');
+  const because = (qid) => (read.because[qid] && JSON.stringify(read.sel[qid]) === JSON.stringify(sel[qid]) ? read.because[qid] : null);
+  return (
+    <div className="voice-result talk-result">
+      <div className="talk-advice" aria-live="polite">
+        <p className="eyebrow">Here is what I would do</p>
+        <p className="talk-advice-text">{recs ? advice : 'Thinking…'}</p>
+        <div className="voice-actions">
+          <button type="button" className="btn accent" onClick={() => (talking ? (window.speechSynthesis?.cancel(), setTalking(false)) : say(advice))} disabled={!window.speechSynthesis || !recs}>{talking ? 'Stop reading' : 'Read it aloud'}</button>
+          <button type="button" className="btn ghost" onClick={onEdit}>Change what I said</button>
+          <button type="button" className="skip-link" onClick={onRestart}>Start again</button>
+        </div>
+      </div>
+
+      <details className="talk-understood" open>
+        <summary>What I understood from what you said</summary>
+        <p className="voice-tip">Change anything I got wrong; the methods update. Things you did not mention are left open.</p>
+        <div className="talk-grid">
+          {QS.map((q) => {
+            const vals = q.multi ? (sel.goal || []) : [sel[q.id]];
+            const setVal = (i, v) => {
+              if (!q.multi) { setSel({ ...sel, [q.id]: v || undefined }); return; }
+              const next = [...vals]; next[i] = v; setSel({ ...sel, goal: [...new Set(next.filter(Boolean))] });
+            };
+            const words = because(q.id);
+            return (
+              <div key={q.id} className="talk-row">
+                <span className="label">{q.short}</span>
+                <div className="talk-selects">
+                  {(q.multi ? [0, 1] : [0]).map((i) => (
+                    <select key={i} className="select" value={vals[i] || ''} onChange={(e) => setVal(i, e.target.value)} aria-label={`${q.short}${q.multi ? ` ${i + 1}` : ''}`}>
+                      <option value="">{i ? 'No second goal' : 'Not mentioned'}</option>
+                      {q.options.map((o) => <option key={o.v} value={o.v}>{o.label}</option>)}
+                    </select>
+                  ))}
+                </div>
+                {words && <small className="talk-because">From “{words.join('”, “')}”</small>}
+              </div>
+            );
+          })}
+        </div>
+      </details>
+
+      {methods.length > 0 && (
+        <section className="voice-methods">
+          <h2 className="h2">Methods for your situation</h2>
+          <div className="grid">{[...methods, ...(extra ? [extra] : [])].map((m) => <MethodCard key={m.id} m={m} why={m.why} calcs={calcsForMethod(m.id)} />)}</div>
+        </section>
+      )}
+      {libQ && <LibraryQuestionPanel id={libQ.id} />}
+
+      <section className="talk-claude">
+        <h2 className="h2">Want a full research plan?</h2>
+        <p>Claude reads everything you said against the atlas and writes a research direction: the decision, sharper research questions, a step-by-step plan with the methods, what to watch out for, and how you will know it worked.</p>
+        <p className="muted">{serverKey ? 'This sends your description to Claude.' : 'This uses your own Anthropic API key and sends your description to Anthropic. The audio itself is never sent.'}</p>
+        <div className="voice-actions">
+          <button type="button" className="btn accent" onClick={askClaude} disabled={ai.busy}>{ai.busy ? <><span className="spinner" /> Writing your plan</> : !serverKey && !visitorKey ? 'Add your API key' : 'Get a research direction'}</button>
+          <button type="button" className="btn ghost" onClick={toFinder}>Refine in Find a method</button>
+          <Link to={link.to} state={link.state} onClick={link.onClick} className="btn ghost">Plan a whole study</Link>
+        </div>
+        {!serverKey && showKey && (
+          <KeyPanel current={visitorKey}
+            onSave={(k, remember) => { setVisitorKey(k, remember); setKeyState(k); setShowKey(false); setAi((a) => ({ ...a, error: '' })); }}
+            onForget={() => { forgetVisitorKey(); setKeyState(''); }}
+            onClose={() => setShowKey(false)} />
+        )}
+        {ai.error && <div className="notice error" role="alert">{ai.error}</div>}
+      </section>
+      {ai.plan && <Plan plan={ai.plan} />}
     </div>
   );
 }

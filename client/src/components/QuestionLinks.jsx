@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { QUESTIONS, QUESTION_BY_ID, SYNONYMS, questionsForMethod, themeOf } from '../questions.js';
+import { QUESTION_BY_ID, questionsForMethod, themeOf } from '../questions.js';
 import { LIBRARY } from '../questions-library.js';
 import { calcInfo } from '../calc/learn.js';
 import { useMethodNames } from './CalcLearn.jsx';
@@ -63,27 +63,8 @@ const THEME_GOALS = {
 };
 export const goalsForQuestion = (q) => THEME_GOALS[q?.theme] || [];
 
-const STOP = new Set('a an and are as at be but by can do does for from how i if in is it its me my of on or our should so that the their them they this to us was we what when where which who why will with would you your'.split(' '));
-const fold = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-const words = (s) => fold(s).split(/[^a-z0-9]+/).filter((w) => w.length > 2 && !STOP.has(w));
-const stem = (w) => w.replace(/(ing|ed|es|s)$/, '');
-// Library questions most like a piece of free text (a research question or a brief), best first. Scores the share
-// of the text's words found in the question, its keywords or answer, counting synonyms; the question text weighs most.
-export function similarQuestions(text, max = 4) {
-  const ws = [...new Set(words(text).map(stem))];
-  if (!ws.length) return [];
-  const syn = (w) => SYNONYMS.find((g) => g.some((x) => stem(fold(x)) === w)) || [w];
-  return QUESTIONS.map((q) => {
-    const head = new Set(words([q.question, ...(q.keywords || [])].join(' ')).map(stem));
-    const body = new Set(words([q.answer, q.askInstead?.question].join(' ')).map(stem));
-    let score = 0;
-    for (const w of ws) {
-      const forms = syn(w).map((x) => stem(fold(x)));
-      if (forms.some((f) => head.has(f))) score += 1; else if (forms.some((f) => body.has(f))) score += 0.4;
-    }
-    return { q, score: score / Math.max(3, ws.length) };
-  }).filter((x) => x.score >= 0.3).sort((a, b) => b.score - a.score).slice(0, max).map((x) => x.q);
-}
+export { similarQuestions, bestQuestion } from '../questions-match.js';
+import { similarQuestions } from '../questions-match.js';
 
 // Pick a question from the library: a search box with live matches, or matches for text the visitor already wrote.
 export function QuestionPicker({ onPick, seedText = '', label = 'Start from a question someone asked you', compact, voice }) {
