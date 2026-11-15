@@ -17,6 +17,7 @@ import Biases from './pages/Biases.jsx';
 import Demos from './pages/Demos.jsx';
 import Questions from './pages/Questions.jsx';
 import Practice from './pages/Practice.jsx';
+import Voice from './pages/Voice.jsx';
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/demos" element={<Demos />} />
         <Route path="/questions" element={<Questions />} />
         <Route path="/practice" element={<Practice />} />
+        <Route path="/voice" element={<Voice />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />

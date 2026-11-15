@@ -6,6 +6,7 @@ import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { calcsForMethod } from '../calc/learn.js';
 import ModeSwitch, { planLink } from '../components/ModeSwitch.jsx';
 import { LibraryQuestionPanel, QuestionPicker, goalsForQuestion } from '../components/QuestionLinks.jsx';
+import { takeHandoff } from '../voice/handoff.js';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
 // Shared with the study planner, which asks the same goal and material questions.
@@ -107,7 +108,7 @@ export const QUESTIONS = [
 
 const STORE = 'atlas-finder';
 
-function toAnswers(sel) {
+export function toAnswers(sel) {
   const goals = [...new Set((sel.goal || []).flatMap((v) => QUESTIONS[0].options.find((o) => o.v === v)?.goals || []))];
   const { goal, ...rest } = sel;
   return { ...rest, goals };
@@ -130,8 +131,8 @@ export default function Finder() {
   // Every visit starts blank, so no answer appears chosen before the person chooses it.
   const [sel, setSel] = useRemembered('answers', () => carry || {});
   const [editing, setEditing] = useRemembered('editing', false); // changing one answer from the summary
-  const [brief, setBrief] = useRemembered('brief', '');
-  const [qid, setQid] = useRemembered('qid', ''); // a question picked from the question library
+  const [brief, setBrief] = useRemembered('brief', () => takeHandoff('brief') || '');
+  const [qid, setQid] = useRemembered('qid', () => takeHandoff('qid') || ''); // a question picked from the question library
   const [recs, setRecs] = useState(null);
   const [plan, setPlan] = useRemembered('plan', null);
   const [busy, setBusy] = useState(false);
@@ -257,6 +258,7 @@ export default function Finder() {
           {step === 0 && (
             <QuestionPicker
               label="Or start from a question someone asked you"
+              voice
               onPick={(x) => {
                 setQid(x.id);
                 if (!brief.trim()) setBrief(x.question);

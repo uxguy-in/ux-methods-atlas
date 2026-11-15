@@ -86,7 +86,7 @@ export function similarQuestions(text, max = 4) {
 }
 
 // Pick a question from the library: a search box with live matches, or matches for text the visitor already wrote.
-export function QuestionPicker({ onPick, seedText = '', label = 'Start from a question someone asked you', compact }) {
+export function QuestionPicker({ onPick, seedText = '', label = 'Start from a question someone asked you', compact, voice }) {
   const [q, setQ] = useState('');
   const query = q.trim() || seedText;
   const list = query.trim() ? similarQuestions(query, 5) : [];
@@ -108,6 +108,7 @@ export function QuestionPicker({ onPick, seedText = '', label = 'Start from a qu
           ))}
         </ul>
       )}
+      {voice && <p className="qpick-note">Rather say it? <Link to="/voice">Ask by voice</Link>.</p>}
       {q.trim() && !list.length && <p className="qpick-note">No close match. Try other words, or browse the <Link to="/questions">question library</Link>.</p>}
     </div>
   );

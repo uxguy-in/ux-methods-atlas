@@ -13,6 +13,7 @@ import { runLCA } from './qual-lca.js';
 import { exampleProject } from './qual-example.js';
 import { AxialStep, Coach, ExportStep, OpenStep, PatternsStep, PrepareStep, SelectiveStep, SentimentStep } from './qual-steps.jsx';
 import { About, download } from './ui.jsx';
+import { takeHandoff } from '../../voice/handoff.js';
 import './qual.css';
 
 const STEPS = [
@@ -47,7 +48,13 @@ function useJob() {
 }
 
 function QualCoding() {
-  const [p, setP] = useState(() => exampleProject(Q.emptyProject()));
+  // A transcript carried over from the voice tool starts the project in place of the example.
+  const [p, setP] = useState(() => {
+    const handed = takeHandoff('qual');
+    if (!handed) return exampleProject(Q.emptyProject());
+    const empty = Q.emptyProject();
+    return { ...empty, raw: handed, interviews: Q.prepare(handed, empty.options) };
+  });
   const [tab, setTab] = useState('open');
   const [selCode, setSelCode] = useState('');
   const [dirty, setDirty] = useState(false);

@@ -37,10 +37,12 @@
     "check:demos": "node server/scripts/check-demos.js",
     "check:questions": "node server/scripts/check-questions.js",
     "check:quiz": "node server/scripts/check-quiz.js",
-    "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site"
+    "build:pages": "vite build --mode pages --base ./ --outDir ../site && node server/scripts/copy-data.js site",
+    "check:voice": "node server/scripts/check-voice.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
+    "@huggingface/transformers": "^4.3.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },

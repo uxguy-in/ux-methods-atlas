@@ -10,6 +10,7 @@ const PAGES = [
   [/^\/demos$/, () => 'Weak vs strong'],
   [/^\/questions$/, () => 'Question library'],
   [/^\/practice$/, () => 'Practice'],
+  [/^\/voice$/, () => 'Say it out loud'],
   [/^\/find$/, () => 'your results'],
   [/^\/plan$/, () => 'your study plan'],
   [/^\/methods\/.+/, () => 'previous method'],
