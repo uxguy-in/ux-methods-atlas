@@ -566,7 +566,7 @@ function TalkResult({ answers, voiceOn, navigate, onEdit, onRestart }) {
       <section className="talk-claude">
         <h2 className="h2">Want a full research plan?</h2>
         <p>Claude reads everything you said against the atlas and writes a research direction: the decision, sharper research questions, a step-by-step plan with the methods, what to watch out for, and how you will know it worked.</p>
-        <p className="muted">{serverKey ? 'This sends your description to Claude.' : 'This uses your own Anthropic API key and sends your description to Anthropic. The audio itself is never sent.'}</p>
+        <p className="muted">{serverKey ? 'This sends your description to Claude.' : 'This uses your own Anthropic API key (from the Anthropic Console; a claude.ai subscription does not cover it) and sends your description to Anthropic, usually for a few cents. The audio itself is never sent.'}</p>
         <div className="voice-actions">
           <button type="button" className="btn accent" onClick={askClaude} disabled={ai.busy}>{ai.busy ? <><span className="spinner" /> Writing your plan</> : !serverKey && !visitorKey ? 'Add your API key' : 'Get a research direction'}</button>
           <button type="button" className="btn ghost" onClick={toFinder}>Refine in Find a method</button>

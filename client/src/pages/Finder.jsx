@@ -415,10 +415,20 @@ export function KeyPanel({ current, onSave, onForget, onClose }) {
         {current && <button type="button" className="btn ghost" onClick={onForget}>Forget my key</button>}
         <button type="button" className="btn ghost" onClick={onClose}>Close</button>
       </div>
-      <p className="muted small-print">
-        No key yet? Create one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">console.anthropic.com</a> after
-        adding a payment method under Billing. You can set a monthly spend limit there.
-      </p>
+      <details className="key-howto" open={!current}>
+        <summary>No key yet? How to get one (about five minutes)</summary>
+        <ol>
+          <li>Go to <a href="https://console.anthropic.com" target="_blank" rel="noreferrer">console.anthropic.com</a> and sign up or log in. You can use the same email as your Claude account.</li>
+          <li>Open <b>Billing</b>, add a card and buy a little credit; $5 covers a great many research plans. Set a monthly spend limit there if you like.</li>
+          <li>Open <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">API keys</a>, choose <b>Create key</b>, give it a name such as “UX Methods Atlas” and copy it. It starts with <code>sk-ant-</code> and is shown only once.</li>
+          <li>Paste it in the box above and choose <b>Save key</b>.</li>
+        </ol>
+        <p className="muted small-print">
+          A Claude Pro, Max or Team subscription on claude.ai does not include API use: the API is a separate, pay-as-you-go
+          account in the Anthropic Console. Each research plan costs a few cents. Delete the key in the Console at any
+          time to stop it working.
+        </p>
+      </details>
     </form>
   );
 }

@@ -768,3 +768,7 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .icon-btn.voice-nav.active { outline: 2px solid currentColor; outline-offset: -2px; }
 .voice-nav-label { font-size: 13px; font-weight: 700; white-space: nowrap; }
 @media (max-width: 1500px) { .voice-nav-label { display: none; } .icon-btn.voice-nav { padding: 0; width: 40px; justify-content: center; } }
+.key-howto { margin-top: 6px; }
+.key-howto summary { cursor: pointer; font-weight: 700; font-size: 15px; }
+.key-howto ol { margin: 10px 0 8px; padding-left: 22px; display: grid; gap: 6px; font-size: 15px; line-height: 1.5; }
+.key-howto a { color: var(--accent); font-weight: 700; }
