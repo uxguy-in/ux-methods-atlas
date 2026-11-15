@@ -79,9 +79,6 @@ button { font: inherit; color: inherit; }
 @media (max-width: 640px) { .wrap { padding: 0 16px; } }
 
 /* ── Header ── */
-.announce { background: var(--green); color: #000; font-size: 14px; font-weight: 700; }
-.announce .wrap { display: flex; align-items: center; justify-content: center; gap: 6px 14px; flex-wrap: wrap; min-height: 40px; padding-top: 6px; padding-bottom: 6px; text-align: center; }
-.announce a { font-weight: 900; text-transform: uppercase; letter-spacing: .06em; font-size: 13px; white-space: nowrap; }
 .site-header { position: sticky; top: 0; z-index: 50; background: var(--black); color: #fff; border-top: 3px solid #285295; }
 .site-header .wrap { display: flex; align-items: stretch; gap: 20px; height: 68px; }
 @media (min-width: 1201px) { .logo-text small { display: none; } }
@@ -658,7 +655,7 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 
 /* Printing a study plan: just the plan, in black on white. */
 @media print {
-  .announce, .site-header, .site-footer, .skip, .no-print, .swap, .progress { display: none !important; }
+  .site-header, .site-footer, .skip, .no-print, .swap, .progress { display: none !important; }
   :root { --bg: #fff; --bg-soft: #fff; --ink: #000; --ink-2: #222; --ink-3: #555; --line: #bbb; }
   body { font-size: 12pt; }
   .finder { padding: 0; }

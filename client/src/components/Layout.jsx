@@ -87,12 +87,6 @@ export default function Layout({ children }) {
   return (
     <>
       <a className="skip" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>Skip to content</a>
-      <div className="announce">
-        <div className="wrap">
-          <span>A companion to UX Brighton 2026: Emerging Methods, Friday 6 November, Brighton Dome.</span>
-          <a href="https://uxbri.org/" target="_blank" rel="noreferrer">Visit uxbri.org</a>
-        </div>
-      </div>
       <header className="site-header">
         <div className="wrap">
           <Link to="/" className="logo" aria-label="UX Methods Atlas home">
@@ -117,7 +111,8 @@ export default function Layout({ children }) {
           <div>
             <b>UX Methods Atlas</b>
             <p>Research is more than talking to users and reporting it.<br />Curated by Vivek Gopinath from 250+ books, papers and playbooks, with frameworks proposed by the community.</p>
-            <p className="sister">A sister site to <a href="https://uxbri.org/" target="_blank" rel="noreferrer">UX Brighton</a>.</p>
+            <p className="sister">A companion to the talk “UX research’s quiet inheritance problem”, given at UX Brighton 2026: Emerging Methods, Brighton Dome, 6 November 2026.</p>
+            <p className="sister">The video of the talk will be on the UX Brighton YouTube channel soon. Keep an eye on <a href="https://uxbri.org/" target="_blank" rel="noreferrer">uxbri.org</a> for it.</p>
             <p className="sister">Copyright © 2026 Vivek Gopinath and Danny Hope. All rights reserved.</p>
           </div>
           <nav aria-label="Footer">
