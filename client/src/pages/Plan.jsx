@@ -10,6 +10,7 @@ import ModeSwitch, { PLAN_STORE as STORE, findLink } from '../components/ModeSwi
 import { QUESTIONS as FINDER } from './Finder.jsx';
 import { LibraryQuestionPanel, QuestionPicker, goalsForQuestion } from '../components/QuestionLinks.jsx';
 import { QUESTION_BY_ID } from '../questions.js';
+import { StudyBiasWatch } from '../components/BiasWatch.jsx';
 import { ACCESS, APPROACH, BUDGET, COLLECT, EXPERTISE, FRAMEWORKS, LIMITS, TIME, draftQuestion, planMarkdown, suggestFramework } from '../../../server/lib/plan.js';
 
 // The answers live in the URL (?a=...&step=...), so a plan can be bookmarked, shared and revisited.
@@ -357,6 +358,11 @@ function Roadmap({ s, set, go, reset }) {
               </ShowMoreList>
             </section>
           ))}
+          <StudyBiasWatch
+            title="Biases to watch for in this study"
+            intro="The methods in this plan are especially prone to these biases. Build the first fix for each into your plan before you start."
+            methodIds={plan.phases.flatMap((ph) => ph.items.map((it) => it.method?.id))}
+          />
           <LibraryQuestionPanel id={s.qid} onClear={() => set({ qid: undefined })} />
           <PlanCalculators plan={plan} />
           <p className="muted plan-foot no-print">

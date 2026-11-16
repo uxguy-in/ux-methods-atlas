@@ -27,6 +27,7 @@ const LINKS = [
   ['/design', 'Design & product'],
   ['/library', 'Library'],
   ['/calculators', 'Calculators'],
+  ['/biases', 'Biases'],
   ['/about', 'About'],
 ];
 

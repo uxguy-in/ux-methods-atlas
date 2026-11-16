@@ -6,6 +6,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ShowMoreList } from '../components/ShowMore.jsx';
 import { CalcCard, TabList, tabPanelProps, useMethodNames } from '../components/CalcLearn.jsx';
 import { CALC_INFO, DATA, DATA_KEYS, STAGES, STAGE_KEYS, byPopularity, matches } from '../calc/learn.js';
+import { BiasSearchHits } from '../components/BiasWatch.jsx';
 
 const SORTED = [...CALC_INFO].sort(byPopularity);
 const readData = (v) => (v || '').split(',').filter((k) => DATA_KEYS.includes(k));
@@ -51,6 +52,7 @@ export default function CalculatorIndex() {
               <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2.5" /><path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2.5" /></svg>
               <input type="search" value={q} placeholder="Search by name, question or method, such as “SUS” or “how many participants”" onChange={(e) => update({ q: e.target.value })} />
             </label>
+            <BiasSearchHits q={q} />
 
             <div className="calc-filter">
               <h2 className="label" id={`${idBase}-stage-h`}>Where are you in your study?</h2>

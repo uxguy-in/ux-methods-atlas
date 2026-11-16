@@ -1118,3 +1118,28 @@ export function biasesForStudy(stages, methods) {
   return BIASES.filter((b) => (!stages.length || b.stages.some((s) => stages.includes(s)))
     && (!methods.length || (b.threatens || []).some((m) => methods.includes(m))));
 }
+
+// Biases matching a search typed anywhere on the site, best first: a hit on the name or other names counts most.
+// Every word must appear somewhere in the bias; "bias" and "biases" on their own match nothing, so a search for
+// "confirmation bias" finds confirmation bias rather than all 48.
+const foldText = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const GENERIC = new Set(['bias', 'biases', 'biased', 'effect', 'effects', 'the', 'a', 'an', 'of', 'in', 'and', 'research', 'ux']);
+export function searchBiases(query, max = 6) {
+  const words = foldText(query).split(/[^a-z0-9-]+/).filter((w) => w.length > 1 && !GENERIC.has(w));
+  if (!words.length) return [];
+  return BIASES.map((b) => {
+    const head = foldText([b.name, ...b.aka].join(' '));
+    const body = foldText([b.what, groupOf(b.group).name].join(' '));
+    if (!words.every((w) => head.includes(w) || body.includes(w))) return null;
+    return { b, score: words.filter((w) => head.includes(w)).length * 3 + words.filter((w) => body.includes(w)).length };
+  }).filter(Boolean).sort((x, y) => y.score - x.score).slice(0, max).map((x) => x.b);
+}
+export const mentionsBias = (query) => /\bbias/i.test(String(query || ''));
+
+// The biases a set of methods is especially prone to, most widely shared first, with the methods each affects.
+export function biasesForMethods(methodIds) {
+  const ids = new Set(methodIds.filter(Boolean));
+  return BIASES.map((b) => ({ b, via: (b.threatens || []).filter((m) => ids.has(m)) }))
+    .filter((x) => x.via.length)
+    .sort((x, y) => y.via.length - x.via.length || STAGE_ORDER.indexOf(x.b.stages[0]) - STAGE_ORDER.indexOf(y.b.stages[0]));
+}

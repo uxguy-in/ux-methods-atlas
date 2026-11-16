@@ -7,6 +7,7 @@ import { calcsForMethod } from '../calc/learn.js';
 import ModeSwitch, { planLink } from '../components/ModeSwitch.jsx';
 import { LibraryQuestionPanel, QuestionPicker, goalsForQuestion } from '../components/QuestionLinks.jsx';
 import { takeHandoff } from '../voice/handoff.js';
+import { StudyBiasWatch } from '../components/BiasWatch.jsx';
 import { forgetVisitorKey, getVisitorKey, isRemembered, looksLikeKey, setVisitorKey } from '../visitor-key.js';
 
 // Shared with the study planner, which asks the same goal and material questions.
@@ -358,6 +359,14 @@ export default function Finder() {
       {plan && <Plan plan={plan} />}
 
       {recs && <Shelves recs={recs} level={sel.level} onShuffle={shuffle} />}
+      {recs && (
+        <StudyBiasWatch
+          title="Biases these methods are prone to"
+          intro="Whichever of these methods you pick, watch for the biases below. Each comes with the first thing to do about it."
+          methodIds={Object.values(recs).flat().map((m) => m?.id)}
+          limit={4}
+        />
+      )}
       {recs && <PlanCta sel={sel} />}
       </div>
     </div>

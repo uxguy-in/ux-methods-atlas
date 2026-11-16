@@ -11,6 +11,7 @@ import { BIASES } from '../biases.js';
 import { DEMOS } from '../demos.js';
 import { QUESTIONS } from '../questions.js';
 import { QUESTIONS as QUIZ } from '../quiz.js';
+import { BiasSearchHits } from '../components/BiasWatch.jsx';
 
 // Books listed at a time; "Show more books" adds the next batch.
 const BOOK_PAGE = 40;
@@ -47,6 +48,7 @@ function MethodIndex() {
         </div>
       </div>
       <div className="wrap" style={{ paddingBottom: 88 }}>
+        <BiasSearchHits q={q} />
         <div className="results-line">
           <span>{q ? <>Showing <b>{list.length}</b> of </> : null}<b>{numbered.length}</b> methods, numbered A to Z</span>
           <button className="btn ghost small" onClick={download}>Download as CSV</button>
@@ -95,6 +97,7 @@ function CalcIndex() {
         </div>
       </div>
       <div className="wrap" style={{ paddingBottom: 88 }}>
+        <BiasSearchHits q={q} />
         <div className="results-line">
           <span>{q ? <>Showing <b>{list.length}</b> of </> : null}<b>{numbered.length}</b> calculators, numbered A to Z</span>
           <button className="btn ghost small" onClick={download}>Download as CSV</button>
@@ -226,6 +229,7 @@ function BookList({ counts }) {
         </div>
       </div>
       <div className="wrap" style={{ paddingBottom: 88 }}>
+        <BiasSearchHits q={q} />
         <div className="results-line"><span><b>{list.length}</b> books</span></div>
         {list.slice(0, limit).map((b) => (
           <div key={b.id} className="book-row">

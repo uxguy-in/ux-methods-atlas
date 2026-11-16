@@ -15,6 +15,7 @@ import { planLink } from '../components/ModeSwitch.jsx';
 import { forgetVisitorKey, getVisitorKey, setVisitorKey } from '../visitor-key.js';
 import { TALK_STEPS, adviceText, composeBrief, understand } from '../voice/voice-understand.js';
 import { giveHandoff } from '../voice/handoff.js';
+import { StudyBiasWatch } from '../components/BiasWatch.jsx';
 import { LANGUAGES, MODELS, chunkCount, cleanSpeech, mergeUp, modelId, stamp, toMono, toParagraphs, transcriptText } from '../voice/voice-core.js';
 import '../voice/voice.css';
 
@@ -562,6 +563,7 @@ function TalkResult({ answers, voiceOn, navigate, onEdit, onRestart }) {
         </section>
       )}
       {libQ && <LibraryQuestionPanel id={libQ.id} />}
+      {methods.length > 0 && <StudyBiasWatch title="Biases to watch for" methodIds={[...methods, ...(extra ? [extra] : [])].map((m) => m.id)} limit={4} />}
 
       <section className="talk-claude">
         <h2 className="h2">Want a full research plan?</h2>

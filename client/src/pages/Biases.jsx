@@ -238,9 +238,9 @@ function toMarkdown(list, stages, methods, methodName, linkFor) {
   return lines.join('\n').trim() + '\n';
 }
 
-function CheckStudy({ methodName, onPick, hrefFor, linkFor }) {
+function CheckStudy({ methodName, onPick, hrefFor, linkFor, startMethods = [] }) {
   const [stages, setStages] = useState([]);
-  const [methods, setMethods] = useState([]);
+  const [methods, setMethods] = useState(startMethods);
   const [copied, setCopied] = useState('');
   const list = useMemo(() => biasesForStudy(stages, methods), [stages, methods]);
   const md = useMemo(() => toMarkdown(list, stages, methods, methodName, linkFor), [list, stages, methods, methodName, linkFor]);
@@ -316,9 +316,18 @@ export default function Biases() {
   const q = params.get('q') || '';
   const view = params.get('view') === 'list' ? 'list' : 'map';
   const [status, setStatus] = useState('');
+  // ?check=1 (from a study plan or recommendations) opens at "Check your study", with ?m= methods already ticked.
+  const startMethods = useMemo(() => (params.get('m') || '').split(',').filter((m) => CHECK_METHODS.includes(m)), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!params.get('check')) return undefined;
+    const t = setTimeout(() => scrollToEl(document.getElementById('check-your-study')), 150);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const visible = useMemo(() => new Set(BIASES.filter((b) => (!stage || b.stages.includes(stage)) && matchesQuery(b, q)).map((b) => b.id)), [stage, q]);
-  const filtering = Boolean(stage || q.trim());
+  // ?group= (from the home page) narrows the map to one group, such as "Who you ask".
+  const group = GROUPS.some((g) => g.id === params.get('group')) ? params.get('group') : '';
+  const visible = useMemo(() => new Set(BIASES.filter((b) => (!stage || b.stages.includes(stage)) && (!group || b.group === group) && matchesQuery(b, q)).map((b) => b.id)), [stage, q, group]);
+  const filtering = Boolean(stage || q.trim() || group);
 
   const update = (changes, replace = true) => {
     const next = new URLSearchParams(params);
@@ -391,6 +400,7 @@ export default function Biases() {
           </div>
           <div className="results-line">
             <span>{filtering ? <>Showing <b>{visible.size}</b> of {BIASES.length} biases</> : <><b>{BIASES.length}</b> biases in {GROUPS.length} groups</>}</span>
+            {group && <button type="button" className="chip on" onClick={() => update({ group: '' })} aria-label={`Show all groups, not only ${groupOf(group).name}`}>{groupOf(group).name} ×</button>}
             {!narrow && (
               <div className="bm-view" role="group" aria-label="View">
                 <button type="button" className={`chip${view === 'map' ? ' on' : ''}`} aria-pressed={view === 'map'} onClick={() => update({ view: '' })}>Map</button>
@@ -429,7 +439,7 @@ export default function Biases() {
         </div>
       </section>
 
-      <CheckStudy methodName={methodName} onPick={pick} hrefFor={hrefFor} linkFor={linkFor} />
+      <CheckStudy methodName={methodName} onPick={pick} hrefFor={hrefFor} linkFor={linkFor} startMethods={startMethods} />
     </>
   );
 }

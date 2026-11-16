@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useApi, useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard, { Status } from '../components/MethodCard.jsx';
 import { DESIGN_KIND, STATUS, STATUS_ORDER, slug } from '../vocab.js';
+import { BIASES, GROUPS } from '../biases.js';
 
 const clip = (t, n = 200) => (t.length > n ? `${t.slice(0, t.lastIndexOf(' ', n))}…` : t);
 
@@ -138,6 +139,35 @@ export default function Home() {
               <span className="card-more">Browse design & product methods</span>
             </Link>
           )}
+        </div>
+      </section>
+
+      <section className="section home-biases">
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <p className="eyebrow">Research biases</p>
+              <h2 className="h2">The right method can still give you the wrong answer.</h2>
+            </div>
+            <Link to="/biases" className="btn ghost small">Open the bias map</Link>
+          </div>
+          <p className="lede home-biases-lede">
+            {BIASES.length} biases distort research itself, from who ends up in your sample to what the team decides
+            to hear. See where each one creeps in, how to spot it and what to do about it.
+          </p>
+          <div className="home-bias-groups">
+            {GROUPS.map((g) => (
+              <Link key={g.id} to={`/biases?group=${g.id}`} className="tax-card home-bias-card">
+                <b>{BIASES.filter((b) => b.group === g.id).length}</b>
+                <h3>{g.name}</h3>
+                <p>{g.blurb}</p>
+              </Link>
+            ))}
+          </div>
+          <div className="hero-actions">
+            <Link to="/biases?check=1" className="btn accent small">Check your study for bias</Link>
+            <Link to="/demos" className="btn ghost small">See weak and strong research side by side</Link>
+          </div>
         </div>
       </section>
 

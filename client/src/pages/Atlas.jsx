@@ -4,6 +4,7 @@ import { useMeta, useMethods, useRemembered } from '../hooks.js';
 import MethodCard from '../components/MethodCard.jsx';
 import Loading from '../components/Loading.jsx';
 import { DATA, EFFORT, GOALS, STAGES, STATUS, STATUS_ORDER, VALIDATION, slug } from '../vocab.js';
+import { BiasSearchHits } from '../components/BiasWatch.jsx';
 
 const PAGE = 60;
 
@@ -123,6 +124,7 @@ export default function Atlas() {
         </div>
       </div>
       <div className="wrap">
+        <BiasSearchHits q={q} />
         <div className="results-line">
           <span><b>{list.length}</b> methods</span>
           <label>

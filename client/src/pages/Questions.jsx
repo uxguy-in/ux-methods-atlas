@@ -6,6 +6,7 @@ import { LIBRARY } from '../questions-library.js';
 import { FromLibrary, cite } from '../components/QuestionLinks.jsx';
 import { STAGES, STAGE_KEYS, calcInfo } from '../calc/learn.js';
 import { CalcCard, StageBadges, useMethodNames } from '../components/CalcLearn.jsx';
+import { BiasSearchHits } from '../components/BiasWatch.jsx';
 
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const scrollToEl = (el) => el?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
@@ -177,6 +178,7 @@ export default function Questions() {
               <span aria-hidden="true">⌕</span>
               <input type="search" value={q} onChange={(e) => update({ q: e.target.value })} placeholder="Search questions, e.g. drop off, sample size, trust" aria-label="Search questions" />
             </label>
+            <BiasSearchHits q={q} />
             <div className="filters" role="group" aria-label="Filter by theme">
               <button type="button" className={`chip${!theme ? ' on' : ''}`} aria-pressed={!theme} onClick={() => update({ theme: '' })}>All themes <span className="n">{matching.length}</span></button>
               {THEMES.map((t) => (

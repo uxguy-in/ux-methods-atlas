@@ -118,3 +118,27 @@
 .bias-strip .label { margin: 0; }
 .bias-strip .more { margin-left: auto; font-size: 14px; font-weight: 800; color: var(--accent); }
 .bm-list { list-style: disc; }
+
+/* Biases in search results elsewhere on the site */
+.bias-hits { border: 1px solid var(--line); border-left: 4px solid var(--accent); background: var(--bg-soft); padding: 14px 18px; margin: 16px 0 20px; display: grid; gap: 8px; min-width: 0; }
+.bias-hits .label { margin: 0; }
+.bias-hits ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.bias-hits li { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; overflow-wrap: anywhere; }
+.bias-hits li a { color: var(--accent); margin-right: 4px; }
+.bias-hits p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+.bias-hits .more { font-size: 14px; font-weight: 800; color: var(--accent); }
+
+/* Biases to watch for in a plan or a set of recommendations */
+.study-bias { margin: 36px 0; border-top: 4px solid var(--ink); padding-top: 16px; min-width: 0; }
+.study-bias .eyebrow { margin: 0 0 4px; }
+.study-bias h2 { margin: 0 0 6px; font-size: clamp(22px, 2.6vw, 28px); }
+.study-bias-intro { margin: 0 0 14px; color: var(--ink-2); max-width: 70ch; }
+.study-bias-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.study-bias-item { border: 1px solid var(--line); background: var(--bg); padding: 14px 16px; min-width: 0; }
+.study-bias-item h3 { margin: 0 0 4px; font-size: 17px; line-height: 1.3; }
+.study-bias-item h3 a { color: var(--accent); }
+.study-bias-group { display: inline-block; font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-left: 4px; }
+.study-bias-item p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.study-bias-via { font-size: 13px !important; color: var(--ink-3) !important; }
+.study-bias-foot { margin: 12px 0 0; font-weight: 800; }
+.study-bias-foot a { color: var(--accent); }

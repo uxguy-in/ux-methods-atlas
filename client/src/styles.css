@@ -102,10 +102,10 @@ button { font: inherit; color: inherit; }
   .menu-btn { display: grid; }
   .header-cta .btn { display: none; }
 }
-/* Eight links fill the 1200px header, so on desktop the links tighten and "Start here" gives way to the nav's own "Find a method". */
+/* Nine links fill the 1200px header, so on desktop the links tighten and "Start here" gives way to the nav's own "Find a method". */
 @media (min-width: 1201px) {
-  .site-header .wrap { gap: 14px; }
-  .nav a { padding: 0 8px; letter-spacing: .04em; }
+  .site-header .wrap { gap: 12px; }
+  .nav a { padding: 0 5px; letter-spacing: .02em; }
   .header-cta .btn { display: none; }
 }
 @media (max-width: 420px) { .logo-text small { display: none; } .logo-block { width: 44px; height: 44px; font-size: 19px; } }
@@ -772,3 +772,11 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .key-howto summary { cursor: pointer; font-weight: 700; font-size: 15px; }
 .key-howto ol { margin: 10px 0 8px; padding-left: 22px; display: grid; gap: 6px; font-size: 15px; line-height: 1.5; }
 .key-howto a { color: var(--accent); font-weight: 700; }
+
+/* Home: research biases */
+.home-biases-lede { margin: 0 0 22px; max-width: 64ch; }
+.home-bias-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px; margin-bottom: 22px; }
+.home-bias-card { --sc: var(--accent); padding: 20px; }
+.home-bias-card b { font-size: 32px; }
+.home-bias-card h3 { font-size: 19px; }
+.home-biases .hero-actions .btn { white-space: normal; text-align: center; }
