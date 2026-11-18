@@ -136,7 +136,7 @@ button { font: inherit; color: inherit; }
 
 .eyebrow { font: 900 13px/1.2 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
 /* Eyebrows open a section or page (red, 13px). Labels name a field or group inside one (grey, 12px). */
-.label, .card .fam, .kv dt, .aside-box h3, .phase-label, .lbl, .answers-bar-label, .unearthed-sub, .spotlight dt, .spotlight-meta {
+.label, .card .fam, .kv dt, .aside-box h2, .aside-box h3, .phase-label, .lbl, .answers-bar-label, .unearthed-sub, .spotlight dt, .spotlight-meta {
   font: 800 12px/1.3 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
 }
 .unearthed-head .eyebrow, .card > .eyebrow, .plan-cta .eyebrow, .draft-q .label { margin: 0; }
@@ -254,7 +254,7 @@ a.card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow
 .panel h3 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
 .panel p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
 .aside-box { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-.aside-box h3 { margin-bottom: 12px; }
+.aside-box h2, .aside-box h3 { margin-bottom: 12px; }
 .aside-box ul { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
 .aside-box .ref { font-size: 14px; color: var(--ink-2); }
 .aside-box p { font-size: 14.5px; color: var(--ink-2); line-height: 1.5; }
@@ -339,7 +339,7 @@ textarea.brief { width: 100%; min-height: 200px; border: 2px solid var(--ink); b
 /* ── Library ── */
 .book-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; padding: 20px 0; border-top: 1px solid var(--line); }
 @media (max-width: 760px) { .book-row { grid-template-columns: 1fr; gap: 10px; } }
-.book-row h3 { font-size: 18px; letter-spacing: -0.015em; line-height: 1.25; }
+.book-row h2, .book-row h3 { font-size: 18px; letter-spacing: -0.015em; line-height: 1.25; }
 .book-row .by { color: var(--ink-3); font-size: 14.5px; margin-top: 4px; }
 .book-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .design-card { margin-top: 16px; }
@@ -780,3 +780,4 @@ a.mode-opt:hover { background: var(--bg-sunk); }
 .home-bias-card b { font-size: 32px; }
 .home-bias-card h3 { font-size: 19px; }
 .home-biases .hero-actions .btn { white-space: normal; text-align: center; }
+.empty h2 { font-size: 1.17em; }

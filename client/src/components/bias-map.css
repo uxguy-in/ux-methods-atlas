@@ -7,7 +7,7 @@
 .bm-g5 { --gc: var(--c4); }
 
 .bm-section { padding-top: 40px; }
-.bm-filters { display: grid; gap: 4px; }
+.bm-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
 .bm-filters .filters { margin-top: 10px; }
 .bm-view { display: flex; gap: 6px; }
 .bm-none { margin: 8px 0 24px; }

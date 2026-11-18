@@ -119,16 +119,16 @@ function CalcIndex() {
 
 function ViewSwitch({ view, counts }) {
   return (
-    <div className="view-switch" role="tablist">
-      <Link role="tab" aria-selected={view === 'books'} className={`chip${view === 'books' ? ' on' : ''}`} to="/library">Books{counts.books ? ` (${counts.books})` : ''}</Link>
-      <Link role="tab" aria-selected={view === 'methods'} className={`chip${view === 'methods' ? ' on' : ''}`} to="/library?view=methods">All methods{counts.methods ? ` (${counts.methods})` : ''}</Link>
-      <Link role="tab" aria-selected={view === 'calculators'} className={`chip${view === 'calculators' ? ' on' : ''}`} to="/library?view=calculators">All calculators ({CALC_INFO.length})</Link>
+    <nav className="view-switch" aria-label="Library views">
+      <Link aria-current={view === 'books' ? 'page' : undefined} className={`chip${view === 'books' ? ' on' : ''}`} to="/library">Books{counts.books ? ` (${counts.books})` : ''}</Link>
+      <Link aria-current={view === 'methods' ? 'page' : undefined} className={`chip${view === 'methods' ? ' on' : ''}`} to="/library?view=methods">All methods{counts.methods ? ` (${counts.methods})` : ''}</Link>
+      <Link aria-current={view === 'calculators' ? 'page' : undefined} className={`chip${view === 'calculators' ? ' on' : ''}`} to="/library?view=calculators">All calculators ({CALC_INFO.length})</Link>
       {counts.design > 0 && <Link className="chip" to="/design">{DESIGN_KIND} ({counts.design})</Link>}
       <Link className="chip" to="/biases">Research biases ({BIASES.length})</Link>
       <Link className="chip" to="/demos">Weak vs strong ({DEMOS.length})</Link>
       <Link className="chip" to="/questions">Questions ({QUESTIONS.length})</Link>
       <Link className="chip" to="/practice">Practice ({QUIZ.length})</Link>
-    </div>
+    </nav>
   );
 }
 
@@ -234,7 +234,7 @@ function BookList({ counts }) {
         {list.slice(0, limit).map((b) => (
           <div key={b.id} className="book-row">
             <div>
-              <h3>{b.title}</h3>
+              <h2>{b.title}</h2>
               {b.fullTitle && <div className="by" style={{ marginTop: 2 }}>{b.fullTitle}</div>}
               <div className="by">{b.author}{b.genre ? ` · ${b.genre}` : ''}</div>
               <div className="book-meta">

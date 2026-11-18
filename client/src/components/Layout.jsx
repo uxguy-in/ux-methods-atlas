@@ -87,8 +87,8 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <a className="skip" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>Skip to content</a>
       <header className="site-header">
+        <a className="skip" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>Skip to content</a>
         <div className="wrap">
           <Link to="/" className="logo" aria-label="UX Methods Atlas home">
             <span className="logo-block" aria-hidden="true">UX</span>

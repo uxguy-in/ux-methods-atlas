@@ -68,8 +68,10 @@ export default function Design() {
           <span>{q ? <>Showing <b>{list.length}</b> of </> : null}<b>{methods.length}</b> design & product methods, A to Z</span>
         </div>
         {list.length === 0 ? (
-          <div className="empty"><h3>No practices match.</h3><p>Try another word.</p></div>
+          <div className="empty"><h2>No practices match.</h2><p>Try another word.</p></div>
         ) : (
+          <>
+          <h2 className="sr-only">Design and product methods</h2>
           <div className="grid">
             {list.slice(0, limit).map((m) => (
               <Link key={m.id} to={`/methods/${m.id}`} className="card">
@@ -83,6 +85,7 @@ export default function Design() {
               </Link>
             ))}
           </div>
+          </>
         )}
         {list.length > limit && (
           <div style={{ textAlign: 'center', margin: '40px 0 88px' }}>

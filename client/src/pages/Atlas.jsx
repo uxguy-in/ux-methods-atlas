@@ -138,9 +138,12 @@ export default function Atlas() {
           </label>
         </div>
         {list.length === 0 ? (
-          <div className="empty"><h3>No methods match.</h3><p>Loosen a filter or try another word.</p></div>
+          <div className="empty"><h2>No methods match.</h2><p>Loosen a filter or try another word.</p></div>
         ) : (
-          <div className="grid">{list.slice(0, limit).map((m) => <MethodCard key={m.id} m={m} />)}</div>
+          <>
+            <h2 className="sr-only">Methods</h2>
+            <div className="grid">{list.slice(0, limit).map((m) => <MethodCard key={m.id} m={m} />)}</div>
+          </>
         )}
         {list.length > limit && (
           <div style={{ textAlign: 'center', margin: '40px 0 88px' }}>

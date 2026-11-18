@@ -155,7 +155,7 @@ export function LearnPanel({ c, methodName }) {
   return (
     <section className="calc-learn" aria-labelledby={`${idBase}-h`}>
       <div className="calc-learn-top">
-        <p className="eyebrow" id={`${idBase}-h`}>Before you start</p>
+        <h2 className="eyebrow" id={`${idBase}-h`}>Before you start</h2>
         {c.hasGuide && <p className="calc-q">{c.question}</p>}
       </div>
       <div className="calc-learn-grid">
