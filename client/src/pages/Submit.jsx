@@ -158,7 +158,7 @@ export default function Submit() {
           </p>
         </form>
         <aside className="aside-box">
-          <h3>What happens next</h3>
+          <h2>What happens next</h2>
           <ol className="plain-list">
             <li>Your submission is posted as an issue on the <a href={REPO_URL} target="_blank" rel="noreferrer">project on GitHub</a>.</li>
             <li>A maintainer checks it is not already in the atlas and asks questions there if needed.</li>
