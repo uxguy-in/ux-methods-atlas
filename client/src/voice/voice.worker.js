@@ -31,14 +31,11 @@ self.onmessage = async ({ data }) => {
       callback_function: (t) => { text += t; self.postMessage({ status: 'partial', text, done: done / data.chunks }); },
       on_finalize: () => { done += 1; text += ' '; self.postMessage({ status: 'partial', text, done: Math.min(1, done / data.chunks) }); },
     });
-    const out = await asr(data.audio, {
-      chunk_length_s: 30,
-      stride_length_s: 5,
-      return_timestamps: true,
-      language: data.language || null,
-      task: data.task || 'transcribe',
-      streamer,
-    });
+    // English-only models (*.en) refuse a language or task: transformers.js throws "Cannot specify task or language
+    // for an English-only model". Only multilingual models get them.
+    const opts = { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true, streamer };
+    if (!/\.en$/.test(data.model)) Object.assign(opts, { language: data.language || null, task: data.task || 'transcribe' });
+    const out = await asr(data.audio, opts);
     self.postMessage({ status: 'result', text: out.text, chunks: (out.chunks || []).map((c) => ({ start: c.timestamp[0], end: c.timestamp[1], text: c.text })) });
   } catch (e) {
     self.postMessage({ status: 'error', error: e?.message || String(e) });
